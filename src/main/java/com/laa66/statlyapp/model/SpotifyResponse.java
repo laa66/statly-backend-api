@@ -1,0 +1,42 @@
+package com.laa66.statlyapp.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+import java.util.List;
+
+@JsonPropertyOrder({"total", "items"})
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class SpotifyResponse {
+
+    @JsonProperty("total")
+    private String total;
+
+    @JsonProperty("items")
+    private List<Item> items;
+
+    public String getTotal() {
+        return total;
+    }
+
+    public void setTotal(String total) {
+        this.total = total;
+    }
+
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(List<Item> items) {
+        this.items = items;
+    }
+
+    @Override
+    public String toString() {
+        return "SpotifyResponse{" +
+                "total='" + total + '\'' +
+                ", items=" + items +
+                '}';
+    }
+}
