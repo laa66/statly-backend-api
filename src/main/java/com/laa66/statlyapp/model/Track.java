@@ -6,17 +6,18 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.List;
 
-@JsonPropertyOrder({"artists", "name"})
+@JsonPropertyOrder({"album", "artists", "name"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Track {
+
+    @JsonProperty("album")
+    private Album album;
 
     @JsonProperty("artists")
     private List<Artist> artists;
 
     @JsonProperty("name")
     private String name;
-
-    // TODO: 20.02.2023 Add album property
 
     public List<Artist> getArtists() {
         return artists;
@@ -34,10 +35,19 @@ public class Track {
         this.name = name;
     }
 
+    public Album getAlbum() {
+        return album;
+    }
+
+    public void setAlbum(Album album) {
+        this.album = album;
+    }
+
     @Override
     public String toString() {
         return "Track{" +
-                "artists=" + artists +
+                "album=" + album +
+                ", artists=" + artists +
                 ", name='" + name + '\'' +
                 '}';
     }

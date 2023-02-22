@@ -1,27 +1,23 @@
 package com.laa66.statlyapp.controller;
 
-import com.laa66.statlyapp.model.SpotifyResponse;
+import com.laa66.statlyapp.constants.SpotifyAPI;
+import com.laa66.statlyapp.model.Item;
+import com.laa66.statlyapp.service.SpotifyApiService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
-import java.time.ZoneId;
+import java.util.List;
 
 @RestController
 public class AppController {
 
     @Autowired
-    private OAuth2AuthorizedClientService clientService;
+    private SpotifyApiService spotifyApiService;
 
     @GetMapping("/")
-    public String home(OAuth2AuthenticationToken token) {
+    public String home() {
+        spotifyApiService.getTopArtists(SpotifyAPI.TOP_ARTISTS_SHORT);
         return "hello!";
     }
 
