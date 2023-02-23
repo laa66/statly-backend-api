@@ -6,9 +6,12 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.List;
 
-@JsonPropertyOrder({"images", "name", "url"})
+@JsonPropertyOrder({"genres", "images", "name", "url"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ItemTopArtists {
+
+    @JsonProperty("genres")
+    private List<String> genres;
 
     @JsonProperty("images")
     private List<Image> images;
@@ -18,6 +21,14 @@ public class ItemTopArtists {
 
     @JsonProperty("uri")
     private String uri;
+
+    public List<String> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(List<String> genres) {
+        this.genres = genres;
+    }
 
     public List<Image> getImages() {
         return images;
@@ -46,7 +57,8 @@ public class ItemTopArtists {
     @Override
     public String toString() {
         return "ItemTopArtists{" +
-                "images=" + images +
+                "genres=" + genres +
+                ", images=" + images +
                 ", name='" + name + '\'' +
                 ", uri='" + uri + '\'' +
                 '}';

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.List;
 
-@JsonPropertyOrder({"album", "artists", "name", "uri"})
+@JsonPropertyOrder({"album", "artists", "name", "popularity", "uri"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ItemTopTracks {
 
@@ -18,6 +18,9 @@ public class ItemTopTracks {
 
     @JsonProperty("name")
     private String name;
+
+    @JsonProperty("popularity")
+    private int popularity;
 
     @JsonProperty("uri")
     private String uri;
@@ -46,6 +49,14 @@ public class ItemTopTracks {
         this.name = name;
     }
 
+    public int getPopularity() {
+        return popularity;
+    }
+
+    public void setPopularity(int popularity) {
+        this.popularity = popularity;
+    }
+
     public String getUri() {
         return uri;
     }
@@ -60,6 +71,7 @@ public class ItemTopTracks {
                 "album=" + album +
                 ", artists=" + artists +
                 ", name='" + name + '\'' +
+                ", popularity=" + popularity +
                 ", uri='" + uri + '\'' +
                 '}';
     }

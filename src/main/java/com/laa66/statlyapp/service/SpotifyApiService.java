@@ -1,20 +1,16 @@
 package com.laa66.statlyapp.service;
 
-import com.laa66.statlyapp.model.ItemRecentlyPlayed;
-import com.laa66.statlyapp.model.ItemTopArtists;
-import com.laa66.statlyapp.model.ItemTopTracks;
-
-import java.util.List;
+import com.laa66.statlyapp.model.*;
 
 public interface SpotifyApiService {
 
-    List<ItemTopTracks> getTopTracks(String url);
+    SpotifyResponseTopTracks getTopTracks(String url);
 
-    List<ItemTopArtists> getTopArtists(String url);
+    SpotifyResponseTopArtists getTopArtists(String url);
 
-    //List<Genre> getTopGenres();
+    SpotifyResponseTopGenres getTopGenres(String url);
 
-    List<ItemRecentlyPlayed> getRecentlyPlayed();
+    SpotifyResponseRecentlyPlayed getRecentlyPlayed();
 
     void postPlaylist();
 

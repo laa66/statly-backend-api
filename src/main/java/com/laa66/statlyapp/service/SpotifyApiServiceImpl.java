@@ -8,7 +8,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 public class SpotifyApiServiceImpl implements SpotifyApiService {
@@ -20,35 +20,41 @@ public class SpotifyApiServiceImpl implements SpotifyApiService {
     private RestTemplate restTemplate;
 
     @Override
-    public List<ItemTopTracks> getTopTracks(String url) {
+    public SpotifyResponseTopTracks getTopTracks(String url) {
         ResponseEntity<SpotifyResponseTopTracks> response =
                 restTemplate.exchange(url, HttpMethod.GET, null, SpotifyResponseTopTracks.class);
-        return response.getBody().getItemTopTracks();
+        return response.getBody();
     }
 
     @Override
-    public List<ItemTopArtists> getTopArtists(String url) {
+    public SpotifyResponseTopArtists getTopArtists(String url) {
         ResponseEntity<SpotifyResponseTopArtists> response =
                 restTemplate.exchange(url, HttpMethod.GET, null, SpotifyResponseTopArtists.class);
-        System.out.println("Headers: " + response.getHeaders());
-        System.out.println("Status code: " + response.getStatusCode());
-        System.out.println("Body: " + response.getBody());
-        return response.getBody().getItemTopArtists();
+        return response.getBody();
     }
 
-    //use top tracks here and top artists
- /*
+    // Used User top artists endpoint here for calculating top genres
     @Override
-    public List<Genre> getTopGenres() {
-        return null;
+    public SpotifyResponseTopGenres getTopGenres(String url) {
+        ResponseEntity<SpotifyResponseTopArtists> response = restTemplate.exchange(url, HttpMethod.GET, null, SpotifyResponseTopArtists.class);
+        List<ItemTopArtists> topArtists = response.getBody().getItemTopArtists();
+        HashMap<String, Integer> map = new HashMap<>();
+        topArtists.forEach(list -> list.getGenres()
+                        .forEach(item -> {
+                            map.merge(item, 1, (x,y) -> map.get(item)+1);
+                        }));
+        map.entrySet().stream().sorted(Map.Entry.comparingByValue());
+        SpotifyResponseTopGenres spotifyResponseTopGenres = new SpotifyResponseTopGenres();
+        spotifyResponseTopGenres.setGenres(map);
+        return spotifyResponseTopGenres;
     }
-  */
+
 
     @Override
-    public List<ItemRecentlyPlayed> getRecentlyPlayed() {
+    public SpotifyResponseRecentlyPlayed getRecentlyPlayed() {
         ResponseEntity<SpotifyResponseRecentlyPlayed> response =
                 restTemplate.exchange(SpotifyAPI.RECENTLY_PLAYED_TRACKS, HttpMethod.GET, null, SpotifyResponseRecentlyPlayed.class);
-        return response.getBody().getItems();
+        return response.getBody();
     }
 
     @Override

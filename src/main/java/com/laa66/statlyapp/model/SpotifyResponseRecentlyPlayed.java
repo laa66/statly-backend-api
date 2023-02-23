@@ -14,7 +14,7 @@ public class SpotifyResponseRecentlyPlayed {
     private String total;
 
     @JsonProperty("items")
-    private List<ItemRecentlyPlayed> itemRecentlyPlayeds;
+    private List<ItemRecentlyPlayed> itemRecentlyPlayedList;
 
     public String getTotal() {
         return total;
@@ -24,19 +24,19 @@ public class SpotifyResponseRecentlyPlayed {
         this.total = total;
     }
 
-    public List<ItemRecentlyPlayed> getItems() {
-        return itemRecentlyPlayeds;
+    public List<ItemRecentlyPlayed> getItemRecentlyPlayedList() {
+        return itemRecentlyPlayedList;
     }
 
-    public void setItems(List<ItemRecentlyPlayed> itemRecentlyPlayeds) {
-        this.itemRecentlyPlayeds = itemRecentlyPlayeds;
+    public void setItemRecentlyPlayedList(List<ItemRecentlyPlayed> itemRecentlyPlayedList) {
+        this.itemRecentlyPlayedList = itemRecentlyPlayedList;
     }
 
     @Override
     public String toString() {
         return "SpotifyResponseRecentlyPlayed{" +
                 "total='" + total + '\'' +
-                ", itemRecentlyPlayeds=" + itemRecentlyPlayeds +
+                ", itemRecentlyPlayedList=" + itemRecentlyPlayedList +
                 '}';
     }
 }
