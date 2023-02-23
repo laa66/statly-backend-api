@@ -1,7 +1,7 @@
 package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.constants.SpotifyAPI;
-import com.laa66.statlyapp.model.Item;
+import com.laa66.statlyapp.model.ItemTopTracks;
 import com.laa66.statlyapp.service.SpotifyApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,9 +16,8 @@ public class AppController {
     private SpotifyApiService spotifyApiService;
 
     @GetMapping("/")
-    public String home() {
-        spotifyApiService.getTopArtists(SpotifyAPI.TOP_ARTISTS_SHORT);
-        return "hello!";
+    public List<ItemTopTracks> home() {
+        return spotifyApiService.getTopTracks(SpotifyAPI.TOP_TRACKS_SHORT);
     }
 
 }

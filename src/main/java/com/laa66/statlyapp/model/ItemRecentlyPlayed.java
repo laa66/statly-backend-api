@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonPropertyOrder({"track", "played_at"})
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Item {
+public class ItemRecentlyPlayed {
 
     @JsonProperty("track")
     private Track track;
@@ -32,7 +32,7 @@ public class Item {
 
     @Override
     public String toString() {
-        return "Item{" +
+        return "ItemRecentlyPlayed{" +
                 "track=" + track +
                 ", playedAt='" + playedAt + '\'' +
                 '}';

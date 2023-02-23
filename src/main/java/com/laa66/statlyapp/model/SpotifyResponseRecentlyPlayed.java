@@ -8,13 +8,13 @@ import java.util.List;
 
 @JsonPropertyOrder({"total", "items"})
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SpotifyResponse {
+public class SpotifyResponseRecentlyPlayed {
 
     @JsonProperty("total")
     private String total;
 
     @JsonProperty("items")
-    private List<Item> items;
+    private List<ItemRecentlyPlayed> itemRecentlyPlayeds;
 
     public String getTotal() {
         return total;
@@ -24,19 +24,19 @@ public class SpotifyResponse {
         this.total = total;
     }
 
-    public List<Item> getItems() {
-        return items;
+    public List<ItemRecentlyPlayed> getItems() {
+        return itemRecentlyPlayeds;
     }
 
-    public void setItems(List<Item> items) {
-        this.items = items;
+    public void setItems(List<ItemRecentlyPlayed> itemRecentlyPlayeds) {
+        this.itemRecentlyPlayeds = itemRecentlyPlayeds;
     }
 
     @Override
     public String toString() {
-        return "SpotifyResponse{" +
+        return "SpotifyResponseRecentlyPlayed{" +
                 "total='" + total + '\'' +
-                ", items=" + items +
+                ", itemRecentlyPlayeds=" + itemRecentlyPlayeds +
                 '}';
     }
 }

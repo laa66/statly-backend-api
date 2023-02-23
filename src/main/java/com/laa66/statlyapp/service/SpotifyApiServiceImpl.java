@@ -20,18 +20,20 @@ public class SpotifyApiServiceImpl implements SpotifyApiService {
     private RestTemplate restTemplate;
 
     @Override
-    public List<Item> getTopTracks(String url) {
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
-        return null;
+    public List<ItemTopTracks> getTopTracks(String url) {
+        ResponseEntity<SpotifyResponseTopTracks> response =
+                restTemplate.exchange(url, HttpMethod.GET, null, SpotifyResponseTopTracks.class);
+        return response.getBody().getItemTopTracks();
     }
 
     @Override
-    public List<Item> getTopArtists(String url) {
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
+    public List<ItemTopArtists> getTopArtists(String url) {
+        ResponseEntity<SpotifyResponseTopArtists> response =
+                restTemplate.exchange(url, HttpMethod.GET, null, SpotifyResponseTopArtists.class);
         System.out.println("Headers: " + response.getHeaders());
         System.out.println("Status code: " + response.getStatusCode());
         System.out.println("Body: " + response.getBody());
-        return null;
+        return response.getBody().getItemTopArtists();
     }
 
     //use top tracks here and top artists
@@ -43,8 +45,9 @@ public class SpotifyApiServiceImpl implements SpotifyApiService {
   */
 
     @Override
-    public List<Item> getRecentlyPlayed() {
-        ResponseEntity<SpotifyResponse> response = restTemplate.exchange(SpotifyAPI.RECENTLY_PLAYED_TRACKS, HttpMethod.GET, null, SpotifyResponse.class);
+    public List<ItemRecentlyPlayed> getRecentlyPlayed() {
+        ResponseEntity<SpotifyResponseRecentlyPlayed> response =
+                restTemplate.exchange(SpotifyAPI.RECENTLY_PLAYED_TRACKS, HttpMethod.GET, null, SpotifyResponseRecentlyPlayed.class);
         return response.getBody().getItems();
     }
 
