@@ -24,7 +24,7 @@ public class OAuth2RestTemplateConfig {
     /**
      *  Rest template bean with interceptor for adding
      *  header and checking if tokens need to be refreshed.
-     *  If response status code is other than 200 OK - send request to refresh token.
+     *  If exchange status code is other than 200 OK - send request to refresh token.
      *
      */
     // TODO: 22.02.2023 If user is null try to logout him

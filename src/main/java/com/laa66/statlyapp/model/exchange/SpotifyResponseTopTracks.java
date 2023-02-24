@@ -1,8 +1,9 @@
-package com.laa66.statlyapp.model;
+package com.laa66.statlyapp.model.exchange;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.laa66.statlyapp.model.ItemTopTracks;
 
 import java.util.List;
 

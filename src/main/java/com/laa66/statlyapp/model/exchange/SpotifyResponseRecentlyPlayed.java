@@ -1,20 +1,21 @@
-package com.laa66.statlyapp.model;
+package com.laa66.statlyapp.model.exchange;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.laa66.statlyapp.model.ItemRecentlyPlayed;
 
 import java.util.List;
 
 @JsonPropertyOrder({"total", "items"})
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SpotifyResponseTopArtists {
+public class SpotifyResponseRecentlyPlayed {
 
     @JsonProperty("total")
     private String total;
 
     @JsonProperty("items")
-    private List<ItemTopArtists> itemTopArtists;
+    private List<ItemRecentlyPlayed> itemRecentlyPlayedList;
 
     public String getTotal() {
         return total;
@@ -24,19 +25,19 @@ public class SpotifyResponseTopArtists {
         this.total = total;
     }
 
-    public List<ItemTopArtists> getItemTopArtists() {
-        return itemTopArtists;
+    public List<ItemRecentlyPlayed> getItemRecentlyPlayedList() {
+        return itemRecentlyPlayedList;
     }
 
-    public void setItemTopArtists(List<ItemTopArtists> itemTopArtists) {
-        this.itemTopArtists = itemTopArtists;
+    public void setItemRecentlyPlayedList(List<ItemRecentlyPlayed> itemRecentlyPlayedList) {
+        this.itemRecentlyPlayedList = itemRecentlyPlayedList;
     }
 
     @Override
     public String toString() {
-        return "SpotifyResponseTopArtists{" +
+        return "SpotifyResponseRecentlyPlayed{" +
                 "total='" + total + '\'' +
-                ", itemTopArtists=" + itemTopArtists +
+                ", itemRecentlyPlayedList=" + itemRecentlyPlayedList +
                 '}';
     }
 }

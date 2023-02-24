@@ -1,6 +1,6 @@
 package com.laa66.statlyapp.service;
 
-import com.laa66.statlyapp.model.*;
+import com.laa66.statlyapp.model.exchange.*;
 
 public interface SpotifyApiService {
 
@@ -12,6 +12,10 @@ public interface SpotifyApiService {
 
     SpotifyResponseRecentlyPlayed getRecentlyPlayed();
 
-    void postPlaylist();
+    SpotifyResponseMainstreamScore getMainstreamScore(String url);
+
+    SpotifyResponseId getCurrentUser();
+
+    String postTopTracksPlaylist(String url);
 
 }
