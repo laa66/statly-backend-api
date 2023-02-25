@@ -4,18 +4,18 @@ import com.laa66.statlyapp.model.exchange.*;
 
 public interface SpotifyApiService {
 
-    SpotifyResponseTopTracks getTopTracks(String url);
+    SpotifyResponseTopTracks getTopTracks(String username, String url);
 
-    SpotifyResponseTopArtists getTopArtists(String url);
+    SpotifyResponseTopArtists getTopArtists(String username, String url);
 
-    SpotifyResponseTopGenres getTopGenres(String url);
+    SpotifyResponseTopGenres getTopGenres(String username, String url);
 
-    SpotifyResponseRecentlyPlayed getRecentlyPlayed();
+    SpotifyResponseRecentlyPlayed getRecentlyPlayed(String username);
 
-    SpotifyResponseMainstreamScore getMainstreamScore(String url);
+    SpotifyResponseMainstreamScore getMainstreamScore(String username, String url);
 
     SpotifyResponseId getCurrentUser();
 
-    String postTopTracksPlaylist(String url);
+    String postTopTracksPlaylist(String username, String url);
 
 }

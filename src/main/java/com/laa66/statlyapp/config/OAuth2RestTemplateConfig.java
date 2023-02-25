@@ -38,7 +38,6 @@ public class OAuth2RestTemplateConfig {
             }
             OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
             OAuth2AuthorizedClient client = oAuth2AuthorizedClientService.loadAuthorizedClient(token.getAuthorizedClientRegistrationId(), token.getName());
-
             if (client == null) {
                 LOGGER.info("If client is null try to logout user.");
                 return execution.execute(request, body);

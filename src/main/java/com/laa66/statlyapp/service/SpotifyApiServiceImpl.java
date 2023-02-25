@@ -7,8 +7,11 @@ import com.laa66.statlyapp.model.*;
 import com.laa66.statlyapp.model.exchange.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -23,9 +26,6 @@ import java.util.*;
 public class SpotifyApiServiceImpl implements SpotifyApiService {
 
     @Autowired
-    private OAuth2AuthorizedClientService clientService;
-
-    @Autowired
     private RestTemplate restTemplate;
 
     @Value("classpath:json/post-playlist.json")
@@ -38,68 +38,78 @@ public class SpotifyApiServiceImpl implements SpotifyApiService {
     }
 
     @Override
-    public SpotifyResponseTopTracks getTopTracks(String url) {
+    @Cacheable(cacheNames = "api", key = "#root.methodName + #username + #url")
+    public SpotifyResponseTopTracks getTopTracks(String username, String url) {
+        System.out.println("Fire!");
         ResponseEntity<SpotifyResponseTopTracks> response =
                 restTemplate.exchange(url, HttpMethod.GET, null, SpotifyResponseTopTracks.class);
         return response.getBody();
     }
 
     @Override
-    public SpotifyResponseTopArtists getTopArtists(String url) {
+    @Cacheable(cacheNames = "api", key = "#root.methodName + #username + #url")
+    public SpotifyResponseTopArtists getTopArtists(String username, String url) {
+        System.out.println("Fire!");
         ResponseEntity<SpotifyResponseTopArtists> response =
                 restTemplate.exchange(url, HttpMethod.GET, null, SpotifyResponseTopArtists.class);
         return response.getBody();
     }
 
     @Override
-    public SpotifyResponseTopGenres getTopGenres(String url) {
-        ResponseEntity<SpotifyResponseTopArtists> response =
-                restTemplate.exchange(url, HttpMethod.GET, null, SpotifyResponseTopArtists.class);
-        List<ItemTopArtists> topArtists = response.getBody().getItemTopArtists();
+    @Cacheable(cacheNames = "api", key = "#root.methodName + #username + #url")
+    public SpotifyResponseTopGenres getTopGenres(String username, String url) {
+        System.out.println("Fire!");
+        SpotifyResponseTopArtists response = getTopArtists(username, url);
+        List<ItemTopArtists> topArtists = response.getItemTopArtists();
         HashMap<String, Integer> map = new HashMap<>();
         topArtists.forEach(list -> list.getGenres()
                         .forEach(item -> {
                             map.merge(item, 1, (x,y) -> map.get(item)+1);
                         }));
-        map.entrySet().stream().sorted(Map.Entry.comparingByValue());
         SpotifyResponseTopGenres spotifyResponseTopGenres = new SpotifyResponseTopGenres();
         spotifyResponseTopGenres.setGenres(map);
         return spotifyResponseTopGenres;
     }
 
     @Override
-    public SpotifyResponseMainstreamScore getMainstreamScore(String url) {
-        ResponseEntity<SpotifyResponseTopTracks> response =
-                restTemplate.exchange(url, HttpMethod.GET, null, SpotifyResponseTopTracks.class);
-        OptionalDouble result = response.getBody().getItemTopTracks().stream().mapToDouble(ItemTopTracks::getPopularity).average();
+    @Cacheable(cacheNames = "api", key = "#root.methodName + #username + #url")
+    public SpotifyResponseMainstreamScore getMainstreamScore(String username, String url) {
+        System.out.println("Fire!");
+        SpotifyResponseTopTracks response = getTopTracks(username, url);
+        OptionalDouble result = response.getItemTopTracks().stream().mapToDouble(ItemTopTracks::getPopularity).average();
         SpotifyResponseMainstreamScore score = new SpotifyResponseMainstreamScore();
         score.setScore(result.getAsDouble());
         return score;
     }
 
     @Override
-    public SpotifyResponseRecentlyPlayed getRecentlyPlayed() {
+    @Cacheable(cacheNames = "api", key = "#root.methodName + #username")
+    public SpotifyResponseRecentlyPlayed getRecentlyPlayed(String username) {
+        System.out.println("Fire!");
         ResponseEntity<SpotifyResponseRecentlyPlayed> response =
                 restTemplate.exchange(SpotifyAPI.RECENTLY_PLAYED_TRACKS, HttpMethod.GET, null, SpotifyResponseRecentlyPlayed.class);
         return response.getBody();
     }
 
     @Override
-    public String postTopTracksPlaylist(String url) {
+    public String postTopTracksPlaylist(String username, String url) {
         SpotifyResponseId user = getCurrentUser();
-        String range;
-        switch (url) {
-            case SpotifyAPI.TOP_TRACKS_SHORT -> range = SpotifyAPI.RANGE_SHORT;
-            case SpotifyAPI.TOP_TRACKS_MEDIUM -> range = SpotifyAPI.RANGE_MEDIUM;
-            case SpotifyAPI.TOP_TRACKS_LONG -> range = SpotifyAPI.RANGE_LONG;
-            default -> throw new RuntimeException();
-        }
+        String range = null;
+        if (url.endsWith("short_term")) range = SpotifyAPI.RANGE_SHORT;
+        if (url.endsWith("medium_term")) range = SpotifyAPI.RANGE_MEDIUM;
+        if (url.endsWith("long_term")) range = SpotifyAPI.RANGE_LONG;
+        if (range == null) throw new RuntimeException();
         SpotifyResponseId playlist = postEmptyPlaylist(user, range);
-        List<String> uris = getTopTracks(url).getItemTopTracks().stream().map(ItemTopTracks::getUri).toList();
+        List<String> uris = getTopTracks(username, url).getItemTopTracks().stream().map(ItemTopTracks::getUri).toList();
         return postTracksToPlaylist(playlist, uris);
     }
 
+
     // helpers
+    @Scheduled(cron = "0 0 4 * * *")
+    @CacheEvict(value = "api", allEntries = true)
+    public void clearCache() {}
+
     private SpotifyResponseId postEmptyPlaylist(SpotifyResponseId user, String range) {
         String url = SpotifyAPI.CREATE_TOP_PLAYLIST.replace("user_id", user.getId());
         String body;
