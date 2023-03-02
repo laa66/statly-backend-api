@@ -12,7 +12,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -43,7 +42,7 @@ public class SpotifyApiServiceImpl implements SpotifyApiService {
         System.out.println("Fire!");
         ResponseEntity<SpotifyResponseTopTracks> response =
                 restTemplate.exchange(url, HttpMethod.GET, null, SpotifyResponseTopTracks.class);
-        return response.getBody();
+        return response.getStatusCode() == HttpStatus.OK ? response.getBody() : null;
     }
 
     @Override
@@ -52,7 +51,7 @@ public class SpotifyApiServiceImpl implements SpotifyApiService {
         System.out.println("Fire!");
         ResponseEntity<SpotifyResponseTopArtists> response =
                 restTemplate.exchange(url, HttpMethod.GET, null, SpotifyResponseTopArtists.class);
-        return response.getBody();
+        return response.getStatusCode() == HttpStatus.OK ? response.getBody() : null;
     }
 
     @Override
@@ -60,6 +59,7 @@ public class SpotifyApiServiceImpl implements SpotifyApiService {
     public SpotifyResponseTopGenres getTopGenres(String username, String url) {
         System.out.println("Fire!");
         SpotifyResponseTopArtists response = getTopArtists(username, url);
+        if (response == null) return null;
         List<ItemTopArtists> topArtists = response.getItemTopArtists();
         HashMap<String, Integer> map = new HashMap<>();
         topArtists.forEach(list -> list.getGenres()
@@ -76,6 +76,7 @@ public class SpotifyApiServiceImpl implements SpotifyApiService {
     public SpotifyResponseMainstreamScore getMainstreamScore(String username, String url) {
         System.out.println("Fire!");
         SpotifyResponseTopTracks response = getTopTracks(username, url);
+        if (response == null) return null;
         OptionalDouble result = response.getItemTopTracks().stream().mapToDouble(ItemTopTracks::getPopularity).average();
         SpotifyResponseMainstreamScore score = new SpotifyResponseMainstreamScore();
         score.setScore(result.getAsDouble());
@@ -88,7 +89,7 @@ public class SpotifyApiServiceImpl implements SpotifyApiService {
         System.out.println("Fire!");
         ResponseEntity<SpotifyResponseRecentlyPlayed> response =
                 restTemplate.exchange(SpotifyAPI.RECENTLY_PLAYED_TRACKS, HttpMethod.GET, null, SpotifyResponseRecentlyPlayed.class);
-        return response.getBody();
+        return response.getStatusCode() == HttpStatus.OK ? response.getBody() : null;
     }
 
     @Override
@@ -121,7 +122,7 @@ public class SpotifyApiServiceImpl implements SpotifyApiService {
             throw new RuntimeException();
         }
         ResponseEntity<SpotifyResponseId> response = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(body), SpotifyResponseId.class);
-        return response.getBody();
+        return response.getStatusCode() == HttpStatus.CREATED ? response.getBody() : null;
     }
 
     private String postTracksToPlaylist(SpotifyResponseId playlist, List<String> uris) {
@@ -137,6 +138,6 @@ public class SpotifyApiServiceImpl implements SpotifyApiService {
         ResponseEntity<String> response =
                 restTemplate.exchange(SpotifyAPI.ADD_PLAYLIST_TRACK
                         .replace("playlist_id", playlist.getId()), HttpMethod.POST, new HttpEntity<>(body), String.class);
-        return response.getBody();
+        return response.getStatusCode() == HttpStatus.CREATED ? response.getBody() : null;
     }
 }

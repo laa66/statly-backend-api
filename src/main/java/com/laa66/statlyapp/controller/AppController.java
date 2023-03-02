@@ -4,7 +4,6 @@ import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.model.exchange.*;
 import com.laa66.statlyapp.service.SpotifyApiService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -15,14 +14,6 @@ public class AppController {
 
     @Autowired
     private SpotifyApiService spotifyApiService;
-
-    @Autowired
-    private ConcurrentMapCacheManager cacheManager;
-
-    @GetMapping("/home")
-    public String home() {
-       return null;
-    }
 
     @GetMapping("/top/tracks")
     public SpotifyResponseTopTracks tracks(@RequestParam("range") String range, Principal principal) {
@@ -54,7 +45,7 @@ public class AppController {
         return spotifyApiService.getMainstreamScore(principal.getName(), url);
     }
 
-    @PostMapping("/playlist/create")
+    @GetMapping("/playlist/create")
     public String createPlaylist(@RequestParam("range") String range, Principal principal) {
         String url = SpotifyAPI.TOP_TRACKS + range + "_term";
         return spotifyApiService.postTopTracksPlaylist(principal.getName(), url);
