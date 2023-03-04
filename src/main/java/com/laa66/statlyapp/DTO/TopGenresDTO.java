@@ -1,8 +1,8 @@
-package com.laa66.statlyapp.model.exchange;
+package com.laa66.statlyapp.DTO;
 
 import java.util.Map;
 
-public class SpotifyResponseTopGenres {
+public class TopGenresDTO {
 
     private Map<String, Integer> genres;
 
@@ -16,7 +16,7 @@ public class SpotifyResponseTopGenres {
 
     @Override
     public String toString() {
-        return "SpotifyResponseTopGenres{" +
+        return "TopGenresDTO{" +
                 "genres=" + genres +
                 '}';
     }

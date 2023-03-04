@@ -1,6 +1,6 @@
-package com.laa66.statlyapp.model.exchange;
+package com.laa66.statlyapp.DTO;
 
-public class SpotifyResponseMainstreamScore {
+public class MainstreamScoreDTO {
     private double score;
 
     public double getScore() {
@@ -13,7 +13,7 @@ public class SpotifyResponseMainstreamScore {
 
     @Override
     public String toString() {
-        return "SpotifyResponseMainstreamScore{" +
+        return "MainstreamScoreDTO{" +
                 "score=" + score +
                 '}';
     }

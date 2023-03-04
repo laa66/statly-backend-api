@@ -1,6 +1,9 @@
 package com.laa66.statlyapp.service;
 
+import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.model.AccessToken;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.*;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -16,8 +19,12 @@ import java.util.*;
 @Service
 public class SpotifyTokenServiceImpl implements SpotifyTokenService {
 
+    @Autowired
+    @Qualifier("restTemplate")
+    private RestTemplate restTemplate;
+
     @Override
-    public OAuth2AccessToken getNewAccessToken(OAuth2AuthorizedClient client) {
+    public OAuth2AccessToken refreshAccessToken(OAuth2AuthorizedClient client) {
         AccessToken refreshedToken = postRefreshTokenRequest(client);
         String[] scopeArr = refreshedToken.getScope().split(" ");
         Set<String> scopes = new HashSet<>(Arrays.stream(scopeArr).toList());
@@ -35,8 +42,7 @@ public class SpotifyTokenServiceImpl implements SpotifyTokenService {
         headers.setBasicAuth(encoded);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         HttpEntity<?> entity = new HttpEntity<>(refreshBody, headers);
-        RestTemplate restTemplateTemp = new RestTemplate();
-        ResponseEntity<AccessToken> response = restTemplateTemp.exchange("https://accounts.spotify.com/api/token", HttpMethod.POST, entity, AccessToken.class);
+        ResponseEntity<AccessToken> response = restTemplate.exchange(SpotifyAPI.TOKEN_ENDPOINT, HttpMethod.POST, entity, AccessToken.class);
         return response.getBody();
     }
 }

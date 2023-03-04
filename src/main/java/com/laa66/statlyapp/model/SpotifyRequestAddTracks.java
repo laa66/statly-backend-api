@@ -1,4 +1,4 @@
-package com.laa66.statlyapp.model.exchange;
+package com.laa66.statlyapp.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

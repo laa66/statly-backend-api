@@ -1,4 +1,4 @@
-package com.laa66.statlyapp.model.exchange;
+package com.laa66.statlyapp.DTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,13 +9,21 @@ import java.util.List;
 
 @JsonPropertyOrder({"total", "items"})
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SpotifyResponseRecentlyPlayed {
+public class RecentlyPlayedDTO {
 
     @JsonProperty("total")
     private String total;
 
     @JsonProperty("items")
     private List<ItemRecentlyPlayed> itemRecentlyPlayedList;
+
+    public RecentlyPlayedDTO() {
+    }
+
+    public RecentlyPlayedDTO(String total, List<ItemRecentlyPlayed> itemRecentlyPlayedList) {
+        this.total = total;
+        this.itemRecentlyPlayedList = itemRecentlyPlayedList;
+    }
 
     public String getTotal() {
         return total;
@@ -35,7 +43,7 @@ public class SpotifyResponseRecentlyPlayed {
 
     @Override
     public String toString() {
-        return "SpotifyResponseRecentlyPlayed{" +
+        return "RecentlyPlayedDTO{" +
                 "total='" + total + '\'' +
                 ", itemRecentlyPlayedList=" + itemRecentlyPlayedList +
                 '}';

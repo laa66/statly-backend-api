@@ -1,0 +1,4 @@
+{
+  "name": "Top tracks %range% %date%",
+  "description": "Your most played tracks on Spotify %range%. Created by Statly"
+}

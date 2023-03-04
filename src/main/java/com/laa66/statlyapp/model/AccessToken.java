@@ -16,6 +16,16 @@ public class AccessToken {
     @JsonProperty("expires_in")
     private int expiresIn;
 
+    public AccessToken() {
+    }
+
+    public AccessToken(String accessToken, String tokenType, String scope, int expiresIn) {
+        this.accessToken = accessToken;
+        this.tokenType = tokenType;
+        this.scope = scope;
+        this.expiresIn = expiresIn;
+    }
+
     public String getAccessToken() {
         return accessToken;
     }

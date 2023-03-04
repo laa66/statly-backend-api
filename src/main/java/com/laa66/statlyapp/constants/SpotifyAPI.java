@@ -2,6 +2,9 @@ package com.laa66.statlyapp.constants;
 
 public class SpotifyAPI {
 
+    // Spotify API token endpoint
+    public final static String TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token";
+
     // GET current user info
     public final static String CURRENT_USER = "https://api.spotify.com/v1/me";
 

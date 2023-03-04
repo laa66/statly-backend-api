@@ -1,20 +1,20 @@
 package com.laa66.statlyapp.service;
 
-import com.laa66.statlyapp.model.exchange.*;
+import com.laa66.statlyapp.DTO.*;
 
-public interface SpotifyApiService {
+public interface SpotifyAPIService {
 
-    SpotifyResponseTopTracks getTopTracks(String username, String url);
+    TopTracksDTO getTopTracks(String username, String url);
 
-    SpotifyResponseTopArtists getTopArtists(String username, String url);
+    TopArtistsDTO getTopArtists(String username, String url);
 
-    SpotifyResponseTopGenres getTopGenres(String username, String url);
+    TopGenresDTO getTopGenres(String username, String url);
 
-    SpotifyResponseRecentlyPlayed getRecentlyPlayed(String username);
+    RecentlyPlayedDTO getRecentlyPlayed(String username);
 
-    SpotifyResponseMainstreamScore getMainstreamScore(String username, String url);
+    MainstreamScoreDTO getMainstreamScore(String username, String url);
 
-    SpotifyResponseId getCurrentUser();
+    UserIdDTO getCurrentUser();
 
     String postTopTracksPlaylist(String username, String url);
 
