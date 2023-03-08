@@ -7,6 +7,14 @@ public class MainstreamScoreDTO {
         return score;
     }
 
+    public MainstreamScoreDTO() {
+
+    }
+
+    public MainstreamScoreDTO(double score) {
+        this.score = score;
+    }
+
     public void setScore(double score) {
         this.score = score;
     }

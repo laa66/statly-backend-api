@@ -45,7 +45,7 @@ public class AppController {
         return spotifyApiService.getMainstreamScore(principal.getName(), url);
     }
 
-    @GetMapping("/playlist/create")
+    @PostMapping("/playlist/create")
     public String createPlaylist(@RequestParam("range") String range, Principal principal) {
         String url = SpotifyAPI.TOP_TRACKS + range + "_term";
         return spotifyApiService.postTopTracksPlaylist(principal.getName(), url);

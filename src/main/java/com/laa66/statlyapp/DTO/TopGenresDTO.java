@@ -6,6 +6,14 @@ public class TopGenresDTO {
 
     private Map<String, Integer> genres;
 
+    public TopGenresDTO() {
+
+    }
+
+    public TopGenresDTO(Map<String, Integer> genres) {
+        this.genres = genres;
+    }
+
     public Map<String, Integer> getGenres() {
         return genres;
     }
