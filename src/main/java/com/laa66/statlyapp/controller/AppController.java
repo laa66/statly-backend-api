@@ -4,16 +4,28 @@ import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.security.Principal;
 
 @RestController
 @RequestMapping("/api")
 public class AppController {
 
+    @Value("${dev.react-app.url}")
+    private String REACT_URL;
+
     @Autowired
     private SpotifyAPIService spotifyApiService;
+
+    @GetMapping("/auth")
+    public ResponseEntity<Void> user() {
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(REACT_URL + "/dashboard")).build();
+    }
 
     @GetMapping("/top/tracks")
     public TopTracksDTO tracks(@RequestParam("range") String range, Principal principal) {
@@ -50,5 +62,4 @@ public class AppController {
         String url = SpotifyAPI.TOP_TRACKS + range + "_term";
         return spotifyApiService.postTopTracksPlaylist(principal.getName(), url);
     }
-
 }
