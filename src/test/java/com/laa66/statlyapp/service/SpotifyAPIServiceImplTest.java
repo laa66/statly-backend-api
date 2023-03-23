@@ -117,9 +117,9 @@ class SpotifyAPIServiceImplTest {
     @Test
     void shouldGetTopGenresWithValidUrl() {
         ItemTopArtists artist1 = new ItemTopArtists();
-        artist1.setGenres(List.of("classic", "rock"));
+        artist1.setGenres(List.of("classic", "classic", "classic", "rock", "rock", "rock", "rock"));
         ItemTopArtists artist2 = new ItemTopArtists();
-        artist2.setGenres(List.of("classic"));
+        artist2.setGenres(List.of("classic", "classic", "classic"));
         TopArtistsDTO dto = new TopArtistsDTO();
         dto.setItemTopArtists(List.of(artist1, artist2));
 
@@ -130,8 +130,8 @@ class SpotifyAPIServiceImplTest {
                 , SpotifyAPI.TOP_ARTISTS + "long_term");
 
         assertEquals(2, returnDto.getGenres().size());
-        assertEquals(2, returnDto.getGenres().get("classic"));
-        assertEquals(1, returnDto.getGenres().get("rock"));
+        assertEquals(60, returnDto.getGenres().get(0).getScore());
+        assertEquals(40, returnDto.getGenres().get(1).getScore());
     }
 
     @Test

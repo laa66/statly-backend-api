@@ -23,6 +23,8 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class SpotifyAPIServiceImpl implements SpotifyAPIService {
@@ -63,13 +65,16 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
         if (response == null) return null;
         List<ItemTopArtists> topArtists = response.getItemTopArtists();
         HashMap<String, Integer> map = new HashMap<>();
-        topArtists.forEach(list -> list.getGenres()
-                        .forEach(item -> {
-                            map.merge(item, 1, (x,y) -> map.get(item)+1);
-                        }));
-        TopGenresDTO topGenresDTO = new TopGenresDTO();
-        topGenresDTO.setGenres(map);
-        return topGenresDTO;
+        topArtists.forEach(list -> list.getGenres().forEach(item -> {
+                            map.merge(item, 1, (x,y) -> map.get(item)+1);}));
+        List<Genre> genres = new ArrayList<>();
+        map.forEach((x, y) -> genres.add(new Genre(x, y)));
+        genres.sort(Comparator.reverseOrder());
+        List<Genre> sliceGenres = genres.size() > 8 ? genres.subList(0, 8) : genres;
+        double sum = sliceGenres.stream().mapToInt(Genre::getScore).sum();
+        return new TopGenresDTO(sliceGenres.stream()
+                .map(item -> new Genre(item.getGenre(), Double.valueOf((item.getScore() / sum) * 100)
+                        .intValue())).collect(Collectors.toList()));
     }
 
     @Override

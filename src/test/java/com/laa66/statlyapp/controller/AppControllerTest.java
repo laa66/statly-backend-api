@@ -2,6 +2,7 @@ package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.constants.SpotifyAPI;
+import com.laa66.statlyapp.model.Genre;
 import com.laa66.statlyapp.model.ItemRecentlyPlayed;
 import com.laa66.statlyapp.model.ItemTopArtists;
 import com.laa66.statlyapp.model.ItemTopTracks;
@@ -49,7 +50,7 @@ class AppControllerTest {
     static void prepare() {
          tracksDTO = new TopTracksDTO(List.of(new ItemTopTracks()), "1");
          artistsDTO = new TopArtistsDTO("1", List.of(new ItemTopArtists()));
-         genresDTO = new TopGenresDTO(Map.of("rock", 2));
+         genresDTO = new TopGenresDTO(List.of(new Genre("rock", 2)));
          recentlyDTO = new RecentlyPlayedDTO("1", List.of(new ItemRecentlyPlayed()));
          mainstreamScoreDTO = new MainstreamScoreDTO(75.00);
     }
@@ -135,7 +136,8 @@ class AppControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("range", "short"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.genres", hasEntry(is("rock"), is(2))))
+                .andExpect(jsonPath("$.genres[0].genre", is("rock")))
+                .andExpect(jsonPath("$.genres[0].score", is(2)))
                 .andDo(print());
     }
 
