@@ -3,13 +3,12 @@ package com.laa66.statlyapp.controller;
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.service.SpotifyAPIService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.security.Principal;
 
 @RestController
@@ -23,8 +22,11 @@ public class AppController {
     private SpotifyAPIService spotifyApiService;
 
     @GetMapping("/auth")
-    public ResponseEntity<Void> user() {
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(REACT_URL + "/dashboard")).build();
+    public void user(HttpServletRequest request, HttpServletResponse response) {
+        UserIdDTO userIdDTO = spotifyApiService.getCurrentUser();
+        response.setStatus(HttpServletResponse.SC_TEMPORARY_REDIRECT);
+        String imageUrl = userIdDTO.getImages().size() > 0 ? userIdDTO.getImages().get(0).getUrl() : "none";
+        response.setHeader("location", REACT_URL + "/callback?name=" + userIdDTO.getDisplayName() + "&url=" + imageUrl);
     }
 
     @GetMapping("/top/tracks")

@@ -17,6 +17,8 @@ public class Image {
     @JsonProperty("width")
     private Integer width;
 
+
+
     public String getUrl() {
         return url;
     }

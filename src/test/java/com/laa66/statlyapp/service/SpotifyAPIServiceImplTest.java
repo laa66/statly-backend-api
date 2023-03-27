@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
+import com.laa66.statlyapp.model.Image;
 import com.laa66.statlyapp.model.ItemRecentlyPlayed;
 import com.laa66.statlyapp.model.ItemTopArtists;
 import com.laa66.statlyapp.model.ItemTopTracks;
@@ -36,12 +37,14 @@ class SpotifyAPIServiceImplTest {
 
     @Test
     void shouldGetCurrentUser() {
-        UserIdDTO dto = new UserIdDTO("1");
+        UserIdDTO dto = new UserIdDTO("testuser", "testuser", List.of(new Image()));
         when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER),
                 eq(HttpMethod.GET), any(), eq(UserIdDTO.class)))
                 .thenReturn(new ResponseEntity<>(dto, HttpStatus.OK));
         UserIdDTO returnDto = spotifyAPIService.getCurrentUser();
         assertEquals(dto.getId(), returnDto.getId());
+        assertEquals(dto.getDisplayName(), returnDto.getDisplayName());
+        assertEquals(1, dto.getImages().size());
     }
 
     @Test
@@ -157,10 +160,10 @@ class SpotifyAPIServiceImplTest {
 
     @Test
     void shouldPostTopTracksPlaylistWithValidUrl() {
-        UserIdDTO userIdDTO = new UserIdDTO("1");
+        UserIdDTO userIdDTO = new UserIdDTO("testuser", "testuser", List.of(new Image()));
         TopTracksDTO tracksDTO = new TopTracksDTO(List.of(new ItemTopTracks()
                 , new ItemTopTracks()), "2");
-        UserIdDTO playlistIdDTO = new UserIdDTO("10");
+        UserIdDTO playlistIdDTO = new UserIdDTO("10", "10", List.of(new Image()));
         String snapshotId = "snapshotId";
 
         when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER),
@@ -181,7 +184,7 @@ class SpotifyAPIServiceImplTest {
 
     @Test
     void shouldPostTopTracksPlaylistWithNotValidUrl() {
-        UserIdDTO userIdDTO = new UserIdDTO("1");
+        UserIdDTO userIdDTO = new UserIdDTO("testuser", "testuser", List.of(new Image()));
         when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER),
                 eq(HttpMethod.GET), any(), eq(UserIdDTO.class)))
                 .thenReturn(new ResponseEntity<>(userIdDTO, HttpStatus.OK));
@@ -190,10 +193,10 @@ class SpotifyAPIServiceImplTest {
 
     @Test
     void shouldPostTopTracksPlaylistWithValidUrlIfPostingFailed() {
-        UserIdDTO userIdDTO = new UserIdDTO("1");
+        UserIdDTO userIdDTO = new UserIdDTO("testuser", "testuser", List.of(new Image()));
         TopTracksDTO tracksDTO = new TopTracksDTO(List.of(new ItemTopTracks()
                 , new ItemTopTracks()), "2");
-        UserIdDTO playlistIdDTO = new UserIdDTO("10");
+        UserIdDTO playlistIdDTO = new UserIdDTO("10", "10", List.of(new Image()));
 
         when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER),
                 eq(HttpMethod.GET), any(), eq(UserIdDTO.class)))
