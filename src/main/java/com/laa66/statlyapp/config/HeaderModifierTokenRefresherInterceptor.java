@@ -33,7 +33,6 @@ public class HeaderModifierTokenRefresherInterceptor implements ClientHttpReques
     private SpotifyTokenService tokenService;
 
 
-
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
