@@ -3,35 +3,15 @@ package com.laa66.statlyapp.controller;
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.service.SpotifyAPIService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
-import org.springframework.security.web.context.SecurityContextHolderFilter;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.WebUtils;
 
-import java.io.IOException;
 import java.security.Principal;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -51,39 +31,44 @@ public class AppController {
     }
 
     @GetMapping("/top/tracks")
-    public TopTracksDTO tracks(@RequestParam("range") String range, Principal principal) {
+    public ResponseEntity<TopTracksDTO> tracks(@RequestParam("range") String range, Principal principal) {
         String url = SpotifyAPI.TOP_TRACKS + range + "_term";
-        return spotifyApiService.getTopTracks(principal.getName(), url);
+        TopTracksDTO topTracks = spotifyApiService.getTopTracks(principal.getName(), url);
+        return new ResponseEntity<>(topTracks, topTracks == null ? HttpStatus.BAD_REQUEST : HttpStatus.OK);
     }
 
-
     @GetMapping("/top/artists")
-    public TopArtistsDTO artists(@RequestParam("range") String range, Principal principal) {
+    public ResponseEntity<TopArtistsDTO> artists(@RequestParam("range") String range, Principal principal) {
         String url = SpotifyAPI.TOP_ARTISTS + range + "_term";
-        return spotifyApiService.getTopArtists(principal.getName(), url);
+        TopArtistsDTO topArtists = spotifyApiService.getTopArtists(principal.getName(), url);
+        return new ResponseEntity<>(topArtists, topArtists == null ? HttpStatus.BAD_REQUEST : HttpStatus.OK);
     }
 
     @GetMapping("/top/genres")
-    public TopGenresDTO genres(@RequestParam("range") String range, Principal principal) {
+    public ResponseEntity<TopGenresDTO> genres(@RequestParam("range") String range, Principal principal) {
         String url = SpotifyAPI.TOP_ARTISTS + range + "_term";
-        return spotifyApiService.getTopGenres(principal.getName(), url);
+        TopGenresDTO topGenres = spotifyApiService.getTopGenres(principal.getName(), url);
+        return new ResponseEntity<>(topGenres, topGenres == null ? HttpStatus.BAD_REQUEST : HttpStatus.OK);
     }
 
     @GetMapping("/recently")
-    public RecentlyPlayedDTO recently(Principal principal) {
-        return spotifyApiService.getRecentlyPlayed(principal.getName());
+    public ResponseEntity<RecentlyPlayedDTO> recently(Principal principal) {
+        RecentlyPlayedDTO recentlyPlayed = spotifyApiService.getRecentlyPlayed(principal.getName());
+        return new ResponseEntity<>(recentlyPlayed, recentlyPlayed == null ? HttpStatus.BAD_REQUEST : HttpStatus.OK);
+
     }
 
     @GetMapping("/score")
-    public MainstreamScoreDTO mainstreamScore(@RequestParam("range") String range, Principal principal) {
+    public ResponseEntity<MainstreamScoreDTO> mainstreamScore(@RequestParam("range") String range, Principal principal) {
         String url = SpotifyAPI.TOP_TRACKS + range + "_term";
-        return spotifyApiService.getMainstreamScore(principal.getName(), url);
+        MainstreamScoreDTO mainstreamScore = spotifyApiService.getMainstreamScore(principal.getName(), url);
+        return new ResponseEntity<>(mainstreamScore, mainstreamScore == null ? HttpStatus.BAD_REQUEST : HttpStatus.OK);
     }
 
-    @CrossOrigin("*")
     @PostMapping("/playlist/create")
-    public String createPlaylist(@RequestParam("range") String range, Principal principal) {
+    public ResponseEntity<String> createPlaylist(@RequestParam("range") String range, Principal principal) {
         String url = SpotifyAPI.TOP_TRACKS + range + "_term";
-        return spotifyApiService.postTopTracksPlaylist(principal.getName(), url);
+        String snapshot = spotifyApiService.postTopTracksPlaylist(principal.getName(), url);
+        return new ResponseEntity<>(snapshot, snapshot == null ? HttpStatus.CONFLICT : HttpStatus.CREATED);
     }
 }

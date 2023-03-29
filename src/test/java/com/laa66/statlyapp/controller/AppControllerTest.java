@@ -111,8 +111,7 @@ class AppControllerTest {
         mockMvc.perform(get("/api/top/tracks")
                     .contentType(MediaType.APPLICATION_JSON)
                     .param("range", "wrong"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").doesNotExist())
+                .andExpect(status().isBadRequest())
                 .andDo(print());
     }
 
@@ -147,8 +146,7 @@ class AppControllerTest {
         mockMvc.perform(get("/api/top/artists")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("range", "wrong"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").doesNotExist())
+                .andExpect(status().isBadRequest())
                 .andDo(print());
     }
 
@@ -183,8 +181,7 @@ class AppControllerTest {
         mockMvc.perform(get("/api/top/genres")
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("range", "wrong"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").doesNotExist())
+                .andExpect(status().isBadRequest())
                 .andDo(print());
     }
 
@@ -238,8 +235,7 @@ class AppControllerTest {
         mockMvc.perform(get("/api/score")
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("range", "wrong"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").doesNotExist())
+                .andExpect(status().isBadRequest())
                 .andDo(print());
     }
 
@@ -252,7 +248,7 @@ class AppControllerTest {
                         .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("range", "short"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(MockMvcResultMatchers.content().string("snapshot"))
                 .andDo(print());
     }
@@ -275,8 +271,7 @@ class AppControllerTest {
                         .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("range", "short"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").doesNotExist())
+                .andExpect(status().isConflict())
                 .andDo(print());
     }
 }
