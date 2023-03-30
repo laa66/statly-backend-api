@@ -5,10 +5,14 @@ import com.laa66.statlyapp.exception.SpotifyAPIException;
 import com.laa66.statlyapp.exception.UserAuthenticationException;
 import com.laa66.statlyapp.DTO.ExceptionDTO;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @RestControllerAdvice
@@ -28,8 +32,13 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(exceptionDTO, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler({HttpClientErrorException.class, HttpServerErrorException.class})
+    public ResponseEntity<ExceptionDTO> handleHttpClientAndServerErrorException(HttpStatusCodeException e) {
+        ExceptionDTO exceptionDTO = new ExceptionDTO(e.getStatusCode().value(), e.getStatusText(), System.currentTimeMillis());
+        return new ResponseEntity<>(exceptionDTO, HttpStatus.valueOf(e.getStatusCode().value()));
+    }
+
     @ExceptionHandler({SpotifyAPIException.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ExceptionDTO> handleClientAuthorizationException(SpotifyAPIException e) {
         int code = e.getCode();
         ExceptionDTO exceptionDTO = new ExceptionDTO(code, e.getMessage(), System.currentTimeMillis());

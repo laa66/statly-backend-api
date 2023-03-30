@@ -17,6 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.*;
 
@@ -74,7 +75,7 @@ class AppControllerUnitTest {
 
     @Test
     void shouldNotAuth() throws Exception {
-        mockMvc.perform(get("/api/top/tracks")
+        mockMvc.perform(get("/api/auth")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
                 .andDo(print());
@@ -105,18 +106,6 @@ class AppControllerUnitTest {
 
     @Test
     @WithMockUser
-    void shouldGetTopTracksAuthenticatedWrongRange() throws Exception {
-        when(spotifyAPIService.getTopTracks("user", SpotifyAPI.TOP_TRACKS + "wrong_term"))
-                .thenReturn(null);
-        mockMvc.perform(get("/api/top/tracks")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .param("range", "wrong"))
-                .andExpect(status().isBadRequest())
-                .andDo(print());
-    }
-
-    @Test
-    @WithMockUser
     void shouldGetTopArtistsAuthenticated() throws Exception {
         when(spotifyAPIService.getTopArtists("user", SpotifyAPI.TOP_ARTISTS + "short_term"))
                 .thenReturn(artistsDTO);
@@ -140,18 +129,6 @@ class AppControllerUnitTest {
 
     @Test
     @WithMockUser
-    void shouldGetTopArtistsAuthenticatedWrongRange() throws Exception {
-        when(spotifyAPIService.getTopArtists("user", SpotifyAPI.TOP_ARTISTS + "wrong_term"))
-                .thenReturn(null);
-        mockMvc.perform(get("/api/top/artists")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .param("range", "wrong"))
-                .andExpect(status().isBadRequest())
-                .andDo(print());
-    }
-
-    @Test
-    @WithMockUser
     void shouldGetTopGenresAuthenticated() throws Exception {
         when(spotifyAPIService.getTopGenres("user", SpotifyAPI.TOP_ARTISTS + "short_term"))
                 .thenReturn(genresDTO);
@@ -170,18 +147,6 @@ class AppControllerUnitTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("range", "short"))
                 .andExpect(status().isUnauthorized())
-                .andDo(print());
-    }
-
-    @Test
-    @WithMockUser
-    void shouldGetTopGenresAuthenticatedWrongRange() throws Exception {
-        when(spotifyAPIService.getTopGenres("user", SpotifyAPI.TOP_ARTISTS + "wrong_range"))
-                .thenReturn(null);
-        mockMvc.perform(get("/api/top/genres")
-                .contentType(MediaType.APPLICATION_JSON)
-                .param("range", "wrong"))
-                .andExpect(status().isBadRequest())
                 .andDo(print());
     }
 
@@ -229,18 +194,6 @@ class AppControllerUnitTest {
 
     @Test
     @WithMockUser
-    void shouldGetMainstreamScoreWrongRange() throws Exception {
-        when(spotifyAPIService.getMainstreamScore("user", SpotifyAPI.TOP_TRACKS + "wrong_term"))
-                .thenReturn(null);
-        mockMvc.perform(get("/api/score")
-                .contentType(MediaType.APPLICATION_JSON)
-                .param("range", "wrong"))
-                .andExpect(status().isBadRequest())
-                .andDo(print());
-    }
-
-    @Test
-    @WithMockUser
     void shouldCreatePlaylistAuthenticated() throws Exception {
         when(spotifyAPIService.postTopTracksPlaylist("user", SpotifyAPI.TOP_TRACKS + "short_term"))
                 .thenReturn("snapshot");
@@ -259,19 +212,6 @@ class AppControllerUnitTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("range", "short"))
                 .andExpect(status().isUnauthorized())
-                .andDo(print());
-    }
-
-    @Test
-    @WithMockUser
-    void shouldCreatePlaylistAuthenticatedWrongRange() throws Exception {
-        when(spotifyAPIService.postTopTracksPlaylist("user", SpotifyAPI.TOP_TRACKS + "short_term"))
-                .thenReturn(null);
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/playlist/create")
-                        .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .param("range", "short"))
-                .andExpect(status().isConflict())
                 .andDo(print());
     }
 }

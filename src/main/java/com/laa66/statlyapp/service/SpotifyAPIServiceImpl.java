@@ -8,10 +8,8 @@ import com.laa66.statlyapp.exception.SpotifyAPIException;
 import com.laa66.statlyapp.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,7 +22,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class SpotifyAPIServiceImpl implements SpotifyAPIService {
@@ -35,26 +32,22 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
 
     @Override
     public UserIdDTO getCurrentUser() {
-        ResponseEntity<UserIdDTO> responseUser = restTemplate.exchange(SpotifyAPI.CURRENT_USER, HttpMethod.GET, null, UserIdDTO.class);
-        return responseUser.getBody();
+        System.out.println("Fire!");
+        return restTemplate.exchange(SpotifyAPI.CURRENT_USER, HttpMethod.GET, null, UserIdDTO.class).getBody();
     }
 
     @Override
     @Cacheable(cacheNames = "api", key = "#root.methodName + #username + #url")
     public TopTracksDTO getTopTracks(String username, String url) {
         System.out.println("Fire!");
-        ResponseEntity<TopTracksDTO> response =
-                restTemplate.exchange(url, HttpMethod.GET, null, TopTracksDTO.class);
-        return response.getStatusCode() == HttpStatus.OK ? response.getBody() : null;
+        return restTemplate.exchange(url, HttpMethod.GET, null, TopTracksDTO.class).getBody();
     }
 
     @Override
     @Cacheable(cacheNames = "api", key = "#root.methodName + #username + #url")
     public TopArtistsDTO getTopArtists(String username, String url) {
         System.out.println("Fire!");
-        ResponseEntity<TopArtistsDTO> response =
-                restTemplate.exchange(url, HttpMethod.GET, null, TopArtistsDTO.class);
-        return response.getStatusCode() == HttpStatus.OK ? response.getBody() : null;
+        return restTemplate.exchange(url, HttpMethod.GET, null, TopArtistsDTO.class).getBody();
     }
 
     @Override
@@ -93,9 +86,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     @Cacheable(cacheNames = "api", key = "#root.methodName + #username")
     public RecentlyPlayedDTO getRecentlyPlayed(String username) {
         System.out.println("Fire!");
-        ResponseEntity<RecentlyPlayedDTO> response =
-                restTemplate.exchange(SpotifyAPI.RECENTLY_PLAYED_TRACKS, HttpMethod.GET, null, RecentlyPlayedDTO.class);
-        return response.getStatusCode() == HttpStatus.OK ? response.getBody() : null;
+        return restTemplate.exchange(SpotifyAPI.RECENTLY_PLAYED_TRACKS, HttpMethod.GET, null, RecentlyPlayedDTO.class).getBody();
     }
 
     @Override
@@ -126,8 +117,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
         } catch (IOException e) {
             throw new RuntimeException("I/O Exception while reading post-playlist.json");
         }
-        ResponseEntity<UserIdDTO> response = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(body), UserIdDTO.class);
-        return response.getStatusCode() == HttpStatus.CREATED ? response.getBody() : null;
+        return restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(body), UserIdDTO.class).getBody();
     }
 
     public String postTracksToPlaylist(UserIdDTO playlist, List<String> uris) {
@@ -140,9 +130,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
             throw new RuntimeException();
         }
 
-        ResponseEntity<String> response =
-                restTemplate.exchange(SpotifyAPI.ADD_PLAYLIST_TRACK
-                        .replace("playlist_id", playlist.getId()), HttpMethod.POST, new HttpEntity<>(body), String.class);
-        return response.getStatusCode() == HttpStatus.CREATED ? response.getBody() : null;
+        return restTemplate.exchange(SpotifyAPI.ADD_PLAYLIST_TRACK
+                        .replace("playlist_id", playlist.getId()), HttpMethod.POST, new HttpEntity<>(body), String.class).getBody();
     }
 }

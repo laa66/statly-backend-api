@@ -36,6 +36,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
@@ -90,10 +91,10 @@ class RestTemplateIntegrationTest {
     }
 
     @Test
-    void shouldSetActiveToken() throws URISyntaxException {
+    void shouldSetActiveToken() {
         String data = "body";
         mockServer.expect(ExpectedCount.once(),
-                requestTo(new URI(SpotifyAPI.CURRENT_USER)))
+                requestTo(SpotifyAPI.CURRENT_USER))
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(header("Authorization", "Bearer access"))
                 .andRespond(withStatus(HttpStatus.OK)
@@ -108,32 +109,34 @@ class RestTemplateIntegrationTest {
     void shouldRefreshToken() throws URISyntaxException {
         String data = "body";
         mockServer.expect(ExpectedCount.once(),
-                requestTo(new URI(SpotifyAPI.CURRENT_USER)))
+                requestTo(SpotifyAPI.CURRENT_USER))
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(header("Authorization", "Bearer access"))
                 .andRespond(withStatus(HttpStatus.UNAUTHORIZED)
                         .contentType(MediaType.APPLICATION_JSON));
 
         mockServer.expect(ExpectedCount.once(),
-                requestTo(new URI(SpotifyAPI.CURRENT_USER)))
+                requestTo(SpotifyAPI.CURRENT_USER))
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(header("Authorization", "Bearer newAccess"))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(data));
         String response = restTemplate.getForObject(SpotifyAPI.CURRENT_USER, String.class);
+        mockServer.verify();
         assertEquals(data, response);
     }
 
     @Test
-    void shouldThrowException() throws URISyntaxException {
+    void shouldThrowException() {
         mockServer.expect(ExpectedCount.once(),
-                requestTo(new URI(SpotifyAPI.CURRENT_USER)))
+                requestTo(SpotifyAPI.CURRENT_USER))
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(header("Authorization", "Bearer access"))
                 .andRespond(withStatus(HttpStatus.NOT_FOUND));
         assertThrows(SpotifyAPIException.class,
                 () -> restTemplate.getForObject(SpotifyAPI.CURRENT_USER, String.class));
+        mockServer.verify();
     }
 
 }

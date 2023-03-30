@@ -35,27 +35,27 @@ public class AppController {
     public ResponseEntity<TopTracksDTO> tracks(@RequestParam("range") String range, Principal principal) {
         String url = SpotifyAPI.TOP_TRACKS + range + "_term";
         TopTracksDTO topTracks = spotifyApiService.getTopTracks(principal.getName(), url);
-        return new ResponseEntity<>(topTracks, topTracks == null ? HttpStatus.BAD_REQUEST : HttpStatus.OK);
+        return new ResponseEntity<>(topTracks, HttpStatus.OK);
     }
 
     @GetMapping("/top/artists")
     public ResponseEntity<TopArtistsDTO> artists(@RequestParam("range") String range, Principal principal) {
         String url = SpotifyAPI.TOP_ARTISTS + range + "_term";
         TopArtistsDTO topArtists = spotifyApiService.getTopArtists(principal.getName(), url);
-        return new ResponseEntity<>(topArtists, topArtists == null ? HttpStatus.BAD_REQUEST : HttpStatus.OK);
+        return new ResponseEntity<>(topArtists, HttpStatus.OK);
     }
 
     @GetMapping("/top/genres")
     public ResponseEntity<TopGenresDTO> genres(@RequestParam("range") String range, Principal principal) {
         String url = SpotifyAPI.TOP_ARTISTS + range + "_term";
         TopGenresDTO topGenres = spotifyApiService.getTopGenres(principal.getName(), url);
-        return new ResponseEntity<>(topGenres, topGenres == null ? HttpStatus.BAD_REQUEST : HttpStatus.OK);
+        return new ResponseEntity<>(topGenres, HttpStatus.OK);
     }
 
     @GetMapping("/recently")
     public ResponseEntity<RecentlyPlayedDTO> recently(Principal principal) {
         RecentlyPlayedDTO recentlyPlayed = spotifyApiService.getRecentlyPlayed(principal.getName());
-        return new ResponseEntity<>(recentlyPlayed, recentlyPlayed == null ? HttpStatus.BAD_REQUEST : HttpStatus.OK);
+        return new ResponseEntity<>(recentlyPlayed, HttpStatus.OK);
 
     }
 
@@ -63,13 +63,13 @@ public class AppController {
     public ResponseEntity<MainstreamScoreDTO> mainstreamScore(@RequestParam("range") String range, Principal principal) {
         String url = SpotifyAPI.TOP_TRACKS + range + "_term";
         MainstreamScoreDTO mainstreamScore = spotifyApiService.getMainstreamScore(principal.getName(), url);
-        return new ResponseEntity<>(mainstreamScore, mainstreamScore == null ? HttpStatus.BAD_REQUEST : HttpStatus.OK);
+        return new ResponseEntity<>(mainstreamScore, HttpStatus.OK);
     }
 
     @PostMapping("/playlist/create")
     public ResponseEntity<String> createPlaylist(@RequestParam("range") String range, Principal principal) {
         String url = SpotifyAPI.TOP_TRACKS + range + "_term";
         String snapshot = spotifyApiService.postTopTracksPlaylist(principal.getName(), url);
-        return new ResponseEntity<>(snapshot, snapshot == null ? HttpStatus.CONFLICT : HttpStatus.CREATED);
+        return new ResponseEntity<>(snapshot, HttpStatus.CREATED);
     }
 }

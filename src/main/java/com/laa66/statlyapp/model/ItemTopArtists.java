@@ -22,6 +22,17 @@ public class ItemTopArtists {
     @JsonProperty("uri")
     private String uri;
 
+    public ItemTopArtists() {
+
+    }
+
+    public ItemTopArtists(List<String> genres, List<Image> images, String name, String uri) {
+        this.genres = genres;
+        this.images = images;
+        this.name = name;
+        this.uri = uri;
+    }
+
     public List<String> getGenres() {
         return genres;
     }
