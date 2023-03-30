@@ -1,5 +1,6 @@
 package com.laa66.statlyapp.config;
 
+import com.laa66.statlyapp.interceptor.HeaderModifierTokenRefresherInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;

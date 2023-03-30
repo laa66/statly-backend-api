@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(AppController.class)
 @ExtendWith(SpringExtension.class)
-class AppControllerTest {
+class AppControllerUnitTest {
 
     @MockBean
     SpotifyAPIService spotifyAPIService;

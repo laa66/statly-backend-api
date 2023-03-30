@@ -24,7 +24,8 @@ public class AppController {
     private SpotifyAPIService spotifyApiService;
 
     @GetMapping("/auth")
-    public void user(HttpServletRequest request, HttpServletResponse response) {UserIdDTO userIdDTO = spotifyApiService.getCurrentUser();
+    public void user(HttpServletRequest request, HttpServletResponse response) {
+        UserIdDTO userIdDTO = spotifyApiService.getCurrentUser();
         response.setStatus(HttpServletResponse.SC_TEMPORARY_REDIRECT);
         String imageUrl = userIdDTO.getImages().size() > 0 ? userIdDTO.getImages().get(0).getUrl() : "none";
         response.setHeader("location", REACT_URL + "/callback?name=" + userIdDTO.getDisplayName() + "&url=" + imageUrl);

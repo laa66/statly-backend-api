@@ -1,6 +1,5 @@
 package com.laa66.statlyapp.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
@@ -26,7 +25,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class SpotifyAPIServiceImplTest {
+class SpotifyAPIServiceImplUnitTest {
 
     @Mock
     @Qualifier("restTemplateInterceptor")

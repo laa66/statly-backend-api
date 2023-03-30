@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
@@ -22,6 +23,7 @@ import org.springframework.web.filter.CorsFilter;
 import java.util.Collections;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     @Value("${api.spotify.client-id}")

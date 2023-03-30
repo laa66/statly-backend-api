@@ -1,4 +1,4 @@
-package com.laa66.statlyapp.config;
+package com.laa66.statlyapp.interceptor;
 
 import com.laa66.statlyapp.exception.ClientAuthorizationException;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
@@ -31,7 +31,6 @@ public class HeaderModifierTokenRefresherInterceptor implements ClientHttpReques
 
     @Autowired
     private SpotifyTokenService tokenService;
-
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
