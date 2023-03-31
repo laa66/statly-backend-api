@@ -8,6 +8,7 @@ import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
 import com.laa66.statlyapp.model.ItemTopArtists;
 import com.laa66.statlyapp.model.ItemTopTracks;
+import com.laa66.statlyapp.model.SpotifyURL;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -283,6 +284,7 @@ class SpotifyAPIServiceImplIntegrationTest {
         ItemTopTracks track = new ItemTopTracks();
         track.setUri("trackId");
         TopTracksDTO topTracks = new TopTracksDTO(List.of(track), "1");
+        PlaylistDTO playlist = new PlaylistDTO("1", new SpotifyURL());
         String data = "playlist";
 
         mockServer.expect(ExpectedCount.once(),
@@ -297,7 +299,7 @@ class SpotifyAPIServiceImplIntegrationTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(mapper.writeValueAsString(user)));
+                        .body(mapper.writeValueAsString(playlist)));
 
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.TOP_TRACKS + "short_term"))
@@ -307,15 +309,16 @@ class SpotifyAPIServiceImplIntegrationTest {
                         .body(mapper.writeValueAsString(topTracks)));
 
         mockServer.expect(ExpectedCount.once(),
-                requestTo(SpotifyAPI.ADD_PLAYLIST_TRACK.replace("playlist_id", user.getId())))
+                requestTo(SpotifyAPI.ADD_PLAYLIST_TRACK.replace("playlist_id", playlist.getId())))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(data));
 
-        String response = spotifyAPIService.postTopTracksPlaylist("user", SpotifyAPI.TOP_TRACKS + "short_term");
+        PlaylistDTO response = spotifyAPIService.postTopTracksPlaylist("user", SpotifyAPI.TOP_TRACKS + "short_term");
         mockServer.verify();
-        assertEquals(data, response);
+        assertEquals(playlist.getId(), response.getId());
+        assertNotNull(playlist.getUrl());
     }
 
     @Test

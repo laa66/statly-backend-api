@@ -69,16 +69,14 @@ class AppControllerUnitTest {
         when(spotifyAPIService.getCurrentUser()).thenReturn(userIdDTO);
         mockMvc.perform(MockMvcRequestBuilders.get("/api/auth"))
                 .andExpect(status().isTemporaryRedirect())
-                .andExpect(header().string("location", REACT_URL + "/callback?name=testuser&url=imageurl"))
-                .andDo(print());
+                .andExpect(header().string("location", REACT_URL + "/callback?name=testuser&url=imageurl"));
     }
 
     @Test
     void shouldNotAuth() throws Exception {
         mockMvc.perform(get("/api/auth")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized())
-                .andDo(print());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -91,8 +89,7 @@ class AppControllerUnitTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total", is("1")))
-                .andExpect(jsonPath("$.items").exists())
-                .andDo(print());
+                .andExpect(jsonPath("$.items").exists());
     }
 
     @Test
@@ -100,8 +97,7 @@ class AppControllerUnitTest {
         mockMvc.perform(get("/api/top/tracks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("range", "short"))
-                .andExpect(status().isUnauthorized())
-                .andDo(print());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -114,8 +110,7 @@ class AppControllerUnitTest {
                     .param("range", "short"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total", is("1")))
-                .andExpect(jsonPath("$.items").exists())
-                .andDo(print());
+                .andExpect(jsonPath("$.items").exists());
     }
 
     @Test
@@ -123,8 +118,7 @@ class AppControllerUnitTest {
         mockMvc.perform(get("/api/top/artists")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("range", "short"))
-                .andExpect(status().isUnauthorized())
-                .andDo(print());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -137,8 +131,7 @@ class AppControllerUnitTest {
                 .param("range", "short"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.genres[0].genre", is("rock")))
-                .andExpect(jsonPath("$.genres[0].score", is(2)))
-                .andDo(print());
+                .andExpect(jsonPath("$.genres[0].score", is(2)));
     }
 
     @Test
@@ -146,8 +139,7 @@ class AppControllerUnitTest {
         mockMvc.perform(get("/api/top/genres")
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("range", "short"))
-                .andExpect(status().isUnauthorized())
-                .andDo(print());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -159,16 +151,14 @@ class AppControllerUnitTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total", is("1")))
-                .andExpect(jsonPath("$.items").exists())
-                .andDo(print());
+                .andExpect(jsonPath("$.items").exists());
     }
 
     @Test
     void shouldGetRecentlyPlayedNotAuthenticated() throws Exception {
         mockMvc.perform(get("/api/recently")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized())
-                .andDo(print());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -180,30 +170,29 @@ class AppControllerUnitTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("range", "short"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.score", is(75.00)))
-                .andDo(print());
+                .andExpect(jsonPath("$.score", is(75.00)));
     }
 
     @Test
     void shouldGetMainstreamScoreNotAuthenticated() throws Exception {
         mockMvc.perform(get("/api/score")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized())
-                .andDo(print());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser
     void shouldCreatePlaylistAuthenticated() throws Exception {
+        PlaylistDTO playlistDTO = new PlaylistDTO("1", new SpotifyURL());
         when(spotifyAPIService.postTopTracksPlaylist("user", SpotifyAPI.TOP_TRACKS + "short_term"))
-                .thenReturn("snapshot");
+                .thenReturn(playlistDTO);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/playlist/create")
                         .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("range", "short"))
                 .andExpect(status().isCreated())
-                .andExpect(MockMvcResultMatchers.content().string("snapshot"))
-                .andDo(print());
+                .andExpect(jsonPath("$.id", is("1")))
+                .andExpect(jsonPath("$.external_urls").exists());
     }
 
     @Test
@@ -211,7 +200,6 @@ class AppControllerUnitTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/playlist/create").with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("range", "short"))
-                .andExpect(status().isUnauthorized())
-                .andDo(print());
+                .andExpect(status().isUnauthorized());
     }
 }

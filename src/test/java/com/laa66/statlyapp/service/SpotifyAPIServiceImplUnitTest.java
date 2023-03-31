@@ -3,10 +3,7 @@ package com.laa66.statlyapp.service;
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
-import com.laa66.statlyapp.model.Image;
-import com.laa66.statlyapp.model.ItemRecentlyPlayed;
-import com.laa66.statlyapp.model.ItemTopArtists;
-import com.laa66.statlyapp.model.ItemTopTracks;
+import com.laa66.statlyapp.model.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -159,7 +156,7 @@ class SpotifyAPIServiceImplUnitTest {
         UserIdDTO userIdDTO = new UserIdDTO("testuser", "testuser", List.of(new Image()));
         TopTracksDTO tracksDTO = new TopTracksDTO(List.of(new ItemTopTracks()
                 , new ItemTopTracks()), "2");
-        UserIdDTO playlistIdDTO = new UserIdDTO("10", "10", List.of(new Image()));
+        PlaylistDTO playlistDTO = new PlaylistDTO("1", new SpotifyURL());
         String snapshotId = "snapshotId";
 
         when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER),
@@ -169,12 +166,14 @@ class SpotifyAPIServiceImplUnitTest {
                 eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
                 .thenReturn(new ResponseEntity<>(tracksDTO, HttpStatus.OK));
         when(restTemplate.exchange(eq(SpotifyAPI.CREATE_TOP_PLAYLIST.replace("user_id",
-                userIdDTO.getId())), eq(HttpMethod.POST), any(), eq(UserIdDTO.class)))
-                .thenReturn(new ResponseEntity<>(playlistIdDTO, HttpStatus.CREATED));
+                userIdDTO.getId())), eq(HttpMethod.POST), any(), eq(PlaylistDTO.class)))
+                .thenReturn(new ResponseEntity<>(playlistDTO, HttpStatus.CREATED));
         when(restTemplate.exchange(eq(SpotifyAPI.ADD_PLAYLIST_TRACK.replace("playlist_id",
-                playlistIdDTO.getId())), eq(HttpMethod.POST), any(), eq(String.class)))
+                playlistDTO.getId())), eq(HttpMethod.POST), any(), eq(String.class)))
                 .thenReturn(new ResponseEntity<>(snapshotId, HttpStatus.CREATED));
-        assertEquals(snapshotId, spotifyAPIService.postTopTracksPlaylist("user", SpotifyAPI.TOP_TRACKS + "long_term"));
+        PlaylistDTO response = spotifyAPIService.postTopTracksPlaylist("user", SpotifyAPI.TOP_TRACKS + "long_term");
+        assertEquals(playlistDTO.getId(), response.getId());
+        assertNotNull(playlistDTO.getUrl());
 
     }
 
@@ -192,7 +191,7 @@ class SpotifyAPIServiceImplUnitTest {
         UserIdDTO userIdDTO = new UserIdDTO("testuser", "testuser", List.of(new Image()));
         TopTracksDTO tracksDTO = new TopTracksDTO(List.of(new ItemTopTracks()
                 , new ItemTopTracks()), "2");
-        UserIdDTO playlistIdDTO = new UserIdDTO("10", "10", List.of(new Image()));
+        PlaylistDTO playlistDTO = new PlaylistDTO("1", new SpotifyURL());
 
         when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER),
                 eq(HttpMethod.GET), any(), eq(UserIdDTO.class)))
@@ -201,10 +200,10 @@ class SpotifyAPIServiceImplUnitTest {
                 eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
                 .thenReturn(new ResponseEntity<>(tracksDTO, HttpStatus.OK));
         when(restTemplate.exchange(eq(SpotifyAPI.CREATE_TOP_PLAYLIST.replace("user_id",
-                userIdDTO.getId())), eq(HttpMethod.POST), any(), eq(UserIdDTO.class)))
-                .thenReturn(new ResponseEntity<>(playlistIdDTO, HttpStatus.CREATED));
+                userIdDTO.getId())), eq(HttpMethod.POST), any(), eq(PlaylistDTO.class)))
+                .thenReturn(new ResponseEntity<>(playlistDTO, HttpStatus.CREATED));
         when(restTemplate.exchange(eq(SpotifyAPI.ADD_PLAYLIST_TRACK.replace("playlist_id",
-                playlistIdDTO.getId())), eq(HttpMethod.POST), any(), eq(String.class)))
+                playlistDTO.getId())), eq(HttpMethod.POST), any(), eq(String.class)))
                 .thenThrow(HttpClientErrorException.class);
 
         assertThrows(HttpClientErrorException.class,

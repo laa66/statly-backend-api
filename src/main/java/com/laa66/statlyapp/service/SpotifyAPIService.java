@@ -16,6 +16,6 @@ public interface SpotifyAPIService {
 
     UserIdDTO getCurrentUser();
 
-    String postTopTracksPlaylist(String username, String url);
+    PlaylistDTO postTopTracksPlaylist(String username, String url);
 
 }

@@ -38,14 +38,14 @@ public class HeaderModifierTokenRefresherInterceptor implements ClientHttpReques
         if (authentication == null) throw new UserAuthenticationException("User not authenticated");
         OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
         OAuth2AuthorizedClient client = clientService.loadAuthorizedClient(token.getAuthorizedClientRegistrationId(), token.getName());
-        System.out.println("---> Auth User: " + client.getPrincipalName() + ", Token: " + client.getAccessToken().getTokenValue() + "Expires at: " + client.getAccessToken().getExpiresAt().atZone(ZoneId.systemDefault()) +", Refresh token: " + client.getRefreshToken().getTokenValue());
+        //LOGGER.info("---> Auth User: " + client.getPrincipalName() + ", Token: " + client.getAccessToken().getTokenValue() + "Expires at: " + client.getAccessToken().getExpiresAt().atZone(ZoneId.systemDefault()) +", Refresh token: " + client.getRefreshToken().getTokenValue());
 
         if (client == null) throw new ClientAuthorizationException("Client is null //then logout user");
         request.getHeaders().setBearerAuth(client.getAccessToken().getTokenValue());
         ClientHttpResponse response = execution.execute(request, body);
 
         if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-            LOGGER.info("---> Spotify API access forbidden, refreshing token and sending new request...");
+            LOGGER.info("-> Spotify API access forbidden, refreshing token and sending new request...");
             // get refreshed token
             OAuth2AccessToken accessToken = tokenService.refreshAccessToken(client);
 
@@ -56,7 +56,7 @@ public class HeaderModifierTokenRefresherInterceptor implements ClientHttpReques
             clientService.removeAuthorizedClient(token.getAuthorizedClientRegistrationId(), client.getPrincipalName());
             clientService.saveAuthorizedClient(newAuthorizedClient, newPrincipal);
 
-            // execute request with refreshed token
+            // execute request with new token
             request.getHeaders().clearContentHeaders();
             request.getHeaders().setBearerAuth(accessToken.getTokenValue());
             response = execution.execute(request, body);
