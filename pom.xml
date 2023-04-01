@@ -11,7 +11,7 @@
 	<groupId>com.laa66</groupId>
 	<artifactId>statly-app</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>statlyapp</name>
 	<description>Spotify stats on demand</description>
 	<properties>

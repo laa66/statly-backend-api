@@ -19,6 +19,9 @@ public class Track {
     @JsonProperty("name")
     private String name;
 
+    @JsonProperty("external_urls")
+    private SpotifyURL url;
+
     public List<Artist> getArtists() {
         return artists;
     }
@@ -43,12 +46,21 @@ public class Track {
         this.album = album;
     }
 
+    public SpotifyURL getUrl() {
+        return url;
+    }
+
+    public void setUrl(SpotifyURL url) {
+        this.url = url;
+    }
+
     @Override
     public String toString() {
         return "Track{" +
                 "album=" + album +
                 ", artists=" + artists +
                 ", name='" + name + '\'' +
+                ", url=" + url +
                 '}';
     }
 }

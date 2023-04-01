@@ -25,6 +25,9 @@ public class ItemTopTracks {
     @JsonProperty("uri")
     private String uri;
 
+    @JsonProperty("external_urls")
+    private SpotifyURL url;
+
     public Album getAlbum() {
         return album;
     }
@@ -65,6 +68,14 @@ public class ItemTopTracks {
         this.uri = uri;
     }
 
+    public SpotifyURL getUrl() {
+        return url;
+    }
+
+    public void setUrl(SpotifyURL url) {
+        this.url = url;
+    }
+
     @Override
     public String toString() {
         return "ItemTopTracks{" +
@@ -73,6 +84,7 @@ public class ItemTopTracks {
                 ", name='" + name + '\'' +
                 ", popularity=" + popularity +
                 ", uri='" + uri + '\'' +
+                ", url=" + url +
                 '}';
     }
 }

@@ -22,15 +22,19 @@ public class ItemTopArtists {
     @JsonProperty("uri")
     private String uri;
 
+    @JsonProperty("external_urls")
+    private SpotifyURL url;
+
     public ItemTopArtists() {
 
     }
 
-    public ItemTopArtists(List<String> genres, List<Image> images, String name, String uri) {
+    public ItemTopArtists(List<String> genres, List<Image> images, String name, String uri, SpotifyURL url) {
         this.genres = genres;
         this.images = images;
         this.name = name;
         this.uri = uri;
+        this.url = url;
     }
 
     public List<String> getGenres() {
@@ -65,6 +69,14 @@ public class ItemTopArtists {
         this.uri = uri;
     }
 
+    public SpotifyURL getUrl() {
+        return url;
+    }
+
+    public void setUrl(SpotifyURL url) {
+        this.url = url;
+    }
+
     @Override
     public String toString() {
         return "ItemTopArtists{" +
@@ -72,6 +84,7 @@ public class ItemTopArtists {
                 ", images=" + images +
                 ", name='" + name + '\'' +
                 ", uri='" + uri + '\'' +
+                ", url=" + url +
                 '}';
     }
 }
