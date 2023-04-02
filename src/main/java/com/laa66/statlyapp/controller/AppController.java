@@ -2,10 +2,13 @@ package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.constants.SpotifyAPI;
+import com.laa66.statlyapp.interceptor.HeaderModifierTokenRefresherInterceptor;
 import com.laa66.statlyapp.model.Image;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -18,6 +21,8 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/api")
 public class AppController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppController.class);
 
     @Value("${dev.react-app.url}")
     private String REACT_URL;
@@ -32,9 +37,14 @@ public class AppController {
                 .findFirst()
                 .map(Image::getUrl)
                 .orElse("none");
-        String redirectUrl = REACT_URL + "/callback?name=" + userIdDTO.getDisplayName() + "&url=" + imageUrl;
+        String redirectUrl = REACT_URL + "/callback?name=" + userIdDTO.getDisplayName() + "&url=" + (imageUrl.equals("none") ? "./account.png"  : imageUrl);
         response.setStatus(HttpStatus.TEMPORARY_REDIRECT.value());
         response.setHeader(HttpHeaders.LOCATION, redirectUrl);
+    }
+
+    @PostMapping("/join")
+    public void join(@RequestBody BetaUserDTO betaUserDTO) {
+        LOGGER.info("-->> User Joined beta tests - username: " + betaUserDTO.getUsername() + ", email: " + betaUserDTO.getEmail());
     }
 
     @GetMapping("/top/tracks")

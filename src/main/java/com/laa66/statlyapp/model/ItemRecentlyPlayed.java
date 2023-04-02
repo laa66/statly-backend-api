@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @JsonPropertyOrder({"track", "played_at"})
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -14,7 +17,7 @@ public class ItemRecentlyPlayed {
     private Track track;
 
     @JsonProperty("played_at")
-    private LocalDateTime playedAt;
+    private ZonedDateTime playedAt;
 
     public Track getTrack() {
         return track;
@@ -24,11 +27,11 @@ public class ItemRecentlyPlayed {
         this.track = track;
     }
 
-    public LocalDateTime getPlayedAt() {
+    public ZonedDateTime getPlayedAt() {
         return playedAt;
     }
 
-    public void setPlayedAt(LocalDateTime playedAt) {
+    public void setPlayedAt(ZonedDateTime playedAt) {
         this.playedAt = playedAt;
     }
 

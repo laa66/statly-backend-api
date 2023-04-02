@@ -20,7 +20,6 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 
 import java.io.IOException;
-import java.time.ZoneId;
 
 public class HeaderModifierTokenRefresherInterceptor implements ClientHttpRequestInterceptor {
 
