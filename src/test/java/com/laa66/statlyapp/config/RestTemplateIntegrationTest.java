@@ -28,20 +28,17 @@ import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
-@SpringBootTest(classes = {SecurityConfig.class, OAuth2RestTemplateConfig.class})
+@SpringBootTest(classes = {TestSecurityConfig.class, OAuth2RestTemplateConfig.class})
 class RestTemplateIntegrationTest {
 
     @Autowired
@@ -106,7 +103,7 @@ class RestTemplateIntegrationTest {
     }
 
     @Test
-    void shouldRefreshToken() throws URISyntaxException {
+    void shouldRefreshToken() {
         String data = "body";
         mockServer.expect(ExpectedCount.once(),
                 requestTo(SpotifyAPI.CURRENT_USER))

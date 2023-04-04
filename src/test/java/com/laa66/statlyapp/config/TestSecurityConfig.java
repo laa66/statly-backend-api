@@ -1,11 +1,10 @@
 package com.laa66.statlyapp.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -23,10 +22,9 @@ import org.springframework.web.filter.CorsFilter;
 
 import java.util.Collections;
 
-@Configuration
+@TestConfiguration
 @EnableWebSecurity
-public class SecurityConfig {
-
+public class TestSecurityConfig {
     @Value("${api.spotify.client-id}")
     private String CLIENT_ID;
 
@@ -39,16 +37,13 @@ public class SecurityConfig {
     @Value("${dev.react-app.url}")
     private String DEV_REACT_URL;
 
-    @Value("${prod.react-app.url}")
-    private String PROD_REACT_URL;
-
     @Bean
     public FilterRegistrationBean<CorsFilter> customCorsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedMethods(Collections.singletonList("*"));
         config.setAllowedHeaders(Collections.singletonList("*"));
-        config.addAllowedOrigin(PROD_REACT_URL);
+        config.addAllowedOrigin(DEV_REACT_URL);
         config.setAllowCredentials(true);
         source.registerCorsConfiguration("/**", config);
         FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
@@ -66,7 +61,6 @@ public class SecurityConfig {
                         .csrfTokenRepository(tokenRepository)
                         .csrfTokenRequestHandler(requestHandler))
                 .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.POST, "/api/join").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
