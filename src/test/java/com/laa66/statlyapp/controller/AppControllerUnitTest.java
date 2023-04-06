@@ -41,7 +41,7 @@ class AppControllerUnitTest {
     @Autowired
     MockMvc mockMvc;
 
-    @Value("${dev.react-app.url}")
+    @Value("${api.react-app.url}")
     String REACT_URL;
 
     static TopTracksDTO tracksDTO;

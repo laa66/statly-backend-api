@@ -2,7 +2,6 @@ package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.constants.SpotifyAPI;
-import com.laa66.statlyapp.interceptor.HeaderModifierTokenRefresherInterceptor;
 import com.laa66.statlyapp.model.Image;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,11 +23,8 @@ public class AppController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppController.class);
 
-    @Value("${dev.react-app.url}")
-    private String DEV_REACT_URL;
-
-    @Value("${prod.react-app.url}")
-    private String PROD_REACT_URL;
+    @Value("${api.react-app.url}")
+    private String REACT_URL;
 
     @Autowired
     private SpotifyAPIService spotifyApiService;
@@ -40,7 +36,7 @@ public class AppController {
                 .findFirst()
                 .map(Image::getUrl)
                 .orElse("none");
-        String redirectUrl = PROD_REACT_URL + "/callback?name=" + userIdDTO.getDisplayName() + "&url=" + (imageUrl.equals("none") ? "./account.png"  : imageUrl);
+        String redirectUrl = REACT_URL + "/callback?name=" + userIdDTO.getDisplayName() + "&url=" + (imageUrl.equals("none") ? "./account.png"  : imageUrl);
         response.setStatus(HttpStatus.TEMPORARY_REDIRECT.value());
         response.setHeader(HttpHeaders.LOCATION, redirectUrl);
     }
