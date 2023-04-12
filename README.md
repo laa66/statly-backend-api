@@ -31,13 +31,13 @@ Check out the [Statly demo](https://statly-app.onrender.com) to see the applicat
     # Clone this repository to your local machine
     $ git clone https://github.com/laa66/statly-app.git
 
-    # Run the backend Spring Boot application in the root project directory:
+    # Run Spring Boot REST API in the root project directory:
     $ ./mvnw spring-boot:run
 
     # Run the frontend React application in the directory statly-app/react-app:
     $ npm start
 
-#### ...and Access the application in your web browser at ``http://localhost:3000``
+<b>...and Access the application in your web browser at<b> ``http://localhost:3000``
 
 ## How to use 🗺️
 
@@ -64,6 +64,10 @@ Check out the [Statly demo](https://statly-app.onrender.com) to see the applicat
 
 * Redirect user to ``Spotify web player`` immediately after clicking on some resources e.g. on special track, artist or created playlist
 
+With these features Statly provides an easy and efficient way for users to explore and interact with their Spotify listening data. 
+The app is powered by the Spotify API and makes use of the OAuth2 authorization flow with Spring Boot for backend and React for frontend. 
+Users can access the app through the web, and it is **deployed on render.com cloud**, providing easy access to anyone who wants 
+to connect their Spotify account and check their listening habits.
 
 ## Built with 🔨
 
