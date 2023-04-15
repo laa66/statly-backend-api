@@ -34,8 +34,8 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     private RestTemplate restTemplate;
 
     @Override
-    public UserIdDTO getCurrentUser() {
-        return restTemplate.exchange(SpotifyAPI.CURRENT_USER, HttpMethod.GET, null, UserIdDTO.class).getBody();
+    public UserDTO getCurrentUser() {
+        return restTemplate.exchange(SpotifyAPI.CURRENT_USER, HttpMethod.GET, null, UserDTO.class).getBody();
     }
 
     @Override
@@ -86,7 +86,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
 
     @Override
     public PlaylistDTO postTopTracksPlaylist(String username, String url) {
-        UserIdDTO user = getCurrentUser();
+        UserDTO user = getCurrentUser();
         String range = null;
         if (url.endsWith("short_term")) range = SpotifyAPI.RANGE_SHORT;
         if (url.endsWith("medium_term")) range = SpotifyAPI.RANGE_MEDIUM;
@@ -103,7 +103,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     @CacheEvict(value = "api", allEntries = true)
     public void clearCache() {}
 
-    public PlaylistDTO postEmptyPlaylist(UserIdDTO user, String range) {
+    public PlaylistDTO postEmptyPlaylist(UserDTO user, String range) {
         String url = SpotifyAPI.CREATE_TOP_PLAYLIST.replace("user_id", user.getId());
         String body;
         try {

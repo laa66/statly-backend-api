@@ -14,7 +14,7 @@ public interface SpotifyAPIService {
 
     MainstreamScoreDTO getMainstreamScore(String username, String url);
 
-    UserIdDTO getCurrentUser();
+    UserDTO getCurrentUser();
 
     PlaylistDTO postTopTracksPlaylist(String username, String url);
 

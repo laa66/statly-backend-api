@@ -7,10 +7,13 @@ import com.laa66.statlyapp.model.Image;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UserIdDTO {
+public class UserDTO {
 
     @JsonProperty("id")
     private String id;
+
+    @JsonProperty("email")
+    private String email;
 
     @JsonProperty("display_name")
     private String displayName;
@@ -18,12 +21,13 @@ public class UserIdDTO {
     @JsonProperty("images")
     private List<Image> images;
 
-    public UserIdDTO() {
+    public UserDTO() {
 
     }
 
-    public UserIdDTO(String id, String displayName, List<Image> images) {
+    public UserDTO(String id, String email, String displayName, List<Image> images) {
         this.id = id;
+        this.email = email;
         this.displayName = displayName;
         this.images = images;
     }
@@ -34,6 +38,14 @@ public class UserIdDTO {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getDisplayName() {
@@ -54,8 +66,9 @@ public class UserIdDTO {
 
     @Override
     public String toString() {
-        return "UserIdDTO{" +
+        return "UserDTO{" +
                 "id='" + id + '\'' +
+                ", email='" + email + '\'' +
                 ", displayName='" + displayName + '\'' +
                 ", images=" + images +
                 '}';

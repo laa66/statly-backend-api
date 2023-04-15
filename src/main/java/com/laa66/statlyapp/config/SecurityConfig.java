@@ -63,6 +63,7 @@ public class SecurityConfig {
                         .csrfTokenRequestHandler(requestHandler))
                 .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.POST, "/api/join").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/test").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

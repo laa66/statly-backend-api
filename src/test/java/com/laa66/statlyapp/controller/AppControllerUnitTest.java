@@ -16,8 +16,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.*;
 
@@ -49,7 +47,7 @@ class AppControllerUnitTest {
     static TopGenresDTO genresDTO;
     static RecentlyPlayedDTO recentlyDTO;
     static MainstreamScoreDTO mainstreamScoreDTO;
-    static UserIdDTO userIdDTO;
+    static UserDTO userDTO;
 
     @BeforeAll
     static void prepare() {
@@ -60,13 +58,13 @@ class AppControllerUnitTest {
          mainstreamScoreDTO = new MainstreamScoreDTO(75.00);
          Image image = new Image();
          image.setUrl("imageurl");
-         userIdDTO = new UserIdDTO("testuser", "testuser", List.of(image));
+         userDTO = new UserDTO("testuser", "test@mail.com", "testuser", List.of(image));
     }
 
     @Test
     @WithMockUser
     void shouldAuthUser() throws Exception {
-        when(spotifyAPIService.getCurrentUser()).thenReturn(userIdDTO);
+        when(spotifyAPIService.getCurrentUser()).thenReturn(userDTO);
         mockMvc.perform(MockMvcRequestBuilders.get("/api/auth"))
                 .andExpect(status().isTemporaryRedirect())
                 .andExpect(header().string("location", REACT_URL + "/callback?name=testuser&url=imageurl"));

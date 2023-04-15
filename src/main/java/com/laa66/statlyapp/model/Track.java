@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.List;
+import java.util.Objects;
 
 @JsonPropertyOrder({"album", "artists", "name"})
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -21,6 +22,16 @@ public class Track {
 
     @JsonProperty("external_urls")
     private SpotifyURL url;
+
+    public Track() {
+    }
+
+    public Track(Album album, List<Artist> artists, String name, SpotifyURL url) {
+        this.album = album;
+        this.artists = artists;
+        this.name = name;
+        this.url = url;
+    }
 
     public List<Artist> getArtists() {
         return artists;

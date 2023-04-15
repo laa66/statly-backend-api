@@ -2,7 +2,10 @@ package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.constants.SpotifyAPI;
-import com.laa66.statlyapp.model.Image;
+import com.laa66.statlyapp.entity.User;
+import com.laa66.statlyapp.entity.UserTrack;
+import com.laa66.statlyapp.model.*;
+import com.laa66.statlyapp.repository.UserRepository;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,9 +16,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -31,12 +40,12 @@ public class AppController {
 
     @GetMapping("/auth")
     public void user(HttpServletRequest request, HttpServletResponse response) {
-        UserIdDTO userIdDTO = spotifyApiService.getCurrentUser();
-        String imageUrl = userIdDTO.getImages().stream()
+        UserDTO userDTO = spotifyApiService.getCurrentUser();
+        String imageUrl = userDTO.getImages().stream()
                 .findFirst()
                 .map(Image::getUrl)
                 .orElse("none");
-        String redirectUrl = REACT_URL + "/callback?name=" + userIdDTO.getDisplayName() + "&url=" + (imageUrl.equals("none") ? "./account.png"  : imageUrl);
+        String redirectUrl = REACT_URL + "/callback?name=" + userDTO.getDisplayName() + "&url=" + (imageUrl.equals("none") ? "./account.png"  : imageUrl);
         response.setStatus(HttpStatus.TEMPORARY_REDIRECT.value());
         response.setHeader(HttpHeaders.LOCATION, redirectUrl);
     }

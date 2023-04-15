@@ -52,16 +52,17 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @Test
     void shouldGetCurrentUserResponseOk() throws JsonProcessingException {
-        UserIdDTO data = new UserIdDTO("1", "user", new ArrayList<>());
+        UserDTO data = new UserDTO("1", "test@mail.com", "user", new ArrayList<>());
         mockServer.expect(ExpectedCount.once(),
                 requestTo(SpotifyAPI.CURRENT_USER))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(mapper.writeValueAsString(data)));
-        UserIdDTO response = spotifyAPIService.getCurrentUser();
+        UserDTO response = spotifyAPIService.getCurrentUser();
         mockServer.verify();
         assertEquals(data.getId(), response.getId());
+        assertEquals(data.getEmail(), response.getEmail());
         assertEquals(data.getDisplayName(), response.getDisplayName());
         assertEquals(data.getImages().size(), response.getImages().size());
     }
@@ -280,7 +281,7 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @Test
     void shouldPostTopTracksResponseOk() throws JsonProcessingException {
-        UserIdDTO user = new UserIdDTO("1", "user", new ArrayList<>());
+        UserDTO user = new UserDTO("1", "test@mail.com", "user", new ArrayList<>());
         ItemTopTracks track = new ItemTopTracks();
         track.setUri("trackId");
         TopTracksDTO topTracks = new TopTracksDTO(List.of(track), "1");
@@ -323,7 +324,7 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @Test
     void shouldPostTopTracksResponseWrongRange() throws JsonProcessingException {
-        UserIdDTO user = new UserIdDTO("1", "user", new ArrayList<>());
+        UserDTO user = new UserDTO("1", "test@mail.com", "user", new ArrayList<>());
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.CURRENT_USER))
                 .andExpect(method(HttpMethod.GET))
