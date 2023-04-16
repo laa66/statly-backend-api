@@ -2,8 +2,7 @@ package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.constants.SpotifyAPI;
-import com.laa66.statlyapp.entity.User;
-import com.laa66.statlyapp.entity.UserTrack;
+import com.laa66.statlyapp.entity.*;
 import com.laa66.statlyapp.model.*;
 import com.laa66.statlyapp.repository.UserRepository;
 import com.laa66.statlyapp.service.SpotifyAPIService;
@@ -16,15 +15,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/api")
@@ -37,6 +34,43 @@ public class AppController {
 
     @Autowired
     private SpotifyAPIService spotifyApiService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    /*
+    @GetMapping("/test")
+    public void test() {
+        User user = userRepository.findByEmail("lasix@gmail.com");
+        System.out.println(user);
+
+        List<Artist> artists = new ArrayList<>();
+        artists.add(new Artist("Freeze Corleone"));
+        UserArtist userArtist = new UserArtist(0, user.getId(), "long", LocalDate.now(), artists);
+        user.addArtist(userArtist);
+
+        List<Track> tracks = new ArrayList<>();
+        tracks.add(new Track(new Album(), new ArrayList<>(), "Hors Ligne", new SpotifyURL()));
+        UserTrack userTrack = new UserTrack(0, user.getId(), "long", tracks, LocalDate.now());
+        user.addTrack(userTrack);
+
+        List<Genre> genres = new ArrayList<>();
+        genres.add(new Genre("rap", 50));
+        UserGenre userGenre = new UserGenre(0, user.getId(), "long", LocalDate.now(), genres);
+        user.addGenre(userGenre);
+
+        UserMainstream userMainstream = new UserMainstream(0, user.getId(), "long", LocalDate.now(), 92.12);
+        user.addMainstream(userMainstream);
+
+        userRepository.save(user);
+    } */
+
+    /*
+    @GetMapping("/delete")
+    public void delete() {
+        User user = userRepository.findByEmail("lasix@gmail.com");
+        userRepository.delete(user);
+    }*/
 
     @GetMapping("/auth")
     public void user(HttpServletRequest request, HttpServletResponse response) {

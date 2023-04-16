@@ -1,17 +1,16 @@
 package com.laa66.statlyapp.entity;
 
-import com.laa66.statlyapp.model.Track;
+import com.laa66.statlyapp.model.Genre;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "user_tracks")
-public class UserTrack {
+@Table(name = "user_genres")
+public class UserGenre {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,21 +22,21 @@ public class UserTrack {
     @Column(name = "time_range")
     private String range;
 
-    @Type(JsonType.class)
-    @Column(columnDefinition = "JSON")
-    private List<Track> tracks;
-
     private LocalDate date;
 
-    public UserTrack() {
+    @Type(JsonType.class)
+    @Column(columnDefinition = "JSON")
+    private List<Genre> genres;
+
+    public UserGenre() {
     }
 
-    public UserTrack(long id, long userId, String range, List<Track> tracks, LocalDate date) {
+    public UserGenre(long id, long userId, String range, LocalDate date, List<Genre> genres) {
         this.id = id;
         this.userId = userId;
         this.range = range;
-        this.tracks = tracks;
         this.date = date;
+        this.genres = genres;
     }
 
     public long getId() {
@@ -64,14 +63,6 @@ public class UserTrack {
         this.range = range;
     }
 
-    public List<Track> getTracks() {
-        return tracks;
-    }
-
-    public void setTracks(List<Track> tracks) {
-        this.tracks = tracks;
-    }
-
     public LocalDate getDate() {
         return date;
     }
@@ -80,14 +71,22 @@ public class UserTrack {
         this.date = date;
     }
 
+    public List<Genre> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(List<Genre> genres) {
+        this.genres = genres;
+    }
+
     @Override
     public String toString() {
-        return "UserTrack{" +
+        return "UserGenre{" +
                 "id=" + id +
                 ", userId=" + userId +
                 ", range='" + range + '\'' +
-                ", tracks='" + tracks + '\'' +
                 ", date=" + date +
+                ", genres=" + genres +
                 '}';
     }
 }
