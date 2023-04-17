@@ -53,18 +53,18 @@ class SpotifyAPIServiceImplUnitTest {
                 eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
                 .thenReturn(new ResponseEntity<>(dto, HttpStatus.OK));
         TopTracksDTO returnDto = spotifyAPIService.getTopTracks("user"
-                , SpotifyAPI.TOP_TRACKS + "long_term");
+                , "long");
         assertEquals(dto.getItemTopTracks().size(), returnDto.getItemTopTracks().size());
         assertEquals(dto.getTotal(), returnDto.getTotal());
     }
 
     @Test
     void shouldGetTopTracksWithNotValidUrl() {
-        when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS + "_t"),
+        when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS + "wrong_term"),
                 eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
                 .thenThrow(HttpClientErrorException.class);
         assertThrows(HttpClientErrorException.class,
-                () ->  spotifyAPIService.getTopTracks("user", SpotifyAPI.TOP_TRACKS + "_t"));
+                () ->  spotifyAPIService.getTopTracks("user", "wrong"));
     }
 
     @Test
@@ -74,18 +74,18 @@ class SpotifyAPIServiceImplUnitTest {
                 eq(HttpMethod.GET), any(), eq(TopArtistsDTO.class)))
                 .thenReturn(new ResponseEntity<>(dto, HttpStatus.OK));
         TopArtistsDTO returnDto = spotifyAPIService.getTopArtists("user"
-                , SpotifyAPI.TOP_ARTISTS + "long_term");
+                , "long");
         assertEquals(dto.getItemTopArtists().size(), returnDto.getItemTopArtists().size());
         assertEquals(dto.getTotal(), returnDto.getTotal());
     }
 
     @Test
     void shouldGetTopArtistsWithNotValidUrl() {
-        when(restTemplate.exchange(eq(SpotifyAPI.TOP_ARTISTS + "_t"),
+        when(restTemplate.exchange(eq(SpotifyAPI.TOP_ARTISTS + "wrong_term"),
                 eq(HttpMethod.GET), any(), eq(TopArtistsDTO.class)))
                 .thenThrow(HttpClientErrorException.class);
         assertThrows(HttpClientErrorException.class,
-                () -> spotifyAPIService.getTopArtists("user", SpotifyAPI.TOP_ARTISTS + "_t"));
+                () -> spotifyAPIService.getTopArtists("user", "wrong"));
     }
 
     @Test
@@ -99,17 +99,17 @@ class SpotifyAPIServiceImplUnitTest {
                 eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
                 .thenReturn(new ResponseEntity<>(dto, HttpStatus.OK));
         MainstreamScoreDTO returnDto = spotifyAPIService.getMainstreamScore("user"
-                , SpotifyAPI.TOP_TRACKS + "long_term");
+                , "long");
         assertEquals(55.00, returnDto.getScore());
     }
 
     @Test
     void shouldGetMainStreamScoreWithNotValidUrl() {
-        when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS + "_t"),
+        when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS + "wrong_term"),
                 eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
                 .thenThrow(HttpClientErrorException.class);
         assertThrows(HttpClientErrorException.class,
-                () -> spotifyAPIService.getMainstreamScore("user", SpotifyAPI.TOP_TRACKS + "_t"));
+                () -> spotifyAPIService.getMainstreamScore("user", "wrong"));
     }
 
     @Test
@@ -125,7 +125,7 @@ class SpotifyAPIServiceImplUnitTest {
                 eq(HttpMethod.GET), any(), eq(TopArtistsDTO.class)))
                 .thenReturn(new ResponseEntity<>(dto, HttpStatus.OK));
         TopGenresDTO returnDto = spotifyAPIService.getTopGenres("user"
-                , SpotifyAPI.TOP_ARTISTS + "long_term");
+                , "long");
 
         assertEquals(2, returnDto.getGenres().size());
         assertEquals(60, returnDto.getGenres().get(0).getScore());
@@ -134,11 +134,11 @@ class SpotifyAPIServiceImplUnitTest {
 
     @Test
     void shouldGetTopGenresWithNotValidUrl() {
-        when(restTemplate.exchange(eq(SpotifyAPI.TOP_ARTISTS + "_t"),
+        when(restTemplate.exchange(eq(SpotifyAPI.TOP_ARTISTS + "wrong_term"),
                 eq(HttpMethod.GET), any(), eq(TopArtistsDTO.class)))
                 .thenThrow(HttpClientErrorException.class);
         assertThrows(HttpClientErrorException.class,
-                () -> spotifyAPIService.getTopGenres("user", SpotifyAPI.TOP_ARTISTS + "_t"));
+                () -> spotifyAPIService.getTopGenres("user", "wrong"));
     }
 
     @Test
@@ -172,7 +172,7 @@ class SpotifyAPIServiceImplUnitTest {
         when(restTemplate.exchange(eq(SpotifyAPI.ADD_PLAYLIST_TRACK.replace("playlist_id",
                 playlistDTO.getId())), eq(HttpMethod.POST), any(), eq(String.class)))
                 .thenReturn(new ResponseEntity<>(snapshotId, HttpStatus.CREATED));
-        PlaylistDTO response = spotifyAPIService.postTopTracksPlaylist("user", SpotifyAPI.TOP_TRACKS + "long_term");
+        PlaylistDTO response = spotifyAPIService.postTopTracksPlaylist("user", "long");
         assertEquals(playlistDTO.getId(), response.getId());
         assertNotNull(playlistDTO.getUrl());
 
@@ -184,7 +184,7 @@ class SpotifyAPIServiceImplUnitTest {
         when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER),
                 eq(HttpMethod.GET), any(), eq(UserDTO.class)))
                 .thenReturn(new ResponseEntity<>(userDTO, HttpStatus.CREATED));
-        assertThrows(SpotifyAPIException.class, () -> spotifyAPIService.postTopTracksPlaylist("user", "wrong_term"));
+        assertThrows(SpotifyAPIException.class, () -> spotifyAPIService.postTopTracksPlaylist("user", "wrong"));
     }
 
     @Test
@@ -208,6 +208,6 @@ class SpotifyAPIServiceImplUnitTest {
                 .thenThrow(HttpClientErrorException.class);
 
         assertThrows(HttpClientErrorException.class,
-                () -> spotifyAPIService.postTopTracksPlaylist("user", SpotifyAPI.TOP_TRACKS + "long_term"));
+                () -> spotifyAPIService.postTopTracksPlaylist("user", "long"));
     }
 }

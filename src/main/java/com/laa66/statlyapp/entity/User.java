@@ -1,7 +1,5 @@
 package com.laa66.statlyapp.entity;
 
-import com.laa66.statlyapp.model.Artist;
-import com.laa66.statlyapp.model.Track;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -118,6 +116,14 @@ public class User {
         this.genres = genres;
     }
 
+    public List<UserMainstream> getMainstreamList() {
+        return mainstreamList;
+    }
+
+    public void setMainstreamList(List<UserMainstream> mainstreamList) {
+        this.mainstreamList = mainstreamList;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -127,6 +133,7 @@ public class User {
                 ", tracks=" + tracks +
                 ", artists=" + artists +
                 ", genres=" + genres +
+                ", mainstreamList=" + mainstreamList +
                 '}';
     }
 }

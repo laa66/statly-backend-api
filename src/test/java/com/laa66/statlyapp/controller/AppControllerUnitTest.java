@@ -22,6 +22,7 @@ import java.util.*;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -62,10 +63,9 @@ class AppControllerUnitTest {
     }
 
     @Test
-    @WithMockUser
     void shouldAuthUser() throws Exception {
         when(spotifyAPIService.getCurrentUser()).thenReturn(userDTO);
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/auth"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/auth").with(oauth2Login()))
                 .andExpect(status().isTemporaryRedirect())
                 .andExpect(header().string("location", REACT_URL + "/callback?name=testuser&url=imageurl"));
     }
@@ -78,11 +78,11 @@ class AppControllerUnitTest {
     }
 
     @Test
-    @WithMockUser
     void shouldGetTopTracksAuthenticated() throws Exception {
-        when(spotifyAPIService.getTopTracks("user", SpotifyAPI.TOP_TRACKS + "short_term"))
+        when(spotifyAPIService.getTopTracks("test@mail.com", "short"))
                 .thenReturn(tracksDTO);
-        mockMvc.perform(get("/api/top/tracks")
+        mockMvc.perform(get("/api/top/tracks").with(oauth2Login()
+                                .attributes(map -> map.put("email", "test@mail.com")))
                         .param("range", "short")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -99,11 +99,11 @@ class AppControllerUnitTest {
     }
 
     @Test
-    @WithMockUser
     void shouldGetTopArtistsAuthenticated() throws Exception {
-        when(spotifyAPIService.getTopArtists("user", SpotifyAPI.TOP_ARTISTS + "short_term"))
+        when(spotifyAPIService.getTopArtists("test@mail.com", "short"))
                 .thenReturn(artistsDTO);
-        mockMvc.perform(get("/api/top/artists")
+        mockMvc.perform(get("/api/top/artists").with(oauth2Login()
+                                .attributes(map -> map.put("email", "test@mail.com")))
                     .contentType(MediaType.APPLICATION_JSON)
                     .param("range", "short"))
                 .andExpect(status().isOk())
@@ -120,11 +120,11 @@ class AppControllerUnitTest {
     }
 
     @Test
-    @WithMockUser
     void shouldGetTopGenresAuthenticated() throws Exception {
-        when(spotifyAPIService.getTopGenres("user", SpotifyAPI.TOP_ARTISTS + "short_term"))
+        when(spotifyAPIService.getTopGenres("test@mail.com", "short"))
                 .thenReturn(genresDTO);
-        mockMvc.perform(get("/api/top/genres")
+        mockMvc.perform(get("/api/top/genres").with(oauth2Login()
+                                .attributes(map -> map.put("email", "test@mail.com")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("range", "short"))
                 .andExpect(status().isOk())
@@ -141,11 +141,11 @@ class AppControllerUnitTest {
     }
 
     @Test
-    @WithMockUser
     void shouldGetRecentlyPlayedAuthenticated() throws Exception {
-        when(spotifyAPIService.getRecentlyPlayed("user"))
+        when(spotifyAPIService.getRecentlyPlayed("test@mail.com"))
                 .thenReturn(recentlyDTO);
-        mockMvc.perform(get("/api/recently")
+        mockMvc.perform(get("/api/recently").with(oauth2Login()
+                                .attributes(map -> map.put("email", "test@mail.com")))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total", is("1")))
@@ -160,11 +160,11 @@ class AppControllerUnitTest {
     }
 
     @Test
-    @WithMockUser
     void shouldGetMainstreamScoreAuthenticated() throws Exception {
-        when(spotifyAPIService.getMainstreamScore("user", SpotifyAPI.TOP_TRACKS + "short_term"))
+        when(spotifyAPIService.getMainstreamScore("test@mail.com", "short"))
                 .thenReturn(mainstreamScoreDTO);
-        mockMvc.perform(get("/api/score")
+        mockMvc.perform(get("/api/score").with(oauth2Login()
+                                .attributes(map -> map.put("email", "test@mail.com")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("range", "short"))
                 .andExpect(status().isOk())
@@ -179,12 +179,12 @@ class AppControllerUnitTest {
     }
 
     @Test
-    @WithMockUser
     void shouldCreatePlaylistAuthenticated() throws Exception {
         PlaylistDTO playlistDTO = new PlaylistDTO("1", new SpotifyURL());
-        when(spotifyAPIService.postTopTracksPlaylist("user", SpotifyAPI.TOP_TRACKS + "short_term"))
+        when(spotifyAPIService.postTopTracksPlaylist("test@mail.com", "short"))
                 .thenReturn(playlistDTO);
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/playlist/create")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/playlist/create").with(oauth2Login()
+                                .attributes(map -> map.put("email", "test@mail.com")))
                         .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("range", "short"))

@@ -1,13 +1,12 @@
 package com.laa66.statlyapp.entity;
 
-import com.laa66.statlyapp.model.Track;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+
 
 @Entity
 @Table(name = "user_tracks")
@@ -25,14 +24,14 @@ public class UserTrack {
 
     @Type(JsonType.class)
     @Column(columnDefinition = "JSON")
-    private List<Track> tracks;
+    private HashMap<String, Integer> tracks;
 
     private LocalDate date;
 
     public UserTrack() {
     }
 
-    public UserTrack(long id, long userId, String range, List<Track> tracks, LocalDate date) {
+    public UserTrack(long id, long userId, String range, HashMap<String, Integer> tracks, LocalDate date) {
         this.id = id;
         this.userId = userId;
         this.range = range;
@@ -64,11 +63,11 @@ public class UserTrack {
         this.range = range;
     }
 
-    public List<Track> getTracks() {
+    public HashMap<String, Integer> getTracks() {
         return tracks;
     }
 
-    public void setTracks(List<Track> tracks) {
+    public void setTracks(HashMap<String, Integer> tracks) {
         this.tracks = tracks;
     }
 
@@ -86,7 +85,7 @@ public class UserTrack {
                 "id=" + id +
                 ", userId=" + userId +
                 ", range='" + range + '\'' +
-                ", tracks='" + tracks + '\'' +
+                ", tracks=" + tracks +
                 ", date=" + date +
                 '}';
     }

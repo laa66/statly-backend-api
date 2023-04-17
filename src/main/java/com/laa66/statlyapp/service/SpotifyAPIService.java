@@ -4,18 +4,18 @@ import com.laa66.statlyapp.DTO.*;
 
 public interface SpotifyAPIService {
 
-    TopTracksDTO getTopTracks(String username, String url);
+    TopTracksDTO getTopTracks(String email, String range);
 
-    TopArtistsDTO getTopArtists(String username, String url);
+    TopArtistsDTO getTopArtists(String email, String range);
 
-    TopGenresDTO getTopGenres(String username, String url);
+    TopGenresDTO getTopGenres(String email, String range);
 
-    RecentlyPlayedDTO getRecentlyPlayed(String username);
+    RecentlyPlayedDTO getRecentlyPlayed(String email);
 
-    MainstreamScoreDTO getMainstreamScore(String username, String url);
+    MainstreamScoreDTO getMainstreamScore(String email, String range);
 
     UserDTO getCurrentUser();
 
-    PlaylistDTO postTopTracksPlaylist(String username, String url);
+    PlaylistDTO postTopTracksPlaylist(String email, String range);
 
 }

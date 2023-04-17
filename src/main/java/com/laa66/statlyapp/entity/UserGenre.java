@@ -1,12 +1,11 @@
 package com.laa66.statlyapp.entity;
 
-import com.laa66.statlyapp.model.Genre;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.HashMap;
 
 @Entity
 @Table(name = "user_genres")
@@ -26,12 +25,12 @@ public class UserGenre {
 
     @Type(JsonType.class)
     @Column(columnDefinition = "JSON")
-    private List<Genre> genres;
+    private HashMap<String, Double> genres;
 
     public UserGenre() {
     }
 
-    public UserGenre(long id, long userId, String range, LocalDate date, List<Genre> genres) {
+    public UserGenre(long id, long userId, String range, LocalDate date, HashMap<String, Double> genres) {
         this.id = id;
         this.userId = userId;
         this.range = range;
@@ -71,11 +70,11 @@ public class UserGenre {
         this.date = date;
     }
 
-    public List<Genre> getGenres() {
+    public HashMap<String, Double> getGenres() {
         return genres;
     }
 
-    public void setGenres(List<Genre> genres) {
+    public void setGenres(HashMap<String, Double> genres) {
         this.genres = genres;
     }
 

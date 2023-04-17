@@ -1,8 +1,6 @@
 package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.DTO.*;
-import com.laa66.statlyapp.constants.SpotifyAPI;
-import com.laa66.statlyapp.entity.*;
 import com.laa66.statlyapp.model.*;
 import com.laa66.statlyapp.repository.UserRepository;
 import com.laa66.statlyapp.service.SpotifyAPIService;
@@ -15,12 +13,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @RestController
@@ -35,27 +30,23 @@ public class AppController {
     @Autowired
     private SpotifyAPIService spotifyApiService;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    /*
-    @GetMapping("/test")
+    /*@GetMapping("/test")
     public void test() {
-        User user = userRepository.findByEmail("lasix@gmail.com");
+        User user = userRepository.findByEmail("lasix@gmail.com").orElseThrow();
         System.out.println(user);
 
-        List<Artist> artists = new ArrayList<>();
-        artists.add(new Artist("Freeze Corleone"));
+        HashMap<String, Integer> artists = new HashMap<>();
+        artists.put("Freeze Corleone", 1);
         UserArtist userArtist = new UserArtist(0, user.getId(), "long", LocalDate.now(), artists);
         user.addArtist(userArtist);
 
-        List<Track> tracks = new ArrayList<>();
-        tracks.add(new Track(new Album(), new ArrayList<>(), "Hors Ligne", new SpotifyURL()));
+        HashMap<String, Integer> tracks = new HashMap<>();
+        tracks.put("Hors Ligne", 1);
         UserTrack userTrack = new UserTrack(0, user.getId(), "long", tracks, LocalDate.now());
         user.addTrack(userTrack);
 
-        List<Genre> genres = new ArrayList<>();
-        genres.add(new Genre("rap", 50));
+        HashMap<String, Double> genres = new HashMap<>();
+        genres.put("rap", 50.0);
         UserGenre userGenre = new UserGenre(0, user.getId(), "long", LocalDate.now(), genres);
         user.addGenre(userGenre);
 
@@ -63,13 +54,6 @@ public class AppController {
         user.addMainstream(userMainstream);
 
         userRepository.save(user);
-    } */
-
-    /*
-    @GetMapping("/delete")
-    public void delete() {
-        User user = userRepository.findByEmail("lasix@gmail.com");
-        userRepository.delete(user);
     }*/
 
     @GetMapping("/auth")
@@ -90,44 +74,45 @@ public class AppController {
     }
 
     @GetMapping("/top/tracks")
-    public ResponseEntity<TopTracksDTO> tracks(@RequestParam("range") String range, Principal principal) {
-        String url = SpotifyAPI.TOP_TRACKS + range + "_term";
-        TopTracksDTO topTracks = spotifyApiService.getTopTracks(principal.getName(), url);
+    public ResponseEntity<TopTracksDTO> tracks(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
+        String email = (String) principal.getAttributes().get("email");
+        TopTracksDTO topTracks = spotifyApiService.getTopTracks(email, range);
         return ResponseEntity.ok(topTracks);
     }
 
     @GetMapping("/top/artists")
-    public ResponseEntity<TopArtistsDTO> artists(@RequestParam("range") String range, Principal principal) {
-        String url = SpotifyAPI.TOP_ARTISTS + range + "_term";
-        TopArtistsDTO topArtists = spotifyApiService.getTopArtists(principal.getName(), url);
+    public ResponseEntity<TopArtistsDTO> artists(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
+        String email = (String) principal.getAttributes().get("email");
+        TopArtistsDTO topArtists = spotifyApiService.getTopArtists(email, range);
         return ResponseEntity.ok(topArtists);
     }
 
     @GetMapping("/top/genres")
-    public ResponseEntity<TopGenresDTO> genres(@RequestParam("range") String range, Principal principal) {
-        String url = SpotifyAPI.TOP_ARTISTS + range + "_term";
-        TopGenresDTO topGenres = spotifyApiService.getTopGenres(principal.getName(), url);
+    public ResponseEntity<TopGenresDTO> genres(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
+        String email = (String) principal.getAttributes().get("email");
+        TopGenresDTO topGenres = spotifyApiService.getTopGenres(email, range);
         return ResponseEntity.ok(topGenres);
     }
 
     @GetMapping("/recently")
-    public ResponseEntity<RecentlyPlayedDTO> recently(Principal principal) {
-        RecentlyPlayedDTO recentlyPlayed = spotifyApiService.getRecentlyPlayed(principal.getName());
+    public ResponseEntity<RecentlyPlayedDTO> recently(@AuthenticationPrincipal OAuth2User principal) {
+        String email = (String) principal.getAttributes().get("email");
+        RecentlyPlayedDTO recentlyPlayed = spotifyApiService.getRecentlyPlayed(email);
         return ResponseEntity.ok(recentlyPlayed);
 
     }
 
     @GetMapping("/score")
-    public ResponseEntity<MainstreamScoreDTO> mainstreamScore(@RequestParam("range") String range, Principal principal) {
-        String url = SpotifyAPI.TOP_TRACKS + range + "_term";
-        MainstreamScoreDTO mainstreamScore = spotifyApiService.getMainstreamScore(principal.getName(), url);
+    public ResponseEntity<MainstreamScoreDTO> mainstreamScore(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
+        String email = (String) principal.getAttributes().get("email");
+        MainstreamScoreDTO mainstreamScore = spotifyApiService.getMainstreamScore(email, range);
         return ResponseEntity.ok(mainstreamScore);
     }
 
     @PostMapping("/playlist/create")
-    public ResponseEntity<PlaylistDTO> createPlaylist(@RequestParam("range") String range, Principal principal) {
-        String url = SpotifyAPI.TOP_TRACKS + range + "_term";
-        PlaylistDTO playlist = spotifyApiService.postTopTracksPlaylist(principal.getName(), url);
+    public ResponseEntity<PlaylistDTO> createPlaylist(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
+        String email = (String) principal.getAttributes().get("email");
+        PlaylistDTO playlist = spotifyApiService.postTopTracksPlaylist(email, range);
         return ResponseEntity.status(HttpStatus.CREATED).body(playlist);
     }
 }
