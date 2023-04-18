@@ -2,13 +2,11 @@ package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.model.*;
-import com.laa66.statlyapp.repository.UserRepository;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,11 +22,13 @@ public class AppController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppController.class);
 
-    @Value("${api.react-app.url}")
-    private String REACT_URL;
+    private final String reactUrl;
+    private final SpotifyAPIService spotifyApiService;
 
-    @Autowired
-    private SpotifyAPIService spotifyApiService;
+    public AppController(SpotifyAPIService spotifyAPIService, @Value("${api.react-app.url}") String reactUrl) {
+        this.spotifyApiService = spotifyAPIService;
+        this.reactUrl = reactUrl;
+    }
 
     /*@GetMapping("/test")
     public void test() {
@@ -63,7 +63,7 @@ public class AppController {
                 .findFirst()
                 .map(Image::getUrl)
                 .orElse("none");
-        String redirectUrl = REACT_URL + "/callback?name=" + userDTO.getDisplayName() + "&url=" + (imageUrl.equals("none") ? "./account.png"  : imageUrl);
+        String redirectUrl = reactUrl + "/callback?name=" + userDTO.getDisplayName() + "&url=" + (imageUrl.equals("none") ? "./account.png"  : imageUrl);
         response.setStatus(HttpStatus.TEMPORARY_REDIRECT.value());
         response.setHeader(HttpHeaders.LOCATION, redirectUrl);
     }

@@ -30,9 +30,11 @@ import java.util.stream.Collectors;
 public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpotifyAPIServiceImpl.class);
 
-    @Autowired
-    @Qualifier("restTemplateInterceptor")
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+
+    public SpotifyAPIServiceImpl(@Qualifier("restTemplateInterceptor") RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     @Override
     public UserDTO getCurrentUser() {

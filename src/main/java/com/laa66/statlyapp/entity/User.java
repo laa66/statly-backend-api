@@ -39,6 +39,12 @@ public class User {
 
     }
 
+    public User(long id, String email, LocalDateTime joinDate) {
+        this.id = id;
+        this.email = email;
+        this.joinDate = joinDate;
+    }
+
     public User(long id, String email, LocalDateTime joinDate, List<UserTrack> tracks, List<UserArtist> artists, List<UserGenre> genres) {
         this.id = id;
         this.email = email;

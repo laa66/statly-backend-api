@@ -2,7 +2,6 @@ package com.laa66.statlyapp.service;
 
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.model.AccessToken;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.*;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -19,9 +18,11 @@ import java.util.*;
 @Service
 public class SpotifyTokenServiceImpl implements SpotifyTokenService {
 
-    @Autowired
-    @Qualifier("restTemplate")
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+
+    public SpotifyTokenServiceImpl(@Qualifier("restTemplate") RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     @Override
     public OAuth2AccessToken refreshAccessToken(OAuth2AuthorizedClient client) {

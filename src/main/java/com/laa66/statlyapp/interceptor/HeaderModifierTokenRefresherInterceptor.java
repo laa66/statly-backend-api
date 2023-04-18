@@ -25,11 +25,13 @@ public class HeaderModifierTokenRefresherInterceptor implements ClientHttpReques
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HeaderModifierTokenRefresherInterceptor.class);
 
-    @Autowired
-    private OAuth2AuthorizedClientService clientService;
+    private final OAuth2AuthorizedClientService clientService;
+    private final SpotifyTokenService tokenService;
 
-    @Autowired
-    private SpotifyTokenService tokenService;
+    public HeaderModifierTokenRefresherInterceptor(OAuth2AuthorizedClientService clientService, SpotifyTokenService tokenService) {
+        this.clientService = clientService;
+        this.tokenService = tokenService;
+    }
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {

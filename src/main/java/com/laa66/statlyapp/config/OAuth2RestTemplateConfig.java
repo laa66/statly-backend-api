@@ -1,8 +1,10 @@
 package com.laa66.statlyapp.config;
 
 import com.laa66.statlyapp.interceptor.HeaderModifierTokenRefresherInterceptor;
+import com.laa66.statlyapp.service.SpotifyTokenService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
@@ -17,9 +19,9 @@ public class OAuth2RestTemplateConfig {
      **/
 
     @Bean("restTemplateInterceptor")
-    public RestTemplate restTemplateInterceptor() {
+    public RestTemplate restTemplateInterceptor(HeaderModifierTokenRefresherInterceptor interceptor) {
         RestTemplate restTemplate = new RestTemplate();
-        restTemplate.getInterceptors().add(interceptor());
+        restTemplate.getInterceptors().add(interceptor);
         return restTemplate;
     }
 
@@ -29,8 +31,8 @@ public class OAuth2RestTemplateConfig {
     }
 
     @Bean
-    public HeaderModifierTokenRefresherInterceptor interceptor() {
-        return new HeaderModifierTokenRefresherInterceptor();
+    public HeaderModifierTokenRefresherInterceptor interceptor(OAuth2AuthorizedClientService clientService, SpotifyTokenService tokenService) {
+        return new HeaderModifierTokenRefresherInterceptor(clientService, tokenService);
     }
 
 }
