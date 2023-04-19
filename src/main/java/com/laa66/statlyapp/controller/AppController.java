@@ -75,44 +75,43 @@ public class AppController {
 
     @GetMapping("/top/tracks")
     public ResponseEntity<TopTracksDTO> tracks(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
-        String email = (String) principal.getAttributes().get("email");
-        TopTracksDTO topTracks = spotifyApiService.getTopTracks(email, range);
+        long userId = (long) principal.getAttributes().get("userId");
+        TopTracksDTO topTracks = spotifyApiService.getTopTracks(userId, range);
         return ResponseEntity.ok(topTracks);
     }
 
     @GetMapping("/top/artists")
     public ResponseEntity<TopArtistsDTO> artists(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
-        String email = (String) principal.getAttributes().get("email");
-        TopArtistsDTO topArtists = spotifyApiService.getTopArtists(email, range);
+        long userId = (long) principal.getAttributes().get("userId");
+        TopArtistsDTO topArtists = spotifyApiService.getTopArtists(userId, range);
         return ResponseEntity.ok(topArtists);
     }
 
     @GetMapping("/top/genres")
     public ResponseEntity<TopGenresDTO> genres(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
-        String email = (String) principal.getAttributes().get("email");
-        TopGenresDTO topGenres = spotifyApiService.getTopGenres(email, range);
+        long userId = (long) principal.getAttributes().get("userId");
+        TopGenresDTO topGenres = spotifyApiService.getTopGenres(userId, range);
         return ResponseEntity.ok(topGenres);
     }
 
     @GetMapping("/recently")
-    public ResponseEntity<RecentlyPlayedDTO> recently(@AuthenticationPrincipal OAuth2User principal) {
-        String email = (String) principal.getAttributes().get("email");
-        RecentlyPlayedDTO recentlyPlayed = spotifyApiService.getRecentlyPlayed(email);
+    public ResponseEntity<RecentlyPlayedDTO> recently() {
+        RecentlyPlayedDTO recentlyPlayed = spotifyApiService.getRecentlyPlayed();
         return ResponseEntity.ok(recentlyPlayed);
 
     }
 
     @GetMapping("/score")
     public ResponseEntity<MainstreamScoreDTO> mainstreamScore(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
-        String email = (String) principal.getAttributes().get("email");
-        MainstreamScoreDTO mainstreamScore = spotifyApiService.getMainstreamScore(email, range);
+        long userId = (long) principal.getAttributes().get("userId");
+        MainstreamScoreDTO mainstreamScore = spotifyApiService.getMainstreamScore(userId, range);
         return ResponseEntity.ok(mainstreamScore);
     }
 
     @PostMapping("/playlist/create")
     public ResponseEntity<PlaylistDTO> createPlaylist(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
-        String email = (String) principal.getAttributes().get("email");
-        PlaylistDTO playlist = spotifyApiService.postTopTracksPlaylist(email, range);
+        long userId = (long) principal.getAttributes().get("userId");
+        PlaylistDTO playlist = spotifyApiService.postTopTracksPlaylist(userId, range);
         return ResponseEntity.status(HttpStatus.CREATED).body(playlist);
     }
 }

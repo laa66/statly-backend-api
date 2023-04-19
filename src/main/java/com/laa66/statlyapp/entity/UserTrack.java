@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
-import java.util.HashMap;
+import java.util.Map;
 
 
 @Entity
@@ -24,14 +24,14 @@ public class UserTrack {
 
     @Type(JsonType.class)
     @Column(columnDefinition = "JSON")
-    private HashMap<String, Integer> tracks;
+    private Map<String, Integer> tracks;
 
     private LocalDate date;
 
     public UserTrack() {
     }
 
-    public UserTrack(long id, long userId, String range, HashMap<String, Integer> tracks, LocalDate date) {
+    public UserTrack(long id, long userId, String range, Map<String, Integer> tracks, LocalDate date) {
         this.id = id;
         this.userId = userId;
         this.range = range;
@@ -63,11 +63,11 @@ public class UserTrack {
         this.range = range;
     }
 
-    public HashMap<String, Integer> getTracks() {
+    public Map<String, Integer> getTracks() {
         return tracks;
     }
 
-    public void setTracks(HashMap<String, Integer> tracks) {
+    public void setTracks(Map<String, Integer> tracks) {
         this.tracks = tracks;
     }
 

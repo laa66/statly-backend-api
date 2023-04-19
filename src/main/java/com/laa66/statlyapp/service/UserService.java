@@ -6,6 +6,7 @@ import com.laa66.statlyapp.DTO.TopGenresDTO;
 import com.laa66.statlyapp.DTO.TopTracksDTO;
 import com.laa66.statlyapp.entity.User;
 
+import java.util.Map;
 import java.util.Optional;
 
 public interface UserService {
@@ -16,20 +17,20 @@ public interface UserService {
 
     void deleteUser(long id);
 
-    void saveUserTracks(String email, String range, TopTracksDTO dto);
+    void saveUserTracks(Map<TopTracksDTO, Long> dtoMap);
 
-    void saveUserArtists(String email, String range, TopArtistsDTO dto);
+    void saveUserArtists(Map<TopArtistsDTO, Long> dtoMap);
 
-    void saveUserGenres(String email, String range, TopGenresDTO dto);
+    void saveUserGenres(Map<TopGenresDTO, Long> dtoMap);
 
-    void saveUserMainstream(String email, String range, MainstreamScoreDTO dto);
+    void saveUserMainstream(Map<MainstreamScoreDTO, Long> dtoMap);
 
-    TopTracksDTO compareTracks(String email, String range, TopTracksDTO dto);
+    TopTracksDTO compareTracks(long userId, TopTracksDTO dto);
 
-    TopArtistsDTO compareArtists(String email, String range, TopArtistsDTO dto);
+    TopArtistsDTO compareArtists(long userId, TopArtistsDTO dto);
 
-    TopGenresDTO compareGenres(String email, String range, TopGenresDTO dto);
+    TopGenresDTO compareGenres(long userId, TopGenresDTO dto);
 
-    MainstreamScoreDTO compareMainstream(String email, MainstreamScoreDTO dto);
+    MainstreamScoreDTO compareMainstream(long userId, MainstreamScoreDTO dto);
 
 }

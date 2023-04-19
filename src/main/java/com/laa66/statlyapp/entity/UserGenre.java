@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
-import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Table(name = "user_genres")
@@ -21,21 +21,21 @@ public class UserGenre {
     @Column(name = "time_range")
     private String range;
 
-    private LocalDate date;
-
     @Type(JsonType.class)
     @Column(columnDefinition = "JSON")
-    private HashMap<String, Double> genres;
+    private Map<String, Integer> genres;
+
+    private LocalDate date;
 
     public UserGenre() {
     }
 
-    public UserGenre(long id, long userId, String range, LocalDate date, HashMap<String, Double> genres) {
+    public UserGenre(long id, long userId, String range, Map<String, Integer> genres, LocalDate date) {
         this.id = id;
         this.userId = userId;
         this.range = range;
-        this.date = date;
         this.genres = genres;
+        this.date = date;
     }
 
     public long getId() {
@@ -70,11 +70,11 @@ public class UserGenre {
         this.date = date;
     }
 
-    public HashMap<String, Double> getGenres() {
+    public Map<String, Integer> getGenres() {
         return genres;
     }
 
-    public void setGenres(HashMap<String, Double> genres) {
+    public void setGenres(Map<String, Integer> genres) {
         this.genres = genres;
     }
 

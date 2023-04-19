@@ -8,12 +8,15 @@ public class TopGenresDTO {
 
     private List<Genre> genres;
 
+    private String range;
+
     public TopGenresDTO() {
 
     }
 
-    public TopGenresDTO(List<Genre> genres) {
+    public TopGenresDTO(List<Genre> genres, String range) {
         this.genres = genres;
+        this.range = range;
     }
 
     public List<Genre> getGenres() {
@@ -24,10 +27,19 @@ public class TopGenresDTO {
         this.genres = genres;
     }
 
+    public String getRange() {
+        return range;
+    }
+
+    public void setRange(String range) {
+        this.range = range;
+    }
+
     @Override
     public String toString() {
         return "TopGenresDTO{" +
                 "genres=" + genres +
+                ", range='" + range + '\'' +
                 '}';
     }
 }

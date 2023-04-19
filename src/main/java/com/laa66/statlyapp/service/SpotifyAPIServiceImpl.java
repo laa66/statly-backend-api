@@ -8,7 +8,6 @@ import com.laa66.statlyapp.exception.SpotifyAPIException;
 import com.laa66.statlyapp.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ClassPathResource;
@@ -43,22 +42,26 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
 
     @Override
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
-    public TopTracksDTO getTopTracks(String email, String range) {
-        LOGGER.info("TopTracksDTO " + range + " object for user: " + email + " cached!");
-        return restTemplate.exchange(SpotifyAPI.TOP_TRACKS + range + "_term", HttpMethod.GET, null, TopTracksDTO.class).getBody();
+    public TopTracksDTO getTopTracks(long userId, String range) {
+        LOGGER.info("TopTracksDTO " + range + " object for user: " + userId + " cached!");
+        TopTracksDTO body = restTemplate.exchange(SpotifyAPI.TOP_TRACKS + range + "_term", HttpMethod.GET, null, TopTracksDTO.class).getBody();
+        if (body != null) body.setRange(range);
+        return body;
     }
 
     @Override
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
-    public TopArtistsDTO getTopArtists(String email, String range) {
-        LOGGER.info("TopArtistsDTO " + range + " object for user: " + email + " cached!");
-        return restTemplate.exchange(SpotifyAPI.TOP_ARTISTS + range + "_term", HttpMethod.GET, null, TopArtistsDTO.class).getBody();
+    public TopArtistsDTO getTopArtists(long userId, String range) {
+        LOGGER.info("TopArtistsDTO " + range + " object for user: " + userId + " cached!");
+        TopArtistsDTO body = restTemplate.exchange(SpotifyAPI.TOP_ARTISTS + range + "_term", HttpMethod.GET, null, TopArtistsDTO.class).getBody();
+        if (body != null) body.setRange(range);
+        return body;
     }
 
     @Override
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
-    public TopGenresDTO getTopGenres(String email, String range) {
-        TopArtistsDTO response = getTopArtists(email, range);
+    public TopGenresDTO getTopGenres(long userId, String range) {
+        TopArtistsDTO response = getTopArtists(userId, range);
         List<ItemTopArtists> topArtists = response.getItemTopArtists();
         HashMap<String, Integer> map = new HashMap<>();
         topArtists.forEach(list -> list.getGenres().forEach(item -> {
@@ -70,26 +73,26 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
         double sum = sliceGenres.stream().mapToInt(Genre::getScore).sum();
         return new TopGenresDTO(sliceGenres.stream()
                 .map(item -> new Genre(item.getGenre(), Double.valueOf((item.getScore() / sum) * 100)
-                        .intValue())).collect(Collectors.toList()));
+                        .intValue())).collect(Collectors.toList()), range);
     }
 
     @Override
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
-    public MainstreamScoreDTO getMainstreamScore(String email, String range) {
-        TopTracksDTO response = getTopTracks(email, range);
+    public MainstreamScoreDTO getMainstreamScore(long userId, String range) {
+        TopTracksDTO response = getTopTracks(userId, range);
         double result = response.getItemTopTracks().stream().mapToInt(ItemTopTracks::getPopularity)
                 .average()
                 .orElse(0);
-        return new MainstreamScoreDTO(result);
+        return new MainstreamScoreDTO(result, range);
     }
 
     @Override
-    public RecentlyPlayedDTO getRecentlyPlayed(String email) {
+    public RecentlyPlayedDTO getRecentlyPlayed() {
         return restTemplate.exchange(SpotifyAPI.RECENTLY_PLAYED_TRACKS, HttpMethod.GET, null, RecentlyPlayedDTO.class).getBody();
     }
 
     @Override
-    public PlaylistDTO postTopTracksPlaylist(String email, String range) {
+    public PlaylistDTO postTopTracksPlaylist(long userId, String range) {
         UserDTO user = getCurrentUser();
         String playlistRange;
         switch (range) {
@@ -99,7 +102,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
             default -> throw new SpotifyAPIException("Wrong data range", HttpStatus.BAD_REQUEST.value());
         }
         PlaylistDTO playlist = postEmptyPlaylist(user, playlistRange);
-        List<String> uris = getTopTracks(email, range).getItemTopTracks().stream().map(ItemTopTracks::getUri).toList();
+        List<String> uris = getTopTracks(userId, range).getItemTopTracks().stream().map(ItemTopTracks::getUri).toList();
         postTracksToPlaylist(playlist, uris);
         return playlist;
     }

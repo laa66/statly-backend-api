@@ -17,12 +17,15 @@ public class TopTracksDTO {
     @JsonProperty("total")
     private String total;
 
+    private String range;
+
     public TopTracksDTO() {
     }
 
-    public TopTracksDTO(List<ItemTopTracks> itemTopTracks, String total) {
+    public TopTracksDTO(List<ItemTopTracks> itemTopTracks, String total, String range) {
         this.itemTopTracks = itemTopTracks;
         this.total = total;
+        this.range = range;
     }
 
     public List<ItemTopTracks> getItemTopTracks() {
@@ -41,11 +44,20 @@ public class TopTracksDTO {
         this.total = total;
     }
 
+    public String getRange() {
+        return range;
+    }
+
+    public void setRange(String range) {
+        this.range = range;
+    }
+
     @Override
     public String toString() {
         return "TopTracksDTO{" +
                 "itemTopTracks=" + itemTopTracks +
                 ", total='" + total + '\'' +
+                ", range='" + range + '\'' +
                 '}';
     }
 }
