@@ -3,6 +3,7 @@ package com.laa66.statlyapp.controller;
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.model.*;
 import com.laa66.statlyapp.service.SpotifyAPIService;
+import com.laa66.statlyapp.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -23,41 +24,17 @@ public class AppController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AppController.class);
 
     private final String reactUrl;
+    private final UserService userService;
     private final SpotifyAPIService spotifyApiService;
 
-    public AppController(SpotifyAPIService spotifyAPIService, @Value("${api.react-app.url}") String reactUrl) {
+    public AppController(UserService userService, SpotifyAPIService spotifyAPIService, @Value("${api.react-app.url}") String reactUrl) {
+        this.userService = userService;
         this.spotifyApiService = spotifyAPIService;
         this.reactUrl = reactUrl;
     }
 
-    /*@GetMapping("/test")
-    public void test() {
-        User user = userRepository.findByEmail("lasix@gmail.com").orElseThrow();
-        System.out.println(user);
-
-        HashMap<String, Integer> artists = new HashMap<>();
-        artists.put("Freeze Corleone", 1);
-        UserArtist userArtist = new UserArtist(0, user.getId(), "long", LocalDate.now(), artists);
-        user.addArtist(userArtist);
-
-        HashMap<String, Integer> tracks = new HashMap<>();
-        tracks.put("Hors Ligne", 1);
-        UserTrack userTrack = new UserTrack(0, user.getId(), "long", tracks, LocalDate.now());
-        user.addTrack(userTrack);
-
-        HashMap<String, Double> genres = new HashMap<>();
-        genres.put("rap", 50.0);
-        UserGenre userGenre = new UserGenre(0, user.getId(), "long", LocalDate.now(), genres);
-        user.addGenre(userGenre);
-
-        UserMainstream userMainstream = new UserMainstream(0, user.getId(), "long", LocalDate.now(), 92.12);
-        user.addMainstream(userMainstream);
-
-        userRepository.save(user);
-    }*/
-
     @GetMapping("/auth")
-    public void user(HttpServletRequest request, HttpServletResponse response) {
+    public void authenticate(HttpServletRequest request, HttpServletResponse response) {
         UserDTO userDTO = spotifyApiService.getCurrentUser();
         String imageUrl = userDTO.getImages().stream()
                 .findFirst()
@@ -73,25 +50,34 @@ public class AppController {
         LOGGER.info("-->> User Joined beta tests - username: " + betaUserDTO.getUsername() + ", email: " + betaUserDTO.getEmail());
     }
 
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> delete(@AuthenticationPrincipal OAuth2User principal) {
+        userService.deleteUser((long) principal.getAttributes().get("userId"));
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/top/tracks")
     public ResponseEntity<TopTracksDTO> tracks(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
         long userId = (long) principal.getAttributes().get("userId");
-        TopTracksDTO topTracks = spotifyApiService.getTopTracks(userId, range);
-        return ResponseEntity.ok(topTracks);
+        TopTracksDTO dto = spotifyApiService.getTopTracks(userId, range);
+        TopTracksDTO comparedDto = userService.compareTracks(userId, dto);
+        return ResponseEntity.ok(comparedDto);
     }
 
     @GetMapping("/top/artists")
     public ResponseEntity<TopArtistsDTO> artists(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
         long userId = (long) principal.getAttributes().get("userId");
-        TopArtistsDTO topArtists = spotifyApiService.getTopArtists(userId, range);
-        return ResponseEntity.ok(topArtists);
+        TopArtistsDTO dto = spotifyApiService.getTopArtists(userId, range);
+        TopArtistsDTO comparedDto = userService.compareArtists(userId, dto);
+        return ResponseEntity.ok(comparedDto);
     }
 
     @GetMapping("/top/genres")
     public ResponseEntity<TopGenresDTO> genres(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
         long userId = (long) principal.getAttributes().get("userId");
-        TopGenresDTO topGenres = spotifyApiService.getTopGenres(userId, range);
-        return ResponseEntity.ok(topGenres);
+        TopGenresDTO dto = spotifyApiService.getTopGenres(userId, range);
+        TopGenresDTO comparedDto = userService.compareGenres(userId, dto);
+        return ResponseEntity.ok(comparedDto);
     }
 
     @GetMapping("/recently")
@@ -104,8 +90,9 @@ public class AppController {
     @GetMapping("/score")
     public ResponseEntity<MainstreamScoreDTO> mainstreamScore(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
         long userId = (long) principal.getAttributes().get("userId");
-        MainstreamScoreDTO mainstreamScore = spotifyApiService.getMainstreamScore(userId, range);
-        return ResponseEntity.ok(mainstreamScore);
+        MainstreamScoreDTO dto = spotifyApiService.getMainstreamScore(userId, range);
+        MainstreamScoreDTO comparedDto = userService.compareMainstream(userId, dto);
+        return ResponseEntity.ok(comparedDto);
     }
 
     @PostMapping("/playlist/create")

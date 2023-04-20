@@ -5,12 +5,16 @@ import com.laa66.statlyapp.DTO.TopArtistsDTO;
 import com.laa66.statlyapp.DTO.TopGenresDTO;
 import com.laa66.statlyapp.DTO.TopTracksDTO;
 import com.laa66.statlyapp.entity.*;
+import com.laa66.statlyapp.exception.UserNotFoundException;
 import com.laa66.statlyapp.model.Genre;
 import com.laa66.statlyapp.model.ItemTopArtists;
+import com.laa66.statlyapp.model.ItemTopTracks;
 import com.laa66.statlyapp.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @Transactional
@@ -51,7 +56,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(long id) {
-        userRepository.deleteById(id);
+        userRepository.findById(id).ifPresentOrElse(item -> userRepository.deleteById(id), () -> {
+                    throw new UserNotFoundException("User not found");
+                });
     }
 
     @Override
@@ -105,21 +112,62 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public TopTracksDTO compareTracks(long userId, TopTracksDTO dto) {
-        return null;
+        Optional<UserTrack> userTrack = trackRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, dto.getRange());
+        userTrack.ifPresent(item -> {
+            IntStream.range(0, dto.getItemTopTracks().size()).forEach(index -> {
+                ItemTopTracks track = dto.getItemTopTracks().get(index);
+                String artist = track.getArtists().get(0).getName();
+                String name = track.getName();
+                int actualPosition = index + 1;
+                int lastPosition = item.getTracks().getOrDefault(artist + "_" + name, 50);
+                track.setDifference(lastPosition - actualPosition);
+                //System.out.println("Today: " + name + " - " + actualPosition + " / Yesterday: " + name + " - " + lastPosition + " / diff: " + track.getDifference());
+            });
+        });
+        return dto;
     }
 
     @Override
     public TopArtistsDTO compareArtists(long userId, TopArtistsDTO dto) {
-        return null;
+        Optional<UserArtist> userArtist = artistRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, dto.getRange());
+        userArtist.ifPresent(item -> {
+            IntStream.range(0, dto.getItemTopArtists().size()).forEach(index -> {
+                ItemTopArtists artist = dto.getItemTopArtists().get(index);
+                String name = artist.getName();
+                int actualPosition = index + 1;
+                int lastPosition = item.getArtists().getOrDefault(name, 50);
+                artist.setDifference(lastPosition - actualPosition);
+                //System.out.println("Today: " + name + " - " + actualPosition + " / Yesterday: " + name + " - " + lastPosition + " / diff: " + artist.getDifference());
+            });
+        });
+        return dto;
     }
 
     @Override
     public TopGenresDTO compareGenres(long userId, TopGenresDTO dto) {
-        return null;
+        Optional<UserGenre> userGenre = genreRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, dto.getRange());
+        userGenre.ifPresent(item -> {
+            IntStream.range(0, dto.getGenres().size()).forEach(index -> {
+                Genre genre = dto.getGenres().get(index);
+                String name = genre.getGenre();
+                int actualScore = genre.getScore();
+                int lastScore = item.getGenres().getOrDefault(name, 0);
+                genre.setDifference(actualScore - lastScore);
+                //System.out.println("Today: " + name + " - " + actualScore + " / Yesterday: " + name + " - " + lastScore + " / diff: " + genre.getDifference());
+            });
+        });
+        return dto;
     }
 
     @Override
     public MainstreamScoreDTO compareMainstream(long userId, MainstreamScoreDTO dto) {
-        return null;
+        Optional<UserMainstream> userMainstream = mainstreamRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, dto.getRange());
+        userMainstream.ifPresent(item -> {
+            double actualScore = dto.getScore();
+            double lastScore = userMainstream.get().getScore();
+            dto.setDifference(new BigDecimal(actualScore - lastScore).setScale(2, RoundingMode.HALF_UP).doubleValue());
+            //System.out.println("Today: " + actualScore + " / Yesterday: " + lastScore + " / diff: " + dto.getDifference());
+        });
+        return dto;
     }
 }

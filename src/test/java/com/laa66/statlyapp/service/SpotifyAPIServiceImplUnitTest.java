@@ -48,14 +48,14 @@ class SpotifyAPIServiceImplUnitTest {
     @Test
     void shouldGetTopTracksWithValidUrl() {
         TopTracksDTO dto = new TopTracksDTO(List.of(new ItemTopTracks()
-                , new ItemTopTracks()), "2");
+                , new ItemTopTracks()), "2", "long");
         when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS + "long_term"),
                 eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
                 .thenReturn(new ResponseEntity<>(dto, HttpStatus.OK));
-        TopTracksDTO returnDto = spotifyAPIService.getTopTracks("user"
-                , "long");
+        TopTracksDTO returnDto = spotifyAPIService.getTopTracks(1, "long");
         assertEquals(dto.getItemTopTracks().size(), returnDto.getItemTopTracks().size());
         assertEquals(dto.getTotal(), returnDto.getTotal());
+        assertEquals(dto.getRange(), returnDto.getRange());
     }
 
     @Test
@@ -64,19 +64,19 @@ class SpotifyAPIServiceImplUnitTest {
                 eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
                 .thenThrow(HttpClientErrorException.class);
         assertThrows(HttpClientErrorException.class,
-                () ->  spotifyAPIService.getTopTracks("user", "wrong"));
+                () ->  spotifyAPIService.getTopTracks(1, "wrong"));
     }
 
     @Test
     void shouldGetTopArtistsWithValidUrl() {
-        TopArtistsDTO dto = new TopArtistsDTO("1", List.of(new ItemTopArtists(), new ItemTopArtists()));
+        TopArtistsDTO dto = new TopArtistsDTO("1", List.of(new ItemTopArtists(), new ItemTopArtists()), "long");
         when(restTemplate.exchange(eq(SpotifyAPI.TOP_ARTISTS + "long_term"),
                 eq(HttpMethod.GET), any(), eq(TopArtistsDTO.class)))
                 .thenReturn(new ResponseEntity<>(dto, HttpStatus.OK));
-        TopArtistsDTO returnDto = spotifyAPIService.getTopArtists("user"
-                , "long");
+        TopArtistsDTO returnDto = spotifyAPIService.getTopArtists(1, "long");
         assertEquals(dto.getItemTopArtists().size(), returnDto.getItemTopArtists().size());
         assertEquals(dto.getTotal(), returnDto.getTotal());
+        assertEquals(dto.getRange(), returnDto.getRange());
     }
 
     @Test
@@ -85,7 +85,7 @@ class SpotifyAPIServiceImplUnitTest {
                 eq(HttpMethod.GET), any(), eq(TopArtistsDTO.class)))
                 .thenThrow(HttpClientErrorException.class);
         assertThrows(HttpClientErrorException.class,
-                () -> spotifyAPIService.getTopArtists("user", "wrong"));
+                () -> spotifyAPIService.getTopArtists(1, "wrong"));
     }
 
     @Test
@@ -94,13 +94,13 @@ class SpotifyAPIServiceImplUnitTest {
         track1.setPopularity(40);
         ItemTopTracks track2 = new ItemTopTracks();
         track2.setPopularity(70);
-        TopTracksDTO dto = new TopTracksDTO(List.of(track1, track2), "2");
+        TopTracksDTO dto = new TopTracksDTO(List.of(track1, track2), "2", "long");
         when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS + "long_term"),
                 eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
                 .thenReturn(new ResponseEntity<>(dto, HttpStatus.OK));
-        MainstreamScoreDTO returnDto = spotifyAPIService.getMainstreamScore("user"
-                , "long");
+        MainstreamScoreDTO returnDto = spotifyAPIService.getMainstreamScore(1, "long");
         assertEquals(55.00, returnDto.getScore());
+        assertEquals(dto.getRange(), returnDto.getRange());
     }
 
     @Test
@@ -109,7 +109,7 @@ class SpotifyAPIServiceImplUnitTest {
                 eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
                 .thenThrow(HttpClientErrorException.class);
         assertThrows(HttpClientErrorException.class,
-                () -> spotifyAPIService.getMainstreamScore("user", "wrong"));
+                () -> spotifyAPIService.getMainstreamScore(1, "wrong"));
     }
 
     @Test
@@ -118,18 +118,17 @@ class SpotifyAPIServiceImplUnitTest {
         artist1.setGenres(List.of("classic", "classic", "classic", "rock", "rock", "rock", "rock"));
         ItemTopArtists artist2 = new ItemTopArtists();
         artist2.setGenres(List.of("classic", "classic", "classic"));
-        TopArtistsDTO dto = new TopArtistsDTO();
-        dto.setItemTopArtists(List.of(artist1, artist2));
+        TopArtistsDTO dto = new TopArtistsDTO("2", List.of(artist1, artist2), "long");
 
         when(restTemplate.exchange(eq(SpotifyAPI.TOP_ARTISTS + "long_term"),
                 eq(HttpMethod.GET), any(), eq(TopArtistsDTO.class)))
                 .thenReturn(new ResponseEntity<>(dto, HttpStatus.OK));
-        TopGenresDTO returnDto = spotifyAPIService.getTopGenres("user"
-                , "long");
+        TopGenresDTO returnDto = spotifyAPIService.getTopGenres(1, "long");
 
         assertEquals(2, returnDto.getGenres().size());
         assertEquals(60, returnDto.getGenres().get(0).getScore());
         assertEquals(40, returnDto.getGenres().get(1).getScore());
+        assertEquals(dto.getRange(), returnDto.getRange());
     }
 
     @Test
@@ -138,7 +137,7 @@ class SpotifyAPIServiceImplUnitTest {
                 eq(HttpMethod.GET), any(), eq(TopArtistsDTO.class)))
                 .thenThrow(HttpClientErrorException.class);
         assertThrows(HttpClientErrorException.class,
-                () -> spotifyAPIService.getTopGenres("user", "wrong"));
+                () -> spotifyAPIService.getTopGenres(1, "wrong"));
     }
 
     @Test
@@ -147,7 +146,7 @@ class SpotifyAPIServiceImplUnitTest {
         when(restTemplate.exchange(eq(SpotifyAPI.RECENTLY_PLAYED_TRACKS),
                 eq(HttpMethod.GET), any(), eq(RecentlyPlayedDTO.class)))
                 .thenReturn(new ResponseEntity<>(dto, HttpStatus.OK));
-        RecentlyPlayedDTO returnDto = spotifyAPIService.getRecentlyPlayed("user");
+        RecentlyPlayedDTO returnDto = spotifyAPIService.getRecentlyPlayed();
         assertEquals(dto.getItemRecentlyPlayedList().size(), returnDto.getItemRecentlyPlayedList().size());
         assertEquals(dto.getTotal(), returnDto.getTotal());
     }
@@ -155,8 +154,7 @@ class SpotifyAPIServiceImplUnitTest {
     @Test
     void shouldPostTopTracksPlaylistWithValidUrl() {
         UserDTO userDTO = new UserDTO("testuser", "test@mail.com", "testuser", List.of(new Image()));
-        TopTracksDTO tracksDTO = new TopTracksDTO(List.of(new ItemTopTracks()
-                , new ItemTopTracks()), "2");
+        TopTracksDTO tracksDTO = new TopTracksDTO(List.of(new ItemTopTracks(), new ItemTopTracks()), "2", "long");
         PlaylistDTO playlistDTO = new PlaylistDTO("1", new SpotifyURL());
         String snapshotId = "snapshotId";
 
@@ -172,7 +170,7 @@ class SpotifyAPIServiceImplUnitTest {
         when(restTemplate.exchange(eq(SpotifyAPI.ADD_PLAYLIST_TRACK.replace("playlist_id",
                 playlistDTO.getId())), eq(HttpMethod.POST), any(), eq(String.class)))
                 .thenReturn(new ResponseEntity<>(snapshotId, HttpStatus.CREATED));
-        PlaylistDTO response = spotifyAPIService.postTopTracksPlaylist("user", "long");
+        PlaylistDTO response = spotifyAPIService.postTopTracksPlaylist(1, "long");
         assertEquals(playlistDTO.getId(), response.getId());
         assertNotNull(playlistDTO.getUrl());
 
@@ -184,14 +182,13 @@ class SpotifyAPIServiceImplUnitTest {
         when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER),
                 eq(HttpMethod.GET), any(), eq(UserDTO.class)))
                 .thenReturn(new ResponseEntity<>(userDTO, HttpStatus.CREATED));
-        assertThrows(SpotifyAPIException.class, () -> spotifyAPIService.postTopTracksPlaylist("user", "wrong"));
+        assertThrows(SpotifyAPIException.class, () -> spotifyAPIService.postTopTracksPlaylist(1, "wrong"));
     }
 
     @Test
     void shouldPostTopTracksPlaylistWithValidUrlIfPostingFailed() {
         UserDTO userDTO = new UserDTO("testuser", "test@mail.com","testuser", List.of(new Image()));
-        TopTracksDTO tracksDTO = new TopTracksDTO(List.of(new ItemTopTracks()
-                , new ItemTopTracks()), "2");
+        TopTracksDTO tracksDTO = new TopTracksDTO(List.of(new ItemTopTracks(), new ItemTopTracks()), "2", "long");
         PlaylistDTO playlistDTO = new PlaylistDTO("1", new SpotifyURL());
 
         when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER),
@@ -208,6 +205,6 @@ class SpotifyAPIServiceImplUnitTest {
                 .thenThrow(HttpClientErrorException.class);
 
         assertThrows(HttpClientErrorException.class,
-                () -> spotifyAPIService.postTopTracksPlaylist("user", "long"));
+                () -> spotifyAPIService.postTopTracksPlaylist(1, "long"));
     }
 }

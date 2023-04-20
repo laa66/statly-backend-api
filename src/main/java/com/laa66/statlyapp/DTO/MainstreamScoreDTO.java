@@ -5,6 +5,8 @@ public class MainstreamScoreDTO {
 
     private String range;
 
+    private double difference;
+
     public MainstreamScoreDTO() {
 
     }
@@ -30,11 +32,20 @@ public class MainstreamScoreDTO {
         this.range = range;
     }
 
+    public double getDifference() {
+        return difference;
+    }
+
+    public void setDifference(double difference) {
+        this.difference = difference;
+    }
+
     @Override
     public String toString() {
         return "MainstreamScoreDTO{" +
                 "score=" + score +
                 ", range='" + range + '\'' +
+                ", difference=" + difference +
                 '}';
     }
 }

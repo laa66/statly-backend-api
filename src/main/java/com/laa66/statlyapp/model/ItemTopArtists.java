@@ -25,6 +25,9 @@ public class ItemTopArtists {
     @JsonProperty("external_urls")
     private SpotifyURL url;
 
+    @JsonProperty("difference")
+    private int difference;
+
     public ItemTopArtists() {
 
     }
@@ -75,6 +78,14 @@ public class ItemTopArtists {
 
     public void setUrl(SpotifyURL url) {
         this.url = url;
+    }
+
+    public int getDifference() {
+        return difference;
+    }
+
+    public void setDifference(int difference) {
+        this.difference = difference;
     }
 
     @Override

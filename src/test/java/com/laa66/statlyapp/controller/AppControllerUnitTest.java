@@ -3,6 +3,7 @@ package com.laa66.statlyapp.controller;
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.model.*;
 import com.laa66.statlyapp.service.SpotifyAPIService;
+import com.laa66.statlyapp.service.UserService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +30,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AppControllerUnitTest {
 
     @MockBean
+    UserService userService;
+
+    @MockBean
     SpotifyAPIService spotifyAPIService;
 
     @Autowired
@@ -49,11 +53,11 @@ class AppControllerUnitTest {
 
     @BeforeAll
     static void prepare() {
-         tracksDTO = new TopTracksDTO(List.of(new ItemTopTracks()), "1");
-         artistsDTO = new TopArtistsDTO("1", List.of(new ItemTopArtists()));
-         genresDTO = new TopGenresDTO(List.of(new Genre("rock", 2)));
+         tracksDTO = new TopTracksDTO(List.of(new ItemTopTracks()), "1", "short");
+         artistsDTO = new TopArtistsDTO("1", List.of(new ItemTopArtists()), "short");
+         genresDTO = new TopGenresDTO(List.of(new Genre("rock", 2)), "short");
          recentlyDTO = new RecentlyPlayedDTO("1", List.of(new ItemRecentlyPlayed()));
-         mainstreamScoreDTO = new MainstreamScoreDTO(75.00);
+         mainstreamScoreDTO = new MainstreamScoreDTO(75.00, "short");
          Image image = new Image();
          image.setUrl("imageurl");
          userDTO = new UserDTO("testuser", "test@mail.com", "testuser", List.of(image));
@@ -76,10 +80,10 @@ class AppControllerUnitTest {
 
     @Test
     void shouldGetTopTracksAuthenticated() throws Exception {
-        when(spotifyAPIService.getTopTracks("test@mail.com", "short"))
-                .thenReturn(tracksDTO);
+        when(spotifyAPIService.getTopTracks(1, "short")).thenReturn(tracksDTO);
+        when(userService.compareTracks(1, tracksDTO)).thenReturn(tracksDTO);
         mockMvc.perform(get("/api/top/tracks").with(oauth2Login()
-                                .attributes(map -> map.put("email", "test@mail.com")))
+                                .attributes(map -> map.put("userId", 1L)))
                         .param("range", "short")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -97,10 +101,10 @@ class AppControllerUnitTest {
 
     @Test
     void shouldGetTopArtistsAuthenticated() throws Exception {
-        when(spotifyAPIService.getTopArtists("test@mail.com", "short"))
-                .thenReturn(artistsDTO);
+        when(spotifyAPIService.getTopArtists(1, "short")).thenReturn(artistsDTO);
+        when(userService.compareArtists(1, artistsDTO)).thenReturn(artistsDTO);
         mockMvc.perform(get("/api/top/artists").with(oauth2Login()
-                                .attributes(map -> map.put("email", "test@mail.com")))
+                                .attributes(map -> map.put("userId", 1L)))
                     .contentType(MediaType.APPLICATION_JSON)
                     .param("range", "short"))
                 .andExpect(status().isOk())
@@ -118,10 +122,10 @@ class AppControllerUnitTest {
 
     @Test
     void shouldGetTopGenresAuthenticated() throws Exception {
-        when(spotifyAPIService.getTopGenres("test@mail.com", "short"))
-                .thenReturn(genresDTO);
+        when(spotifyAPIService.getTopGenres(1, "short")).thenReturn(genresDTO);
+        when(userService.compareGenres(1, genresDTO)).thenReturn(genresDTO);
         mockMvc.perform(get("/api/top/genres").with(oauth2Login()
-                                .attributes(map -> map.put("email", "test@mail.com")))
+                                .attributes(map -> map.put("userId", 1L)))
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("range", "short"))
                 .andExpect(status().isOk())
@@ -139,10 +143,9 @@ class AppControllerUnitTest {
 
     @Test
     void shouldGetRecentlyPlayedAuthenticated() throws Exception {
-        when(spotifyAPIService.getRecentlyPlayed("test@mail.com"))
+        when(spotifyAPIService.getRecentlyPlayed())
                 .thenReturn(recentlyDTO);
-        mockMvc.perform(get("/api/recently").with(oauth2Login()
-                                .attributes(map -> map.put("email", "test@mail.com")))
+        mockMvc.perform(get("/api/recently").with(oauth2Login())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total", is("1")))
@@ -158,10 +161,11 @@ class AppControllerUnitTest {
 
     @Test
     void shouldGetMainstreamScoreAuthenticated() throws Exception {
-        when(spotifyAPIService.getMainstreamScore("test@mail.com", "short"))
+        when(spotifyAPIService.getMainstreamScore(1, "short"))
                 .thenReturn(mainstreamScoreDTO);
+        when(userService.compareMainstream(1, mainstreamScoreDTO)).thenReturn(mainstreamScoreDTO);
         mockMvc.perform(get("/api/score").with(oauth2Login()
-                                .attributes(map -> map.put("email", "test@mail.com")))
+                                .attributes(map -> map.put("userId", 1L)))
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("range", "short"))
                 .andExpect(status().isOk())
@@ -178,10 +182,10 @@ class AppControllerUnitTest {
     @Test
     void shouldCreatePlaylistAuthenticated() throws Exception {
         PlaylistDTO playlistDTO = new PlaylistDTO("1", new SpotifyURL());
-        when(spotifyAPIService.postTopTracksPlaylist("test@mail.com", "short"))
+        when(spotifyAPIService.postTopTracksPlaylist(1, "short"))
                 .thenReturn(playlistDTO);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/playlist/create").with(oauth2Login()
-                                .attributes(map -> map.put("email", "test@mail.com")))
+                                .attributes(map -> map.put("userId", 1L)))
                         .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("range", "short"))
