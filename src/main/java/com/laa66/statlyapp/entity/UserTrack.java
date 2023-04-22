@@ -4,13 +4,14 @@ import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Map;
 
 
 @Entity
 @Table(name = "user_tracks")
-public class UserTrack {
+public class UserTrack implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
