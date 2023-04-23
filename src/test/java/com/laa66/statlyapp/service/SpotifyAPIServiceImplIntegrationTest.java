@@ -162,8 +162,8 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @Test
     void shouldGetTopGenresResponseOk() throws JsonProcessingException {
-        ItemTopArtists item1 = new ItemTopArtists(List.of("Rock", "Rap", "Rap"), new ArrayList<>(), "artist1", "uri", new SpotifyURL());
-        ItemTopArtists item2 = new ItemTopArtists(List.of("Rock", "Rap"), new ArrayList<>(), "artist2", "uri", new SpotifyURL());
+        ItemTopArtists item1 = new ItemTopArtists(List.of("Rock", "Rap", "Rap"), new ArrayList<>(), "artist1", "uri", new SpotifyURL(), 0);
+        ItemTopArtists item2 = new ItemTopArtists(List.of("Rock", "Rap"), new ArrayList<>(), "artist2", "uri", new SpotifyURL(), 0);
         TopArtistsDTO data = new TopArtistsDTO("2", List.of(item1, item2), "short");
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.TOP_ARTISTS + "short_term"))

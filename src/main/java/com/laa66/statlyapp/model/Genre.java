@@ -4,7 +4,7 @@ public class Genre implements Comparable<Genre> {
 
     private String genre;
     private Integer score;
-    private int difference;
+    private Integer difference;
 
     public Genre() {
 
@@ -27,11 +27,11 @@ public class Genre implements Comparable<Genre> {
         return score;
     }
 
-    public int getDifference() {
+    public Integer getDifference() {
         return difference;
     }
 
-    public void setDifference(int difference) {
+    public void setDifference(Integer difference) {
         this.difference = difference;
     }
 

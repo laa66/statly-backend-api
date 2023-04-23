@@ -26,18 +26,19 @@ public class ItemTopArtists {
     private SpotifyURL url;
 
     @JsonProperty("difference")
-    private int difference;
+    private Integer difference;
 
     public ItemTopArtists() {
 
     }
 
-    public ItemTopArtists(List<String> genres, List<Image> images, String name, String uri, SpotifyURL url) {
+    public ItemTopArtists(List<String> genres, List<Image> images, String name, String uri, SpotifyURL url, Integer difference) {
         this.genres = genres;
         this.images = images;
         this.name = name;
         this.uri = uri;
         this.url = url;
+        this.difference = difference;
     }
 
     public List<String> getGenres() {
@@ -80,11 +81,11 @@ public class ItemTopArtists {
         this.url = url;
     }
 
-    public int getDifference() {
+    public Integer getDifference() {
         return difference;
     }
 
-    public void setDifference(int difference) {
+    public void setDifference(Integer difference) {
         this.difference = difference;
     }
 

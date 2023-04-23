@@ -1,6 +1,8 @@
-# Statly REST API documentation
+# Spring REST API documentation
 
-Statly is a Spring Boot REST API that provides endpoints to access Spotify user data. 
+## Overview
+
+This REST API provides endpoints to access Spotify user data. 
 The API allows users to retrieve their top tracks, top artists, top genres, recently played tracks, and calculate their mainstream score. 
 The API also provides functionality to create a playlist based on the user's top tracks.
 

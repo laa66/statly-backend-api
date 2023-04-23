@@ -189,8 +189,8 @@ class UserServiceImplUnitTest {
     @Test
     void shouldCompareArtists() {
         TopArtistsDTO dto = new TopArtistsDTO("2", List.of(
-                new ItemTopArtists(List.of(), List.of(), "artist1", "uri", new SpotifyURL()),
-                new ItemTopArtists(List.of(), List.of(), "artist2", "uri", new SpotifyURL())
+                new ItemTopArtists(List.of(), List.of(), "artist1", "uri", new SpotifyURL(), 0),
+                new ItemTopArtists(List.of(), List.of(), "artist2", "uri", new SpotifyURL(), 0)
         ), "short");
         UserArtist artist = new UserArtist(1, 1, "short", Map.of(
                 "artist1", 2, "artist2", 1
@@ -212,8 +212,8 @@ class UserServiceImplUnitTest {
     @Test
     void shouldNotCompareArtistsWrongId() {
         TopArtistsDTO dto = new TopArtistsDTO("2", List.of(
-                new ItemTopArtists(List.of(), List.of(), "artist1", "uri", new SpotifyURL()),
-                new ItemTopArtists(List.of(), List.of(), "artist2", "uri", new SpotifyURL())
+                new ItemTopArtists(List.of(), List.of(), "artist1", "uri", new SpotifyURL(), 0),
+                new ItemTopArtists(List.of(), List.of(), "artist2", "uri", new SpotifyURL(), 0)
         ), "short");
         when(artistRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "short"))
                 .thenReturn(Optional.empty());
@@ -232,8 +232,8 @@ class UserServiceImplUnitTest {
     @Test
     void shouldNotCompareArtistsWrongRange() {
         TopArtistsDTO dto = new TopArtistsDTO("2", List.of(
-                new ItemTopArtists(List.of(), List.of(), "artist1", "uri", new SpotifyURL()),
-                new ItemTopArtists(List.of(), List.of(), "artist2", "uri", new SpotifyURL())
+                new ItemTopArtists(List.of(), List.of(), "artist1", "uri", new SpotifyURL(), 0),
+                new ItemTopArtists(List.of(), List.of(), "artist2", "uri", new SpotifyURL(), 0)
         ), "wrong");
         when(artistRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "wrong"))
                 .thenReturn(Optional.empty());
@@ -271,7 +271,7 @@ class UserServiceImplUnitTest {
         assertEquals(dto.getGenres().get(2).getGenre(), returnDto.getGenres().get(2).getGenre());
         assertEquals(10, returnDto.getGenres().get(0).getDifference());
         assertEquals(-15, returnDto.getGenres().get(1).getDifference());
-        assertEquals(8, returnDto.getGenres().get(2).getDifference());
+        assertNull(returnDto.getGenres().get(2).getDifference());
     }
 
     @Test

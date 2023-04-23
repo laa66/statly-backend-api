@@ -10,7 +10,8 @@ import com.laa66.statlyapp.model.Genre;
 import com.laa66.statlyapp.model.ItemTopArtists;
 import com.laa66.statlyapp.model.ItemTopTracks;
 import com.laa66.statlyapp.repository.*;
-import org.springframework.lang.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,8 @@ import java.util.stream.IntStream;
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
+
+    //private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final UserRepository userRepository;
     private final TrackRepository trackRepository;
@@ -120,9 +123,10 @@ public class UserServiceImpl implements UserService {
                 String artist = track.getArtists().get(0).getName();
                 String name = track.getName();
                 int actualPosition = index + 1;
-                int lastPosition = item.getTracks().getOrDefault(artist + "_" + name, dto.getItemTopTracks().size() + 1);
-                track.setDifference(lastPosition - actualPosition);
-                //System.out.println("Today: " + name + " - " + actualPosition + " / Yesterday: " + name + " - " + lastPosition + " / diff: " + track.getDifference());
+                Integer lastPosition = item.getTracks().getOrDefault(artist + "_" + name, null);
+                Integer difference = lastPosition != null ? (lastPosition - actualPosition) : null;
+                track.setDifference(difference);
+                //LOGGER.info("Today: " + name + " - " + actualPosition + " / Yesterday: " + name + " - " + lastPosition + " / diff: " + track.getDifference());
             });
         });
         return dto;
@@ -136,9 +140,10 @@ public class UserServiceImpl implements UserService {
                 ItemTopArtists artist = dto.getItemTopArtists().get(index);
                 String name = artist.getName();
                 int actualPosition = index + 1;
-                int lastPosition = item.getArtists().getOrDefault(name, dto.getItemTopArtists().size() + 1);
-                artist.setDifference(lastPosition - actualPosition);
-                //System.out.println("Today: " + name + " - " + actualPosition + " / Yesterday: " + name + " - " + lastPosition + " / diff: " + artist.getDifference());
+                Integer lastPosition = item.getArtists().getOrDefault(name, null);
+                Integer difference = lastPosition != null ? (lastPosition - actualPosition) : null;
+                artist.setDifference(difference);
+                //LOGGER.info("Today: " + name + " - " + actualPosition + " / Yesterday: " + name + " - " + lastPosition + " / diff: " + artist.getDifference());
             });
         });
         return dto;
@@ -152,9 +157,10 @@ public class UserServiceImpl implements UserService {
                 Genre genre = dto.getGenres().get(index);
                 String name = genre.getGenre();
                 int actualScore = genre.getScore();
-                int lastScore = item.getGenres().getOrDefault(name, 0);
-                genre.setDifference(actualScore - lastScore);
-                //System.out.println("Today: " + name + " - " + actualScore + " / Yesterday: " + name + " - " + lastScore + " / diff: " + genre.getDifference());
+                Integer lastScore = item.getGenres().getOrDefault(name, null);
+                Integer difference = lastScore != null ? (actualScore - lastScore) : null;
+                genre.setDifference(difference);
+                //LOGGER.info("Today: " + name + " - " + actualScore + " / Yesterday: " + name + " - " + lastScore + " / diff: " + genre.getDifference());
             });
         });
         return dto;
@@ -167,7 +173,7 @@ public class UserServiceImpl implements UserService {
             double actualScore = dto.getScore();
             double lastScore = userMainstream.get().getScore();
             dto.setDifference(new BigDecimal(actualScore - lastScore).setScale(2, RoundingMode.HALF_UP).doubleValue());
-            //System.out.println("Today: " + actualScore + " / Yesterday: " + lastScore + " / diff: " + dto.getDifference());
+            //LOGGER.info("Today: " + actualScore + " / Yesterday: " + lastScore + " / diff: " + dto.getDifference());
         });
         return dto;
     }
