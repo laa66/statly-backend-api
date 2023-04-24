@@ -10,6 +10,7 @@ import com.laa66.statlyapp.model.Genre;
 import com.laa66.statlyapp.model.ItemTopArtists;
 import com.laa66.statlyapp.model.ItemTopTracks;
 import com.laa66.statlyapp.repository.*;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,13 +51,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveUser(User user) {
-        userRepository.save(user);
+    public User saveUser(User user) {
+        return userRepository.save(user);
     }
 
     @Override
     public void deleteUser(long id) {
-        userRepository.findById(id).ifPresentOrElse(item -> userRepository.deleteById(id), () -> {
+        userRepository.findById(id).ifPresentOrElse(item -> userRepository.deleteById(item.getId()), () -> {
                     throw new UserNotFoundException("User not found");
                 });
     }
@@ -119,7 +120,7 @@ public class UserServiceImpl implements UserService {
                 String artist = track.getArtists().get(0).getName();
                 String name = track.getName();
                 int actualPosition = index + 1;
-                int lastPosition = item.getTracks().getOrDefault(artist + "_" + name, 50);
+                int lastPosition = item.getTracks().getOrDefault(artist + "_" + name, dto.getItemTopTracks().size() + 1);
                 track.setDifference(lastPosition - actualPosition);
                 //System.out.println("Today: " + name + " - " + actualPosition + " / Yesterday: " + name + " - " + lastPosition + " / diff: " + track.getDifference());
             });
@@ -135,7 +136,7 @@ public class UserServiceImpl implements UserService {
                 ItemTopArtists artist = dto.getItemTopArtists().get(index);
                 String name = artist.getName();
                 int actualPosition = index + 1;
-                int lastPosition = item.getArtists().getOrDefault(name, 50);
+                int lastPosition = item.getArtists().getOrDefault(name, dto.getItemTopArtists().size() + 1);
                 artist.setDifference(lastPosition - actualPosition);
                 //System.out.println("Today: " + name + " - " + actualPosition + " / Yesterday: " + name + " - " + lastPosition + " / diff: " + artist.getDifference());
             });
