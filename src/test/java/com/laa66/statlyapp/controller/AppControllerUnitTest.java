@@ -4,7 +4,7 @@ import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.model.*;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.UserService;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +19,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.*;
 
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -44,15 +46,15 @@ class AppControllerUnitTest {
     @Value("${api.react-app.url}")
     String REACT_URL;
 
-    static TopTracksDTO tracksDTO;
-    static TopArtistsDTO artistsDTO;
-    static TopGenresDTO genresDTO;
-    static RecentlyPlayedDTO recentlyDTO;
-    static MainstreamScoreDTO mainstreamScoreDTO;
-    static UserDTO userDTO;
+    TopTracksDTO tracksDTO;
+    TopArtistsDTO artistsDTO;
+    TopGenresDTO genresDTO;
+    RecentlyPlayedDTO recentlyDTO;
+    MainstreamScoreDTO mainstreamScoreDTO;
+    UserDTO userDTO;
 
-    @BeforeAll
-    static void prepare() {
+    @BeforeEach
+    void prepare() {
          tracksDTO = new TopTracksDTO(List.of(new ItemTopTracks()), "1", "short");
          artistsDTO = new TopArtistsDTO("1", List.of(new ItemTopArtists()), "short");
          genresDTO = new TopGenresDTO(List.of(new Genre("rock", 2)), "short");
@@ -76,6 +78,16 @@ class AppControllerUnitTest {
         mockMvc.perform(get("/api/auth")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void shouldDelete() throws Exception {
+        doNothing().when(userService).deleteUser(1L);
+        mockMvc.perform(delete("/api/delete").with(oauth2Login()
+                .attributes(map -> map.put("userId", 1L)))
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
     }
 
     @Test
