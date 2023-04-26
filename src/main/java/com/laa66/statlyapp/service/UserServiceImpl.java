@@ -10,8 +10,6 @@ import com.laa66.statlyapp.model.Genre;
 import com.laa66.statlyapp.model.ItemTopArtists;
 import com.laa66.statlyapp.model.ItemTopTracks;
 import com.laa66.statlyapp.repository.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -3,12 +3,18 @@ package com.laa66.statlyapp.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.*;
 
 import java.util.List;
 import java.util.Objects;
 
 @JsonPropertyOrder({"album", "artists", "name"})
 @JsonIgnoreProperties(ignoreUnknown = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
 public class Track {
 
     @JsonProperty("album")
@@ -22,56 +28,4 @@ public class Track {
 
     @JsonProperty("external_urls")
     private SpotifyURL url;
-
-    public Track() {
-    }
-
-    public Track(Album album, List<Artist> artists, String name, SpotifyURL url) {
-        this.album = album;
-        this.artists = artists;
-        this.name = name;
-        this.url = url;
-    }
-
-    public List<Artist> getArtists() {
-        return artists;
-    }
-
-    public void setArtists(List<Artist> artists) {
-        this.artists = artists;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Album getAlbum() {
-        return album;
-    }
-
-    public void setAlbum(Album album) {
-        this.album = album;
-    }
-
-    public SpotifyURL getUrl() {
-        return url;
-    }
-
-    public void setUrl(SpotifyURL url) {
-        this.url = url;
-    }
-
-    @Override
-    public String toString() {
-        return "Track{" +
-                "album=" + album +
-                ", artists=" + artists +
-                ", name='" + name + '\'' +
-                ", url=" + url +
-                '}';
-    }
 }

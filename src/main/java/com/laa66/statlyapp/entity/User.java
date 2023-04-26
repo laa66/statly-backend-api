@@ -1,6 +1,10 @@
 package com.laa66.statlyapp.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -8,6 +12,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
 public class User {
 
     @Id
@@ -34,10 +42,6 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private List<UserMainstream> mainstreamList;
-
-    public User() {
-
-    }
 
     public User(long id, String email, LocalDateTime joinDate) {
         this.id = id;
@@ -72,74 +76,5 @@ public class User {
     public void addMainstream(UserMainstream mainstream) {
         if (mainstreamList == null) mainstreamList = new ArrayList<>();
         mainstreamList.add(mainstream);
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public LocalDateTime getJoinDate() {
-        return joinDate;
-    }
-
-    public void setJoinDate(LocalDateTime joinDate) {
-        this.joinDate = joinDate;
-    }
-
-    public List<UserTrack> getTracks() {
-        return tracks;
-    }
-
-    public void setTracks(List<UserTrack> tracks) {
-        this.tracks = tracks;
-    }
-
-    public List<UserArtist> getArtists() {
-        return artists;
-    }
-
-    public void setArtists(List<UserArtist> artists) {
-        this.artists = artists;
-    }
-
-    public List<UserGenre> getGenres() {
-        return genres;
-    }
-
-    public void setGenres(List<UserGenre> genres) {
-        this.genres = genres;
-    }
-
-    public List<UserMainstream> getMainstreamList() {
-        return mainstreamList;
-    }
-
-    public void setMainstreamList(List<UserMainstream> mainstreamList) {
-        this.mainstreamList = mainstreamList;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", email='" + email + '\'' +
-                ", joinDate=" + joinDate +
-                ", tracks=" + tracks +
-                ", artists=" + artists +
-                ", genres=" + genres +
-                ", mainstreamList=" + mainstreamList +
-                '}';
     }
 }

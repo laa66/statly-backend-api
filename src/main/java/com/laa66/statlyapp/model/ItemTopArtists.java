@@ -3,11 +3,17 @@ package com.laa66.statlyapp.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.*;
 
 import java.util.List;
 
 @JsonPropertyOrder({"genres", "images", "name", "url"})
 @JsonIgnoreProperties(ignoreUnknown = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
 public class ItemTopArtists {
 
     @JsonProperty("genres")
@@ -27,76 +33,4 @@ public class ItemTopArtists {
 
     @JsonProperty("difference")
     private Integer difference;
-
-    public ItemTopArtists() {
-
-    }
-
-    public ItemTopArtists(List<String> genres, List<Image> images, String name, String uri, SpotifyURL url, Integer difference) {
-        this.genres = genres;
-        this.images = images;
-        this.name = name;
-        this.uri = uri;
-        this.url = url;
-        this.difference = difference;
-    }
-
-    public List<String> getGenres() {
-        return genres;
-    }
-
-    public void setGenres(List<String> genres) {
-        this.genres = genres;
-    }
-
-    public List<Image> getImages() {
-        return images;
-    }
-
-    public void setImages(List<Image> images) {
-        this.images = images;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getUri() {
-        return uri;
-    }
-
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
-
-    public SpotifyURL getUrl() {
-        return url;
-    }
-
-    public void setUrl(SpotifyURL url) {
-        this.url = url;
-    }
-
-    public Integer getDifference() {
-        return difference;
-    }
-
-    public void setDifference(Integer difference) {
-        this.difference = difference;
-    }
-
-    @Override
-    public String toString() {
-        return "ItemTopArtists{" +
-                "genres=" + genres +
-                ", images=" + images +
-                ", name='" + name + '\'' +
-                ", uri='" + uri + '\'' +
-                ", url=" + url +
-                '}';
-    }
 }
