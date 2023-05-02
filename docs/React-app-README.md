@@ -14,19 +14,17 @@ You can also check [Spring REST API documentation](REST-API-README.md) for more 
 
 ## Deployment
 
-Application is deployed on [Render.com](http://Render.com) Cloud provider with combination of static site deployment for the frontend React app and Dockerfile-based deployment for the Spring Boot backend app.
-
-Frontend application involves integrating GitHub repository with Render Cloud, which allows for automated deployments whenever changes are pushed to the repository. React-app is served from content delivery network (CDN) that caches and delivers content to users from a server that is closest to them.
+Application is deployed as a combination of static site deployment for the frontend React app on GitHub pages and Dockerfile-based deployment for the Spring Boot backend app on the Render.com. Also REST API is connected with MySQL relational database created with Planetscale. The database schema includes tables for storing user data and user statistics which can be later used to compare their listening habits.
 
 Backend application is deployed as a web service on cloud with help of Dockerfile script which contains instructions for building a Docker image. This Docker image is then deployed as web service which runs the backend app in a containerized environment with all its dependencies and configurations.
 
-You can also check [instructions ](../README.md) on how to set up and run the application locally.
+You can also check [instructions](../README.md) on how to set up and run the application locally.
 
 ## React Components
 
 ### index.js
 
-This React component serves as the entry point for the frontend application, setting up the necessary environment and rendering the `root` component of the application using `ReactDOM.createRoot()`and `root.render()`. It also includes necessary imports for CSS, JS, routing dependencies, and wraps the `App`component in a `React**.**StrictMode`component for enhanced runtime checks.
+This React component serves as the entry point for the frontend application, setting up the necessary environment and rendering the `root` component of the application using `ReactDOM.createRoot()`and `root.render()`. It also includes necessary imports for CSS, JS, routing dependencies.
 
 ### App.js
 

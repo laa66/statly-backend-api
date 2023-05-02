@@ -19,13 +19,14 @@ Check out the [Statly demo](https://statly-app.onrender.com) to see the applicat
 
 ## How to run ⚡
 
-#### It's simple! Go and check [Statly demo](https://statly-app.onrender.com) or...
+#### It's simple! Go and check [Statly demo](https://laa66.github.io/statly-app/) or...
 #### Try to run this application on your local machine. You will need to do the following:
 
 1. Obtain a **Client ID** and **Client secret** from [Spotify Developer](https://developer.spotify.com/) panel
 2. Set the ``SPOTIFY_CLIENT_ID``, ``SPOTIFY_CLIENT_SECRET`` environment variables
    with the values from your Spotify Developer panel and set ``STATLY_APP_URL``
    variable to ``http://localhost:3000``
+3. Set the ``STATLY_DB_URL``, ``STATLY_DB_USERNAME`` and ``STATLY_DB_PASSWORD`` environment variables - you can provide MySQL or H2 database details here for fast configuration.
  <!-- end -->
 
     # Clone this repository to your local machine
@@ -82,14 +83,20 @@ You can view full documentation of this project in different paths:
 
 - JDK 19
 - Spring Boot 3 (Spring MVC, Spring Security, Spring AOP)
+- Hibernate & JPA
 - Maven
 - OAuth 2.0
+- SQL
 - React.js
 - Node.js
-- HTML/CSS
+- HTML & CSS
 - Bootstrap v5.3
 - IntelliJ IDEA Community Edition
 - Visual Studio Code
+- MySQL Workbench
+- PlanetScale
+- Render Cloud
+- GitHub Pages
 
 #### Tested with:
 
@@ -97,11 +104,13 @@ You can view full documentation of this project in different paths:
 - JUnit 5 & AssertJ
 - Mockito
 - Hamcrest
+- H2 database
 
 
 ## To-do 💡
 
-- Add MySQL database to save user stats and compare their listening habits
+- Add functionality for saving beta-testers details to database and e-mail notification
+- Add functionality for comparing full user statistics history
 - Make app stateless with JWT authentication
 - Rebuild the Mainstream Score section in the React-app
 - Add custom playlist image to exported playlists
