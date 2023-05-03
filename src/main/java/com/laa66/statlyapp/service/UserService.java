@@ -1,11 +1,10 @@
 package com.laa66.statlyapp.service;
 
-import com.laa66.statlyapp.DTO.MainstreamScoreDTO;
-import com.laa66.statlyapp.DTO.TopArtistsDTO;
-import com.laa66.statlyapp.DTO.TopGenresDTO;
-import com.laa66.statlyapp.DTO.TopTracksDTO;
+import com.laa66.statlyapp.DTO.*;
+import com.laa66.statlyapp.entity.BetaUser;
 import com.laa66.statlyapp.entity.User;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -16,6 +15,10 @@ public interface UserService {
     User saveUser(User user);
 
     void deleteUser(long id);
+
+    void saveBetaUser(BetaUserDTO dto);
+
+    List<BetaUserDTO> findAllBetaUsers();
 
     void saveUserTracks(Map<TopTracksDTO, Long> dtoMap);
 

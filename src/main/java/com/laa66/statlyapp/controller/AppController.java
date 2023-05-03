@@ -17,6 +17,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api")
@@ -46,9 +48,17 @@ public class AppController {
         response.setHeader(HttpHeaders.LOCATION, redirectUrl);
     }
 
+    @GetMapping("/beta")
+    public ResponseEntity<List<BetaUserDTO>> findAllBetaUsers() {
+        List<BetaUserDTO> dto = userService.findAllBetaUsers();
+        return ResponseEntity.ok(dto);
+    }
+
     @PostMapping("/join")
-    public void join(@RequestBody BetaUserDTO betaUserDTO) {
-        LOGGER.info("-->> User Joined beta tests - username: " + betaUserDTO.getUsername() + ", email: " + betaUserDTO.getEmail());
+    public ResponseEntity<Void> join(@RequestBody BetaUserDTO betaUserDTO) {
+        LOGGER.info("-->> User Joined beta tests - Full name: " + betaUserDTO.getFullName() + ", email: " + betaUserDTO.getEmail());
+        userService.saveBetaUser(betaUserDTO);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/delete")

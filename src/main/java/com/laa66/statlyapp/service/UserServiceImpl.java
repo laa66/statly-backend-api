@@ -1,9 +1,6 @@
 package com.laa66.statlyapp.service;
 
-import com.laa66.statlyapp.DTO.MainstreamScoreDTO;
-import com.laa66.statlyapp.DTO.TopArtistsDTO;
-import com.laa66.statlyapp.DTO.TopGenresDTO;
-import com.laa66.statlyapp.DTO.TopTracksDTO;
+import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.entity.*;
 import com.laa66.statlyapp.exception.UserNotFoundException;
 import com.laa66.statlyapp.model.Genre;
@@ -16,10 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -35,15 +30,17 @@ public class UserServiceImpl implements UserService {
     private final ArtistRepository artistRepository;
     private final GenreRepository genreRepository;
     private final MainstreamRepository mainstreamRepository;
+    private final BetaUserRepository betaUserRepository;
 
     public UserServiceImpl(UserRepository userRepository, TrackRepository trackRepository,
                            ArtistRepository artistRepository, GenreRepository genreRepository,
-                           MainstreamRepository mainstreamRepository) {
+                           MainstreamRepository mainstreamRepository, BetaUserRepository betaUserRepository) {
         this.userRepository = userRepository;
         this.trackRepository = trackRepository;
         this.artistRepository = artistRepository;
         this.genreRepository = genreRepository;
         this.mainstreamRepository = mainstreamRepository;
+        this.betaUserRepository = betaUserRepository;
     }
 
     @Override
@@ -61,6 +58,19 @@ public class UserServiceImpl implements UserService {
         userRepository.findById(id).ifPresentOrElse(item -> userRepository.deleteById(item.getId()), () -> {
                     throw new UserNotFoundException("User not found");
                 });
+    }
+
+    @Override
+    public void saveBetaUser(BetaUserDTO dto) {
+        BetaUser betaUser = new BetaUser(0, dto.getFullName(), dto.getEmail(), LocalDateTime.now());
+        betaUserRepository.save(betaUser);
+    }
+
+    @Override
+    public List<BetaUserDTO> findAllBetaUsers() {
+        return ((Collection<BetaUser>) betaUserRepository.findAll()).stream()
+                .map(item -> new BetaUserDTO(item.getFullName(), item.getEmail(), item.getDate().toString()))
+                .collect(Collectors.toList());
     }
 
     @Override
