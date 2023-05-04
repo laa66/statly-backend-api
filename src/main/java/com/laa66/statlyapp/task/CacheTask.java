@@ -5,7 +5,7 @@ import com.laa66.statlyapp.DTO.MainstreamScoreDTO;
 import com.laa66.statlyapp.DTO.TopArtistsDTO;
 import com.laa66.statlyapp.DTO.TopGenresDTO;
 import com.laa66.statlyapp.DTO.TopTracksDTO;
-import com.laa66.statlyapp.service.UserService;
+import com.laa66.statlyapp.service.StatsService;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,14 +18,14 @@ import java.util.Map;
 public class CacheTask {
 
     private final CacheManager cacheManager;
-    private final UserService userService;
+    private final StatsService statsService;
 
-    public CacheTask(CacheManager cacheManager, UserService userService) {
+    public CacheTask(CacheManager cacheManager, StatsService statsService) {
         this.cacheManager = cacheManager;
-        this.userService = userService;
+        this.statsService = statsService;
     }
 
-    @Scheduled(cron = "0 59 23 * * *")
+    @Scheduled(cron = "0 22 20 * * *")
     public void saveCache() {
         CaffeineCache cache = (CaffeineCache) cacheManager.getCache("api");
         Cache<Object, Object> nativeCache = cache.getNativeCache();
@@ -42,10 +42,10 @@ public class CacheTask {
                 case "getMainstreamScore" -> mainstreamScoreDTOMap.put(((MainstreamScoreDTO) value), Long.valueOf(params[1]));
             }
         });
-        userService.saveUserTracks(tracksDTOMap);
-        userService.saveUserArtists(artistsDTOMap);
-        userService.saveUserGenres(genresDTOMap);
-        userService.saveUserMainstream(mainstreamScoreDTOMap);
+        statsService.saveUserTracks(tracksDTOMap);
+        statsService.saveUserArtists(artistsDTOMap);
+        statsService.saveUserGenres(genresDTOMap);
+        statsService.saveUserMainstream(mainstreamScoreDTOMap);
         cache.invalidate();
     }
 

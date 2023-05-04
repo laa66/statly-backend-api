@@ -5,6 +5,7 @@ import com.laa66.statlyapp.DTO.MainstreamScoreDTO;
 import com.laa66.statlyapp.DTO.TopArtistsDTO;
 import com.laa66.statlyapp.DTO.TopGenresDTO;
 import com.laa66.statlyapp.DTO.TopTracksDTO;
+import com.laa66.statlyapp.service.StatsService;
 import com.laa66.statlyapp.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ class CacheTaskUnitTest {
     CacheManager cacheManager;
 
     @Mock
-    UserService userService;
+    StatsService statsService;
 
     @InjectMocks
     CacheTask cacheTask;
@@ -47,10 +48,10 @@ class CacheTaskUnitTest {
         when(cacheManager.getCache("api")).thenReturn(cache);
         cacheTask.saveCache();
 
-        verify(userService, times(1)).saveUserTracks(anyMap());
-        verify(userService, times(1)).saveUserArtists(anyMap());
-        verify(userService, times(1)).saveUserGenres(anyMap());
-        verify(userService, times(1)).saveUserMainstream(anyMap());
+        verify(statsService, times(1)).saveUserTracks(anyMap());
+        verify(statsService, times(1)).saveUserArtists(anyMap());
+        verify(statsService, times(1)).saveUserGenres(anyMap());
+        verify(statsService, times(1)).saveUserMainstream(anyMap());
         assertEquals(0, cache.getNativeCache().asMap().size());
     }
 }

@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -28,6 +29,9 @@ class SpotifyAPIServiceImplUnitTest {
     @Mock
     @Qualifier("restTemplateInterceptor")
     RestTemplate restTemplate;
+
+    @Mock
+    StatsService statsService;
 
     @InjectMocks
     SpotifyAPIServiceImpl spotifyAPIService;
@@ -52,6 +56,7 @@ class SpotifyAPIServiceImplUnitTest {
         when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS + "long_term"),
                 eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
                 .thenReturn(new ResponseEntity<>(dto, HttpStatus.OK));
+        when(statsService.compareTracks(1, dto)).thenReturn(dto);
         TopTracksDTO returnDto = spotifyAPIService.getTopTracks(1, "long");
         assertEquals(dto.getItemTopTracks().size(), returnDto.getItemTopTracks().size());
         assertEquals(dto.getTotal(), returnDto.getTotal());
@@ -73,6 +78,7 @@ class SpotifyAPIServiceImplUnitTest {
         when(restTemplate.exchange(eq(SpotifyAPI.TOP_ARTISTS + "long_term"),
                 eq(HttpMethod.GET), any(), eq(TopArtistsDTO.class)))
                 .thenReturn(new ResponseEntity<>(dto, HttpStatus.OK));
+        when(statsService.compareArtists(1, dto)).thenReturn(dto);
         TopArtistsDTO returnDto = spotifyAPIService.getTopArtists(1, "long");
         assertEquals(dto.getItemTopArtists().size(), returnDto.getItemTopArtists().size());
         assertEquals(dto.getTotal(), returnDto.getTotal());
@@ -94,13 +100,16 @@ class SpotifyAPIServiceImplUnitTest {
         track1.setPopularity(40);
         ItemTopTracks track2 = new ItemTopTracks();
         track2.setPopularity(70);
-        TopTracksDTO dto = new TopTracksDTO(List.of(track1, track2), "2", "long");
+        TopTracksDTO tracksDTO = new TopTracksDTO(List.of(track1, track2), "2", "long");
+        MainstreamScoreDTO mainstreamScoreDTO = new MainstreamScoreDTO(55.00, "long");
         when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS + "long_term"),
                 eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
-                .thenReturn(new ResponseEntity<>(dto, HttpStatus.OK));
+                .thenReturn(new ResponseEntity<>(tracksDTO, HttpStatus.OK));
+        when(statsService.compareTracks(1, tracksDTO)).thenReturn(tracksDTO);
+        when(statsService.compareMainstream(eq(1L), any())).thenReturn(mainstreamScoreDTO);
         MainstreamScoreDTO returnDto = spotifyAPIService.getMainstreamScore(1, "long");
-        assertEquals(55.00, returnDto.getScore());
-        assertEquals(dto.getRange(), returnDto.getRange());
+        assertEquals(mainstreamScoreDTO.getScore(), returnDto.getScore());
+        assertEquals(mainstreamScoreDTO.getRange(), returnDto.getRange());
     }
 
     @Test
@@ -118,17 +127,19 @@ class SpotifyAPIServiceImplUnitTest {
         artist1.setGenres(List.of("classic", "classic", "classic", "rock", "rock", "rock", "rock"));
         ItemTopArtists artist2 = new ItemTopArtists();
         artist2.setGenres(List.of("classic", "classic", "classic"));
-        TopArtistsDTO dto = new TopArtistsDTO("2", List.of(artist1, artist2), "long");
-
+        TopArtistsDTO artistsDTO = new TopArtistsDTO("2", List.of(artist1, artist2), "long");
+        TopGenresDTO genresDTO = new TopGenresDTO(List.of(new Genre("classic", 60), new Genre("rock", 40)), "long");
         when(restTemplate.exchange(eq(SpotifyAPI.TOP_ARTISTS + "long_term"),
                 eq(HttpMethod.GET), any(), eq(TopArtistsDTO.class)))
-                .thenReturn(new ResponseEntity<>(dto, HttpStatus.OK));
+                .thenReturn(new ResponseEntity<>(artistsDTO, HttpStatus.OK));
+        when(statsService.compareArtists(1, artistsDTO)).thenReturn(artistsDTO);
+        when(statsService.compareGenres(eq(1L), any())).thenReturn(genresDTO);
         TopGenresDTO returnDto = spotifyAPIService.getTopGenres(1, "long");
 
         assertEquals(2, returnDto.getGenres().size());
         assertEquals(60, returnDto.getGenres().get(0).getScore());
         assertEquals(40, returnDto.getGenres().get(1).getScore());
-        assertEquals(dto.getRange(), returnDto.getRange());
+        assertEquals(artistsDTO.getRange(), returnDto.getRange());
     }
 
     @Test
@@ -164,6 +175,7 @@ class SpotifyAPIServiceImplUnitTest {
         when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS + "long_term"),
                 eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
                 .thenReturn(new ResponseEntity<>(tracksDTO, HttpStatus.OK));
+        when(statsService.compareTracks(eq(1L), any())).thenReturn(tracksDTO);
         when(restTemplate.exchange(eq(SpotifyAPI.CREATE_TOP_PLAYLIST.replace("user_id",
                 userDTO.getId())), eq(HttpMethod.POST), any(), eq(PlaylistDTO.class)))
                 .thenReturn(new ResponseEntity<>(playlistDTO, HttpStatus.CREATED));
@@ -197,6 +209,7 @@ class SpotifyAPIServiceImplUnitTest {
         when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS + "long_term"),
                 eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
                 .thenReturn(new ResponseEntity<>(tracksDTO, HttpStatus.OK));
+        when(statsService.compareTracks(eq(1L), any())).thenReturn(tracksDTO);
         when(restTemplate.exchange(eq(SpotifyAPI.CREATE_TOP_PLAYLIST.replace("user_id",
                 userDTO.getId())), eq(HttpMethod.POST), any(), eq(PlaylistDTO.class)))
                 .thenReturn(new ResponseEntity<>(playlistDTO, HttpStatus.CREATED));

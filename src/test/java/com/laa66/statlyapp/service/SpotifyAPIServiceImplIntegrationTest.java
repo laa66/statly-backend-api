@@ -6,14 +6,23 @@ import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.config.TestOAuth2RestTemplateConfig;
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
+import com.laa66.statlyapp.model.Artist;
 import com.laa66.statlyapp.model.ItemTopArtists;
 import com.laa66.statlyapp.model.ItemTopTracks;
 import com.laa66.statlyapp.model.SpotifyURL;
+import com.laa66.statlyapp.repository.ArtistRepository;
+import com.laa66.statlyapp.repository.GenreRepository;
+import com.laa66.statlyapp.repository.MainstreamRepository;
+import com.laa66.statlyapp.repository.TrackRepository;
+import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,11 +36,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
-@SpringBootTest(classes = {TestOAuth2RestTemplateConfig.class, SpotifyAPIServiceImpl.class})
+@SpringBootTest(classes = {TestOAuth2RestTemplateConfig.class, SpotifyAPIServiceImpl.class, StatsServiceImpl.class})
 class SpotifyAPIServiceImplIntegrationTest {
 
     @Autowired
@@ -39,6 +51,22 @@ class SpotifyAPIServiceImplIntegrationTest {
     RestTemplate restTemplate;
 
     @Autowired
+    StatsServiceImpl statsService;
+
+    @MockBean
+    TrackRepository trackRepository;
+
+    @MockBean
+    ArtistRepository artistRepository;
+
+    @MockBean
+    GenreRepository genreRepository;
+
+    @MockBean
+    MainstreamRepository mainstreamRepository;
+
+    @Autowired
+    @InjectMocks
     SpotifyAPIServiceImpl spotifyAPIService;
 
     MockRestServiceServer mockServer;
@@ -340,7 +368,4 @@ class SpotifyAPIServiceImplIntegrationTest {
                 () -> spotifyAPIService.postTopTracksPlaylist(1, SpotifyAPI.TOP_TRACKS + "wrong"));
         mockServer.verify();
     }
-
-
-
 }

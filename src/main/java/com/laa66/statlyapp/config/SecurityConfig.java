@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -41,6 +42,9 @@ public class SecurityConfig {
     @Value("${api.react-app.url}")
     private String REACT_URL;
 
+    @Value("${statly.api.admin-email}")
+    private String ADMIN_EMAIL;
+
     @Bean
     public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService(UserService userService) {
         return new CustomOAuth2UserService(userService);
@@ -71,8 +75,9 @@ public class SecurityConfig {
                         .csrfTokenRepository(tokenRepository)
                         .csrfTokenRequestHandler(requestHandler))*/
                 .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.POST, "/api/join").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/test").permitAll()
+                .requestMatchers("/user/beta/all", "/user/beta/delete").access((authentication, object) ->
+                        new AuthorizationDecision(((OAuth2User) authentication.get().getPrincipal()).getAttributes().get("email").equals(ADMIN_EMAIL)))
+                .requestMatchers(HttpMethod.POST, "/user/beta/join").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
