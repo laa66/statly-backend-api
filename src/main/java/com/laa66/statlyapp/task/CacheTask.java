@@ -25,7 +25,7 @@ public class CacheTask {
         this.statsService = statsService;
     }
 
-    @Scheduled(cron = "0 22 20 * * *")
+    @Scheduled(cron = "0 59 21 * * *")
     public void saveCache() {
         CaffeineCache cache = (CaffeineCache) cacheManager.getCache("api");
         Cache<Object, Object> nativeCache = cache.getNativeCache();

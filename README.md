@@ -5,7 +5,7 @@ statistics, account mainstream score, and recently played tracks.
 You can also export a playlist to your Spotify account from your favourite tracks in three different
 ranges.
 
-Check out the [Statly demo](https://statly-app.onrender.com) to see the application in action.
+Check out the [Statly demo](https://laa66.github.io/statly-app/) to see the application in action.
 
 <hr>
 
