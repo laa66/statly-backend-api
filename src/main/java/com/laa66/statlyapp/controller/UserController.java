@@ -3,6 +3,7 @@ package com.laa66.statlyapp.controller;
 import com.laa66.statlyapp.DTO.BetaUserDTO;
 import com.laa66.statlyapp.DTO.UserDTO;
 import com.laa66.statlyapp.model.Image;
+import com.laa66.statlyapp.service.MailService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,11 +27,13 @@ public class UserController {
 
     private final UserService userService;
     private final SpotifyAPIService spotifyApiService;
+    private final MailService mailService;
     private final String reactUrl;
 
-    public UserController(UserService userService, SpotifyAPIService spotifyApiService, @Value("${api.react-app.url}") String reactUrl) {
+    public UserController(UserService userService, SpotifyAPIService spotifyApiService, MailService mailService, @Value("${api.react-app.url}") String reactUrl) {
         this.userService = userService;
         this.spotifyApiService = spotifyApiService;
+        this.mailService = mailService;
         this.reactUrl = reactUrl;
     }
 
@@ -62,6 +65,13 @@ public class UserController {
     public ResponseEntity<Void> join(@RequestBody BetaUserDTO betaUserDTO) {
         log.info("-->> User Joined beta tests - Full name: " + betaUserDTO.getFullName() + ", email: " + betaUserDTO.getEmail());
         userService.saveBetaUser(betaUserDTO);
+        mailService.sendJoinBetaNotification();
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/beta/notification")
+    public ResponseEntity<Void> sendNotification(@RequestBody BetaUserDTO betaUserDTO) {
+        mailService.sendAccessGrantedNotification(betaUserDTO);
         return ResponseEntity.noContent().build();
     }
 

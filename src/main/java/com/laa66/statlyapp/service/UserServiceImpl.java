@@ -16,12 +16,10 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BetaUserRepository betaUserRepository;
-    private final MailService mailService;
 
-    public UserServiceImpl(UserRepository userRepository, BetaUserRepository betaUserRepository, MailService mailService) {
+    public UserServiceImpl(UserRepository userRepository, BetaUserRepository betaUserRepository) {
         this.userRepository = userRepository;
         this.betaUserRepository = betaUserRepository;
-        this.mailService = mailService;
     }
 
     @Override
@@ -45,7 +43,6 @@ public class UserServiceImpl implements UserService {
     public void saveBetaUser(BetaUserDTO dto) {
         BetaUser betaUser = new BetaUser(0, dto.getFullName(), dto.getEmail(), LocalDateTime.now());
         betaUserRepository.save(betaUser);
-        mailService.sendJoinBetaNotification();
     }
 
     @Override
