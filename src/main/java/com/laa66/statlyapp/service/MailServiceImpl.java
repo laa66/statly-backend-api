@@ -14,7 +14,7 @@ public class MailServiceImpl implements MailService {
     private final JavaMailSender mailSender;
     private final String email;
 
-    public MailServiceImpl(JavaMailSender mailSender, @Value("${STATLY_ADMIN_EMAIL}") String email) {
+    public MailServiceImpl(JavaMailSender mailSender, @Value("${statly.api.admin-email}") String email) {
         this.mailSender = mailSender;
         this.email = email;
     }

@@ -8,7 +8,6 @@ import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -63,7 +61,6 @@ public class UserController {
 
     @PostMapping("/beta/join")
     public ResponseEntity<Void> join(@RequestBody BetaUserDTO betaUserDTO) {
-        log.info("-->> User Joined beta tests - Full name: " + betaUserDTO.getFullName() + ", email: " + betaUserDTO.getEmail());
         userService.saveBetaUser(betaUserDTO);
         mailService.sendJoinBetaNotification();
         return ResponseEntity.noContent().build();

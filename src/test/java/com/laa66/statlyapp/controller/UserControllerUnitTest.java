@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.config.TestSecurityConfig;
 import com.laa66.statlyapp.model.*;
+import com.laa66.statlyapp.service.MailService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,6 +46,9 @@ class UserControllerUnitTest {
     @MockBean
     UserService userService;
 
+    @MockBean
+    MailService mailService;
+
     @Autowired
     UserController userController;
 
@@ -55,28 +59,13 @@ class UserControllerUnitTest {
 
     @Value("${api.react-app.url}")
     String REACT_URL;
-
-    TopTracksDTO tracksDTO;
-    TopArtistsDTO artistsDTO;
-    TopGenresDTO genresDTO;
-    RecentlyPlayedDTO recentlyDTO;
-    MainstreamScoreDTO mainstreamScoreDTO;
-    UserDTO userDTO;
-
-    @BeforeEach
-    void prepare() {
-        tracksDTO = new TopTracksDTO(List.of(new ItemTopTracks()), "1", "short");
-        artistsDTO = new TopArtistsDTO("1", List.of(new ItemTopArtists()), "short");
-        genresDTO = new TopGenresDTO(List.of(new Genre("rock", 2)), "short");
-        recentlyDTO = new RecentlyPlayedDTO("1", List.of(new ItemRecentlyPlayed()));
-        mainstreamScoreDTO = new MainstreamScoreDTO(75.00, "short");
-        Image image = new Image();
-        image.setUrl("imageurl");
-        userDTO = new UserDTO("testuser", "test@mail.com", "testuser", List.of(image));
-    }
+    
 
     @Test
     void shouldAuthUser() throws Exception {
+        Image image = new Image();
+        image.setUrl("imageurl");
+        UserDTO userDTO = new UserDTO("testuser", "test@mail.com", "testuser", List.of(image));
         when(spotifyAPIService.getCurrentUser()).thenReturn(userDTO);
         mockMvc.perform(MockMvcRequestBuilders.get("/user/auth").with(oauth2Login()))
                 .andExpect(status().isTemporaryRedirect())
@@ -134,6 +123,17 @@ class UserControllerUnitTest {
                         .content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isNoContent());
         verify(userService, times(1)).saveBetaUser(isA(BetaUserDTO.class));
+        verify(mailService, times(1)).sendJoinBetaNotification();
+    }
+
+    @Test
+    void shouldSentNotification() throws Exception {
+        BetaUserDTO dto = new BetaUserDTO("name", "email", null);
+        mockMvc.perform(post("/user/beta/notification").with(oauth2Login())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isNoContent());
+        verify(mailService, times(1)).sendAccessGrantedNotification(any());
     }
 
     @Test

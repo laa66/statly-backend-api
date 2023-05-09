@@ -5,7 +5,6 @@ import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.config.TestSecurityConfig;
 import com.laa66.statlyapp.model.*;
 import com.laa66.statlyapp.service.SpotifyAPIService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,27 +45,9 @@ class ApiControllerUnitTest {
     @Value("${api.react-app.url}")
     String REACT_URL;
 
-    TopTracksDTO tracksDTO;
-    TopArtistsDTO artistsDTO;
-    TopGenresDTO genresDTO;
-    RecentlyPlayedDTO recentlyDTO;
-    MainstreamScoreDTO mainstreamScoreDTO;
-    UserDTO userDTO;
-
-    @BeforeEach
-    void prepare() {
-         tracksDTO = new TopTracksDTO(List.of(new ItemTopTracks()), "1", "short");
-         artistsDTO = new TopArtistsDTO("1", List.of(new ItemTopArtists()), "short");
-         genresDTO = new TopGenresDTO(List.of(new Genre("rock", 2)), "short");
-         recentlyDTO = new RecentlyPlayedDTO("1", List.of(new ItemRecentlyPlayed()));
-         mainstreamScoreDTO = new MainstreamScoreDTO(75.00, "short");
-         Image image = new Image();
-         image.setUrl("imageurl");
-         userDTO = new UserDTO("testuser", "test@mail.com", "testuser", List.of(image));
-    }
-
     @Test
     void shouldGetTopTracksAuthenticated() throws Exception {
+        TopTracksDTO tracksDTO = new TopTracksDTO(List.of(new ItemTopTracks()), "1", "short");
         when(spotifyAPIService.getTopTracks(1, "short")).thenReturn(tracksDTO);
         mockMvc.perform(get("/api/top/tracks").with(oauth2Login()
                                 .attributes(map -> map.put("userId", 1L)))
@@ -87,6 +68,7 @@ class ApiControllerUnitTest {
 
     @Test
     void shouldGetTopArtistsAuthenticated() throws Exception {
+        TopArtistsDTO artistsDTO = new TopArtistsDTO("1", List.of(new ItemTopArtists()), "short");
         when(spotifyAPIService.getTopArtists(1, "short")).thenReturn(artistsDTO);
         mockMvc.perform(get("/api/top/artists").with(oauth2Login()
                                 .attributes(map -> map.put("userId", 1L)))
@@ -107,6 +89,7 @@ class ApiControllerUnitTest {
 
     @Test
     void shouldGetTopGenresAuthenticated() throws Exception {
+        TopGenresDTO genresDTO = new TopGenresDTO(List.of(new Genre("rock", 2)), "short");
         when(spotifyAPIService.getTopGenres(1, "short")).thenReturn(genresDTO);
         mockMvc.perform(get("/api/top/genres").with(oauth2Login()
                                 .attributes(map -> map.put("userId", 1L)))
@@ -127,6 +110,7 @@ class ApiControllerUnitTest {
 
     @Test
     void shouldGetRecentlyPlayedAuthenticated() throws Exception {
+        RecentlyPlayedDTO recentlyDTO = new RecentlyPlayedDTO("1", List.of(new ItemRecentlyPlayed()));
         when(spotifyAPIService.getRecentlyPlayed())
                 .thenReturn(recentlyDTO);
         mockMvc.perform(get("/api/recently").with(oauth2Login())
@@ -145,6 +129,7 @@ class ApiControllerUnitTest {
 
     @Test
     void shouldGetMainstreamScoreAuthenticated() throws Exception {
+        MainstreamScoreDTO mainstreamScoreDTO = new MainstreamScoreDTO(75.00, "short");
         when(spotifyAPIService.getMainstreamScore(1, "short"))
                 .thenReturn(mainstreamScoreDTO);
         mockMvc.perform(get("/api/score").with(oauth2Login()

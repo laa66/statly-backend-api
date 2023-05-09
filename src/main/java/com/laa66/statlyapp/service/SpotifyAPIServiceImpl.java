@@ -6,7 +6,6 @@ import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
 import com.laa66.statlyapp.model.*;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ClassPathResource;
@@ -25,7 +24,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 public class SpotifyAPIServiceImpl implements SpotifyAPIService {
 
     private final RestTemplate restTemplate;
@@ -44,7 +42,6 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     @Override
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
     public TopTracksDTO getTopTracks(long userId, String range) {
-        log.info("TopTracksDTO " + range + " object for user: " + userId + " cached!");
         TopTracksDTO body = restTemplate.exchange(SpotifyAPI.TOP_TRACKS + range + "_term", HttpMethod.GET, null, TopTracksDTO.class).getBody();
         if (body != null) body.setRange(range);
         return statsService.compareTracks(userId, body);
@@ -53,7 +50,6 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     @Override
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
     public TopArtistsDTO getTopArtists(long userId, String range) {
-        log.info("TopArtistsDTO " + range + " object for user: " + userId + " cached!");
         TopArtistsDTO body = restTemplate.exchange(SpotifyAPI.TOP_ARTISTS + range + "_term", HttpMethod.GET, null, TopArtistsDTO.class).getBody();
         if (body != null) body.setRange(range);
         return statsService.compareArtists(userId, body);

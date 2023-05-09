@@ -5,6 +5,14 @@ CREATE TABLE IF NOT EXISTS users (
     PRIMARY KEY (id)
 );
 
+CREATE TABLE IF NOT EXISTS beta_users (
+	id BIGINT AUTO_INCREMENT,
+    full_name VARCHAR(50) NOT NULL,
+    email VARCHAR(50) NOT NULL,
+    date DATETIME NOT NULL,
+    PRIMARY KEY (id)
+);
+
 CREATE TABLE IF NOT EXISTS user_tracks (
 	id BIGINT AUTO_INCREMENT,
     user_id BIGINT,

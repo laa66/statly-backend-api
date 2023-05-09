@@ -4,6 +4,8 @@ import com.laa66.statlyapp.exception.ClientAuthorizationException;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
 import com.laa66.statlyapp.exception.UserAuthenticationException;
 import com.laa66.statlyapp.service.SpotifyTokenService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +23,9 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 
 import java.io.IOException;
 
-public class HeaderModifierTokenRefresherInterceptor implements ClientHttpRequestInterceptor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HeaderModifierTokenRefresherInterceptor.class);
+@Slf4j
+public class HeaderModifierTokenRefresherInterceptor implements ClientHttpRequestInterceptor {
 
     private final OAuth2AuthorizedClientService clientService;
     private final SpotifyTokenService tokenService;
@@ -39,14 +41,13 @@ public class HeaderModifierTokenRefresherInterceptor implements ClientHttpReques
         if (authentication == null) throw new UserAuthenticationException("User not authenticated");
         OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
         OAuth2AuthorizedClient client = clientService.loadAuthorizedClient(token.getAuthorizedClientRegistrationId(), token.getName());
-        //LOGGER.info("---> Auth User: " + client.getPrincipalName() + ", Token: " + client.getAccessToken().getTokenValue() + "Expires at: " + client.getAccessToken().getExpiresAt().atZone(ZoneId.systemDefault()) +", Refresh token: " + client.getRefreshToken().getTokenValue());
 
         if (client == null) throw new ClientAuthorizationException("Client is null //then logout user");
         request.getHeaders().setBearerAuth(client.getAccessToken().getTokenValue());
         ClientHttpResponse response = execution.execute(request, body);
 
         if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-            LOGGER.info("-> Spotify API access forbidden, refreshing token and sending new request...");
+            log.info("-->> Spotify API access forbidden, refreshing token and sending new request...");
             // get refreshed token
             OAuth2AccessToken accessToken = tokenService.refreshAccessToken(client);
 

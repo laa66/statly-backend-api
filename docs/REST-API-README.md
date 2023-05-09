@@ -144,17 +144,35 @@ Methods description:
 
 ### User Service
 
-The `UserServiceImpl` is a service [class](/src/main/java/com/laa66/statlyapp/service/UserServiceImpl.java) that implements `UserService` interface. It provides implementation for operations such as finding a user by email, saving user, deleting a user and saving user statistics. It also provides methods for comparing user current stats with last visit stats. The Class is annotated with `@Transactional` to group multiple database operations together as a single transaction.
+The `UserServiceImpl` is a service [class](/src/main/java/com/laa66/statlyapp/service/UserServiceImpl.java) that implements `UserService` interface. It provides implementation for operations such as finding user/beta-user by email, saving user/beta-user, deleting user/beta-users. The Class is annotated with `@Transactional` to group multiple database operations together as a single transaction.
 
-`UserServiceImpl` also has injected 5 dependencies: `UserRepository`, `UserTrackRepository`, `UserAritstRepository`, `UserGenreRepository` , `UserMainstreamRepository` which are responsible for performing CRUD operations.
+`UserServiceImpl` also has injected 2 dependencies: `UserRepository` and `BetaUserRepository` which are responsible for performing CRUD operations.
 
 Methods description:
 
 - `findUserByEmail(String email)` takes an email as a parameter and returns Optional `User` object from database.
 - `saveUser(User user)` takes a `User` object as a parameter and saves it in the database.
 - `deleteUser(long id)` takes user ID as a parameter, finds the user with given ID and delete it from database. If user is not found method will throw `UserNotFoundException` .
+- `saveBetaUser(BetaUserDTO dto)` takes a dto object and saves it in the database.
+- `findAllBetaUsers()` it returns list of all beta users from the database.
+- `deleteAllBetUsers()` it removes all beta users from the database.
+
+### Stats Service
+
+The `StatsServiceImpl` is a service [class](/src/main/java/com/laa66/statlyapp/service/StatsServiceImpl.java) that implements `StatsService` interface. It provides implementation for operations such as saving cached user statistics and comparing user current stats with last visit stats. The Class is annotated with `@Transactional` to group multiple database operations together as a single transaction.
+
+`StatsServiceImpl` has also injected 4 dependencies: `TrackRepository`, `ArtistRepository`, `GenreReposiory` and `MainstreamRepository` which are responsible for performing CRUD operations.
+
+Methods description:
+
 - `saveUserTracks`, `saveUserArtists`, `saveUserGenres`, `saveUserMainstream` these methods are called only from `CacheTask` component once a day. They map data from special DTO objects (cached Spotify API responses) to the entities which are saved in the database.
 - `compareTracks`, `compareArtists`, `compareGenres`, `compareMainstream` these methods are called only from `AppController` and are used to read user’s last visit stats and compare them with current visit statistics.
+
+### Mail Service
+
+The `MailServiceImpl` is a service [class](/src/main/java/com/laa66/statlyapp/service/MailServiceImpl.java) that implements `MailService` interface. It provides implementation for operations such as sending Join notification to app administrator and sending Access Granted Notification to beta-users.
+
+`MailServiceImpl` has also injected 2 dependencies: `JavaMailSender` configured in properties responsible for sending mail messages and `email` value from properties
 
 ### Custom OAuth 2.0 User Service
 
@@ -164,37 +182,19 @@ This customized bean gets user attributes and then checks if user was previously
 
 ## Cache
 
-Statly REST API is using `Caffeine` Cache implementation to cache Spotify API responses. This custom Cache is configured in [Cache Config class](/path).
+Statly REST API is using `Caffeine` Cache implementation to cache Spotify API responses. This custom Cache is configured in [Cache Config class](/src/main/java/com/laa66/statlyapp/config/CacheConfig.java).
 
-When a user logs in for the first time during the day their statistics obtained from the Spotify API will be cached until 11:59 PM on the same day. At this time API responses will be saved to the database with [scheduled task](/path) implemented inside `CacheTask` component using `UserService` implementation, and the Cache will be cleared.
+When a user logs in for the first time during the day their statistics obtained from the Spotify API will be cached until 11:59 PM on the same day. At this time API responses will be saved to the database with [scheduled task](/src/main/java/com/laa66/statlyapp/task/CacheTask.java) implemented inside `CacheTask` component using `StatsService` implementation, and the Cache will be cleared.
 
 With this approach current user’s statistics can be compared with data from previous days.
 
 ## REST Controllers
 
-This [REST Controller](../src/main/java/com/laa66/statlyapp/controller/AppController.java) is responsible for handling API requests from a React application and returning JSON data.
+[ApiController](../src/main/java/com/laa66/statlyapp/controller/ApiController.java) is responsible for handling API requests from a React application and returning JSON data.
 
-It uses the **`SpotifyAPIService`** class to interact with the Spotify Web API to retrieve data. It also uses the `Image` and `UserIdDTO` classes to handle user image data and user information data respectively. The `@Value` annotation is used to inject the `REACT_URL` property which points to the React-app from the application properties file into the controller.
+It uses the **`SpotifyAPIService`** class to interact with the Spotify Web API to retrieve data.
 
 `@RestController` annotation on the controller class indicates that all methods in the class return JSON data. The `@RequestMapping` annotation on the class specifies the base URL `/api` for all endpoints.
-
-- **`/api/auth`**: This GET endpoint is starting point of application. At first it starts user authentication flow with help of Spring Security filters configured with OAuth 2.0. It redirects the user to the Spotify authentication page and then redirects them back to the React application with user information and profile image URL in the query string.
-
-
-- **`/api/join`**: This POST endpoint is used for beta user sign-up. It logs information about the user who joined the beta test.
-    - Header of this request should contain valid CSRF token which is generated inside REST API.
-    - Incoming POST request body should look like this:
-
-        ```json
-        {
-            "username": "test-user",
-            "email": "testuser@domain.com"
-        }
-        ```
-
-- **`/api/delete`**: This DELETE endpoint is used to delete all data from database associated with user Statly account.
-  - Header of this request should contain valid CSRF token.
-
 
 - **`/api/top/tracks`**: This GET endpoint returns user's 50 most listened tracks on Spotify based on a time range specified in the request parameter.
   - Response JSON look like this:
@@ -381,6 +381,53 @@ It uses the **`SpotifyAPIService`** class to interact with the Spotify Web API t
         }
     }
     ```
+<br>
+
+[UserController](../src/main/java/com/laa66/statlyapp/controller/UserController.java) is responsible for handling API requests from a React application, authenticating user and performing CRUD operations with `UserService` implementation.
+
+The `@Value` annotation is used to inject the `reactUrl` property which points to the React-app from the application properties file into the controller.
+
+`@RestController` annotation on the controller class indicates that all methods in the class return JSON data. The `@RequestMapping` annotation on the class specifies the base URL `/user` for all endpoints.
+
+- **`/user/auth`**: This GET endpoint is starting point of application. At first it starts user authentication flow with help of Spring Security filters configured with OAuth 2.0. It redirects the user to the Spotify authentication page and then redirects them back to the React application with user information and profile image URL in the query string.
+
+
+- **`/user/delete`**: This DELETE endpoint is used to delete all data from database associated with user Statly account.
+  - Header of this request should contain valid CSRF token.
+
+
+- **`/user/beta/join`**: This POST endpoint is used for beta user sign-up. It logs information about the user who joined the beta test.
+  - Header of this request should contain valid CSRF token which is generated inside REST API.
+  - Incoming POST request body should look like this:
+
+    ```json
+      {
+          "username": "test-user",
+          "email": "testuser@domain.com"
+      }
+     ```
+
+
+- **`/user/beta/all`**: This GET endpoint is used to get all beta users from the database.
+    - Header of this request should contain valid CSRF token.
+    - Response JSON look like this:
+      ```json 
+         [
+           {
+               "fullName": "name",
+               "email": "test@mail.com",
+               "date": "2023-05-09T14:33:09"
+           }
+         ]  
+      ```
+
+
+- **`/user/beta/delete`**: This DELETE endpoint is used to delete all beta-users from the database.
+  - Header of this request should contain valid CSRF token.
+
+
+- **`/user/beta/notification`**: This POST endpoint is used to send notification to the user who joined beta-test program.
+  - Header of this request should contain valid CSRF token.
 
 ## Exception handling
 

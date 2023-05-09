@@ -15,6 +15,7 @@ import com.laa66.statlyapp.repository.ArtistRepository;
 import com.laa66.statlyapp.repository.GenreRepository;
 import com.laa66.statlyapp.repository.MainstreamRepository;
 import com.laa66.statlyapp.repository.TrackRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+@Slf4j
 @Service
 @Transactional
 public class StatsServiceImpl implements StatsService {
@@ -106,7 +108,7 @@ public class StatsServiceImpl implements StatsService {
                 Integer lastPosition = item.getTracks().getOrDefault(artist + "_" + name, null);
                 Integer difference = lastPosition != null ? (lastPosition - actualPosition) : null;
                 track.setDifference(difference);
-                //LOGGER.info("Today: " + name + " - " + actualPosition + " / Yesterday: " + name + " - " + lastPosition + " / diff: " + track.getDifference());
+                //log.info("Today: " + name + " - " + actualPosition + " / Yesterday: " + name + " - " + lastPosition + " / diff: " + track.getDifference());
             });
         });
         return dto;
@@ -123,7 +125,7 @@ public class StatsServiceImpl implements StatsService {
                 Integer lastPosition = item.getArtists().getOrDefault(name, null);
                 Integer difference = lastPosition != null ? (lastPosition - actualPosition) : null;
                 artist.setDifference(difference);
-                //LOGGER.info("Today: " + name + " - " + actualPosition + " / Yesterday: " + name + " - " + lastPosition + " / diff: " + artist.getDifference());
+                //log.info("Today: " + name + " - " + actualPosition + " / Yesterday: " + name + " - " + lastPosition + " / diff: " + artist.getDifference());
             });
         });
         return dto;
@@ -140,7 +142,7 @@ public class StatsServiceImpl implements StatsService {
                 Integer lastScore = item.getGenres().getOrDefault(name, null);
                 Integer difference = lastScore != null ? (actualScore - lastScore) : null;
                 genre.setDifference(difference);
-                //LOGGER.info("Today: " + name + " - " + actualScore + " / Yesterday: " + name + " - " + lastScore + " / diff: " + genre.getDifference());
+                //log.info("Today: " + name + " - " + actualScore + " / Yesterday: " + name + " - " + lastScore + " / diff: " + genre.getDifference());
             });
         });
         return dto;
@@ -153,7 +155,7 @@ public class StatsServiceImpl implements StatsService {
             double actualScore = dto.getScore();
             double lastScore = userMainstream.get().getScore();
             dto.setDifference(new BigDecimal(actualScore - lastScore).setScale(2, RoundingMode.HALF_UP).doubleValue());
-            //LOGGER.info("Today: " + actualScore + " / Yesterday: " + lastScore + " / diff: " + dto.getDifference());
+            //log.info("Today: " + actualScore + " / Yesterday: " + lastScore + " / diff: " + dto.getDifference());
         });
         return dto;
     }

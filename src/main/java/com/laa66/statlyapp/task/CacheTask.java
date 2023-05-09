@@ -6,6 +6,7 @@ import com.laa66.statlyapp.DTO.TopArtistsDTO;
 import com.laa66.statlyapp.DTO.TopGenresDTO;
 import com.laa66.statlyapp.DTO.TopTracksDTO;
 import com.laa66.statlyapp.service.StatsService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class CacheTask {
 
     private final CacheManager cacheManager;
@@ -47,6 +49,7 @@ public class CacheTask {
         statsService.saveUserGenres(genresDTOMap);
         statsService.saveUserMainstream(mainstreamScoreDTOMap);
         cache.invalidate();
+        log.info("-->> API Cache saved to database and cleared.");
     }
 
 }

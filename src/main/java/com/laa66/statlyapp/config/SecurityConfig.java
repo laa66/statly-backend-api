@@ -71,9 +71,9 @@ public class SecurityConfig {
         tokenRepository.setSecure(true);
         delegate.setCsrfRequestAttributeName(null);
         CsrfTokenRequestHandler requestHandler = delegate::handle;
-        httpSecurity.csrf().disable()/*((csrf) -> csrf
+        httpSecurity.csrf((csrf) -> csrf
                         .csrfTokenRepository(tokenRepository)
-                        .csrfTokenRequestHandler(requestHandler))*/
+                        .csrfTokenRequestHandler(requestHandler))
                 .authorizeHttpRequests()
                 .requestMatchers("/user/beta/all", "/user/beta/delete", "user/beta/notification").access((authentication, object) ->
                         new AuthorizationDecision(((OAuth2User) authentication.get().getPrincipal()).getAttributes().get("email").equals(ADMIN_EMAIL)))

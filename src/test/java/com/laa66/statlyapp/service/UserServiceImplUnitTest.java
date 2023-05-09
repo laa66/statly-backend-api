@@ -80,7 +80,6 @@ class UserServiceImplUnitTest {
     void shouldSaveBetaUser() {
         userService.saveBetaUser(new BetaUserDTO());
         verify(betaUserRepository, times(1)).save(any());
-        verify(mailService, times(1)).sendJoinBetaNotification();
     }
 
     @Test
