@@ -2,10 +2,18 @@ package com.laa66.statlyapp.service;
 
 import com.laa66.statlyapp.DTO.BetaUserDTO;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONObject;
+import net.minidev.json.parser.JSONParser;
+import net.minidev.json.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 @Service
 @Slf4j
@@ -13,6 +21,7 @@ public class MailServiceImpl implements MailService {
 
     private final JavaMailSender mailSender;
     private final String email;
+    private final JSONParser parser = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
 
     public MailServiceImpl(JavaMailSender mailSender, @Value("${statly.api.admin-email}") String email) {
         this.mailSender = mailSender;
@@ -21,35 +30,34 @@ public class MailServiceImpl implements MailService {
 
     @Override
     public void sendJoinBetaNotification() {
-           SimpleMailMessage message = new SimpleMailMessage();
-           message.setTo(email);
-           message.setSubject("Statly-app: User Joined Beta-tests!");
-           message.setText("Hello!\nNew user joined beta-tests. " +
-                   "Checkout admin panel and add him to the Spotify web developer panel to grant them access to Statly.");
-           mailSender.send(message);
+        Resource resource = new ClassPathResource("json/join-beta-mail.json");
+        try {
+            JSONObject object = (JSONObject) parser.parse(resource.getInputStream());
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject((String) object.get("subject"));
+            message.setText((String) object.get("text"));
+            mailSender.send(message);
+        } catch (IOException | ParseException e) {
+            throw new RuntimeException("Failed to read mail template.", e);
+        }
     }
 
     @Override
     public void sendAccessGrantedNotification(BetaUserDTO dto) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(dto.getEmail());
-        message.setSubject("Welcome to the Statly Beta-Test Program!");
-        message.setText("Dear " + dto.getFullName() + ",\n" +
-                "\n" +
-                "We are delighted to inform you that you have successfully joined the beta-tests for our app with Spotify API integration - Statly. Thank you for your interest in our project!\n" +
-                "\n" +
-                "As a beta-tester, you will have the opportunity to try out the latest features of Statly before they are released to the public, and provide valuable feedback that will help us improve the app for everyone." +
-                "To get started, please log in the Statly app.\n" +
-                "\n" +
-                "Thank you again for joining the beta-tests. We look forward to hearing your feedback and working together to make Statly the best it can be!\n" +
-                "\n" +
-                "Best regards,\n" +
-                "Statly");
+        Resource resource = new ClassPathResource("json/access-granted-mail.json");
         try {
+            JSONObject object = (JSONObject) parser.parse(resource.getInputStream());
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(dto.getEmail());
+            message.setSubject((String) object.get("subject"));
+            String text = ((String) object.get("text")).replace("{fullname}", dto.getFullName());
+            message.setText(text);
             mailSender.send(message);
-            log.info("Notification email sent to: " + dto.getEmail());
-        } catch (Exception e) {
+        } catch (MailException e) {
             log.warn("Error while sending notification email.");
+        } catch (IOException | ParseException e) {
+            throw new RuntimeException("Failed to read mail template.", e);
         }
     }
 }

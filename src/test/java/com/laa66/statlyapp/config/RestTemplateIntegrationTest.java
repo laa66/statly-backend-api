@@ -92,13 +92,13 @@ class RestTemplateIntegrationTest {
     void shouldSetActiveToken() {
         String data = "body";
         mockServer.expect(ExpectedCount.once(),
-                requestTo(SpotifyAPI.CURRENT_USER))
+                requestTo(SpotifyAPI.CURRENT_USER.get()))
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(header("Authorization", "Bearer access"))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(data));
-        String response = restTemplate.getForObject(SpotifyAPI.CURRENT_USER, String.class);
+        String response = restTemplate.getForObject(SpotifyAPI.CURRENT_USER.get(), String.class);
         mockServer.verify();
         assertEquals(data, response);
     }
@@ -107,20 +107,20 @@ class RestTemplateIntegrationTest {
     void shouldRefreshToken() {
         String data = "body";
         mockServer.expect(ExpectedCount.once(),
-                requestTo(SpotifyAPI.CURRENT_USER))
+                requestTo(SpotifyAPI.CURRENT_USER.get()))
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(header("Authorization", "Bearer access"))
                 .andRespond(withStatus(HttpStatus.UNAUTHORIZED)
                         .contentType(MediaType.APPLICATION_JSON));
 
         mockServer.expect(ExpectedCount.once(),
-                requestTo(SpotifyAPI.CURRENT_USER))
+                requestTo(SpotifyAPI.CURRENT_USER.get()))
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(header("Authorization", "Bearer newAccess"))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(data));
-        String response = restTemplate.getForObject(SpotifyAPI.CURRENT_USER, String.class);
+        String response = restTemplate.getForObject(SpotifyAPI.CURRENT_USER.get(), String.class);
         mockServer.verify();
         assertEquals(data, response);
     }
@@ -128,12 +128,12 @@ class RestTemplateIntegrationTest {
     @Test
     void shouldThrowException() {
         mockServer.expect(ExpectedCount.once(),
-                requestTo(SpotifyAPI.CURRENT_USER))
+                requestTo(SpotifyAPI.CURRENT_USER.get()))
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(header("Authorization", "Bearer access"))
                 .andRespond(withStatus(HttpStatus.NOT_FOUND));
         assertThrows(SpotifyAPIException.class,
-                () -> restTemplate.getForObject(SpotifyAPI.CURRENT_USER, String.class));
+                () -> restTemplate.getForObject(SpotifyAPI.CURRENT_USER.get(), String.class));
         mockServer.verify();
     }
 

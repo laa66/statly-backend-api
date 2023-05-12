@@ -62,7 +62,7 @@ class SpotifyTokenServiceImplUnitTest {
     @Test
     void shouldRefreshAccessToken() {
         AccessToken accessToken = new AccessToken("new", "BEARER", "SCOPE", 10);
-        when(restTemplate.exchange(eq(SpotifyAPI.TOKEN_ENDPOINT),
+        when(restTemplate.exchange(eq(SpotifyAPI.TOKEN_ENDPOINT.get()),
                 eq(HttpMethod.POST),any() , eq(AccessToken.class)))
                 .thenReturn(new ResponseEntity<>(accessToken, HttpStatus.CREATED));
 

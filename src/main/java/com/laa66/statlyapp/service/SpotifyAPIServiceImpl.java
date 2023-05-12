@@ -18,6 +18,8 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -36,13 +38,13 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
 
     @Override
     public UserDTO getCurrentUser() {
-        return restTemplate.exchange(SpotifyAPI.CURRENT_USER, HttpMethod.GET, null, UserDTO.class).getBody();
+        return restTemplate.exchange(SpotifyAPI.CURRENT_USER.get(), HttpMethod.GET, null, UserDTO.class).getBody();
     }
 
     @Override
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
     public TopTracksDTO getTopTracks(long userId, String range) {
-        TopTracksDTO body = restTemplate.exchange(SpotifyAPI.TOP_TRACKS + range + "_term", HttpMethod.GET, null, TopTracksDTO.class).getBody();
+        TopTracksDTO body = restTemplate.exchange(SpotifyAPI.TOP_TRACKS.get() + range + "_term", HttpMethod.GET, null, TopTracksDTO.class).getBody();
         if (body != null) body.setRange(range);
         return statsService.compareTracks(userId, body);
     }
@@ -50,7 +52,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     @Override
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
     public TopArtistsDTO getTopArtists(long userId, String range) {
-        TopArtistsDTO body = restTemplate.exchange(SpotifyAPI.TOP_ARTISTS + range + "_term", HttpMethod.GET, null, TopArtistsDTO.class).getBody();
+        TopArtistsDTO body = restTemplate.exchange(SpotifyAPI.TOP_ARTISTS.get() + range + "_term", HttpMethod.GET, null, TopArtistsDTO.class).getBody();
         if (body != null) body.setRange(range);
         return statsService.compareArtists(userId, body);
     }
@@ -85,7 +87,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
 
     @Override
     public RecentlyPlayedDTO getRecentlyPlayed() {
-        return restTemplate.exchange(SpotifyAPI.RECENTLY_PLAYED_TRACKS, HttpMethod.GET, null, RecentlyPlayedDTO.class).getBody();
+        return restTemplate.exchange(SpotifyAPI.RECENTLY_PLAYED_TRACKS.get(), HttpMethod.GET, null, RecentlyPlayedDTO.class).getBody();
     }
 
     @Override
@@ -93,20 +95,21 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
         UserDTO user = getCurrentUser();
         String playlistRange;
         switch (range) {
-            case "short" -> playlistRange = SpotifyAPI.RANGE_SHORT;
-            case "medium" -> playlistRange = SpotifyAPI.RANGE_MEDIUM;
-            case "long" -> playlistRange = SpotifyAPI.RANGE_LONG;
+            case "short" -> playlistRange = SpotifyAPI.PLAYLIST_RANGE_SHORT.get();
+            case "medium" -> playlistRange = SpotifyAPI.PLAYLIST_RANGE_MEDIUM.get();
+            case "long" -> playlistRange = SpotifyAPI.PLAYLIST_RANGE_LONG.get();
             default -> throw new SpotifyAPIException("Wrong data range", HttpStatus.BAD_REQUEST.value());
         }
         PlaylistDTO playlist = postEmptyPlaylist(user, playlistRange);
         List<String> uris = getTopTracks(userId, range).getItemTopTracks().stream().map(ItemTopTracks::getUri).toList();
         postTracksToPlaylist(playlist, uris);
+        putPlaylistImage(playlist, range);
         return playlist;
     }
 
     // helpers
     public PlaylistDTO postEmptyPlaylist(UserDTO user, String range) {
-        String url = SpotifyAPI.CREATE_TOP_PLAYLIST.replace("user_id", user.getId());
+        String url = SpotifyAPI.CREATE_TOP_PLAYLIST.get().replace("user_id", user.getId());
         String body;
         try {
             Resource resource = new ClassPathResource("json/post-playlist.json");
@@ -120,8 +123,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(body, headers);
-        return restTemplate.exchange(url, HttpMethod.POST, request, PlaylistDTO.class).getBody();
+        return restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(body, headers), PlaylistDTO.class).getBody();
     }
 
     public void postTracksToPlaylist(PlaylistDTO playlist, List<String> uris) {
@@ -133,7 +135,22 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException();
         }
-        restTemplate.exchange(SpotifyAPI.ADD_PLAYLIST_TRACK
-                        .replace("playlist_id", playlist.getId()), HttpMethod.POST, new HttpEntity<>(body), String.class).getBody();
+        restTemplate.exchange(SpotifyAPI.ADD_PLAYLIST_TRACK.get()
+                        .replace("playlist_id", playlist.getId()), HttpMethod.POST, new HttpEntity<>(body), String.class);
+    }
+
+    public void putPlaylistImage(PlaylistDTO playlist, String range) {
+        String encodedImage;
+        try {
+            Resource resource = new ClassPathResource("image/" + range + ".jpg");
+            byte[] fileBytes = Files.readAllBytes(Paths.get(resource.getURI()));
+            encodedImage = Base64.getEncoder().encodeToString(fileBytes);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read image", e);
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        restTemplate.exchange(SpotifyAPI.EDIT_PLAYLIST_IMAGE.get().replace("playlist_id", playlist.getId()), HttpMethod.PUT,
+                new HttpEntity<>(encodedImage, headers), Void.class);
     }
 }

@@ -43,7 +43,7 @@ public class SpotifyTokenServiceImpl implements SpotifyTokenService {
         headers.setBasicAuth(encoded);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         HttpEntity<?> entity = new HttpEntity<>(refreshBody, headers);
-        ResponseEntity<AccessToken> response = restTemplate.exchange(SpotifyAPI.TOKEN_ENDPOINT, HttpMethod.POST, entity, AccessToken.class);
+        ResponseEntity<AccessToken> response = restTemplate.exchange(SpotifyAPI.TOKEN_ENDPOINT.get(), HttpMethod.POST, entity, AccessToken.class);
         return response.getBody();
     }
 }
