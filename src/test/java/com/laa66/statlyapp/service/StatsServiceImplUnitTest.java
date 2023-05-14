@@ -51,7 +51,7 @@ public class StatsServiceImplUnitTest {
         ItemTopTracks item = new ItemTopTracks();
         item.setArtists(Collections.singletonList(new Artist("artist")));
         item.setName("song");
-        TopTracksDTO dto = new TopTracksDTO(Collections.singletonList(item), "1", "short");
+        TopTracksDTO dto = new TopTracksDTO(Collections.singletonList(item), "1", "short", null);
         Map<TopTracksDTO, Long> dtoMap = Collections.singletonMap(dto, 1L);
         statsService.saveUserTracks(dtoMap);
         verify(trackRepository, times(1)).saveAll(anyList());
@@ -61,7 +61,7 @@ public class StatsServiceImplUnitTest {
     void shouldSaveUserArtists() {
         ItemTopArtists item = new ItemTopArtists();
         item.setName("artist");
-        TopArtistsDTO dto = new TopArtistsDTO("1", Collections.singletonList(item), "short");
+        TopArtistsDTO dto = new TopArtistsDTO("1", Collections.singletonList(item), "short", null);
         Map<TopArtistsDTO, Long> dtoMap = Collections.singletonMap(dto, 1L);
         statsService.saveUserArtists(dtoMap);
         verify(artistRepository, times(1)).saveAll(anyList());
@@ -70,7 +70,7 @@ public class StatsServiceImplUnitTest {
     @Test
     void shouldSaveUserGenres() {
         TopGenresDTO dto = new TopGenresDTO(Collections
-                .singletonList(new Genre("genre", 20)), "short");
+                .singletonList(new Genre("genre", 20)), "short", null);
         Map<TopGenresDTO, Long> dtoMap = Collections.singletonMap(dto, 1L);
         statsService.saveUserGenres(dtoMap);
         verify(genreRepository, times(1)).saveAll(anyList());
@@ -89,10 +89,10 @@ public class StatsServiceImplUnitTest {
         TopTracksDTO dto = new TopTracksDTO(List.of(
                 new ItemTopTracks(new Album(), List.of(new Artist("artist1")), "track1", 50, "uri", new SpotifyURL(), 0),
                 new ItemTopTracks(new Album(), List.of(new Artist("artist2")), "track2", 50, "uri", new SpotifyURL(), 0)
-        ), "2", "short");
+        ), "2", "short", null);
         UserTrack track = new UserTrack(1, 1, "short", Map.of(
                 "artist1_track1", 2, "artist2_track2", 1
-        ), LocalDate.now());
+        ), LocalDate.of(2023, 1, 1));
         when(trackRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "short"))
                 .thenReturn(Optional.of(track));
 
@@ -105,6 +105,7 @@ public class StatsServiceImplUnitTest {
         assertEquals(dto.getItemTopTracks().get(1).getName(), returnDto.getItemTopTracks().get(1).getName());
         assertEquals(1, returnDto.getItemTopTracks().get(0).getDifference(), "Artist1 was on second place and now should be at first place");
         assertEquals(-1, returnDto.getItemTopTracks().get(1).getDifference(), "Artist2 was on first place and now should be at second place");
+        assertEquals(track.getDate(), returnDto.getDate());
     }
 
     @Test
@@ -112,7 +113,7 @@ public class StatsServiceImplUnitTest {
         TopTracksDTO dto = new TopTracksDTO(List.of(
                 new ItemTopTracks(new Album(), List.of(new Artist("artist1")), "track1", 50, "uri", new SpotifyURL(), 0),
                 new ItemTopTracks(new Album(), List.of(new Artist("artist2")), "track2", 50, "uri", new SpotifyURL(), 0)
-        ), "2", "short");
+        ), "2", "short", null);
         when(trackRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "short"))
                 .thenReturn(Optional.empty());
         TopTracksDTO returnDto = statsService.compareTracks(1, dto);
@@ -124,6 +125,7 @@ public class StatsServiceImplUnitTest {
         assertEquals(dto.getItemTopTracks().get(1).getName(), returnDto.getItemTopTracks().get(1).getName());
         assertEquals(dto.getItemTopTracks().get(0).getDifference(), returnDto.getItemTopTracks().get(0).getDifference());
         assertEquals(dto.getItemTopTracks().get(1).getDifference(), returnDto.getItemTopTracks().get(1).getDifference());
+        assertNull(returnDto.getDate());
     }
 
     @Test
@@ -131,7 +133,7 @@ public class StatsServiceImplUnitTest {
         TopTracksDTO dto = new TopTracksDTO(List.of(
                 new ItemTopTracks(new Album(), List.of(new Artist("artist1")), "track1", 50, "uri", new SpotifyURL(), 0),
                 new ItemTopTracks(new Album(), List.of(new Artist("artist2")), "track2", 50, "uri", new SpotifyURL(), 0)
-        ), "2", "wrong");
+        ), "2", "wrong", null);
         when(trackRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "wrong"))
                 .thenReturn(Optional.empty());
         TopTracksDTO returnDto = statsService.compareTracks(1, dto);
@@ -143,6 +145,7 @@ public class StatsServiceImplUnitTest {
         assertEquals(dto.getItemTopTracks().get(1).getName(), returnDto.getItemTopTracks().get(1).getName());
         assertEquals(dto.getItemTopTracks().get(0).getDifference(), returnDto.getItemTopTracks().get(0).getDifference());
         assertEquals(dto.getItemTopTracks().get(1).getDifference(), returnDto.getItemTopTracks().get(1).getDifference());
+        assertNull(returnDto.getDate());
     }
 
     @Test
@@ -150,10 +153,10 @@ public class StatsServiceImplUnitTest {
         TopArtistsDTO dto = new TopArtistsDTO("2", List.of(
                 new ItemTopArtists(List.of(), List.of(), "artist1", "uri", new SpotifyURL(), 0),
                 new ItemTopArtists(List.of(), List.of(), "artist2", "uri", new SpotifyURL(), 0)
-        ), "short");
+        ), "short", null);
         UserArtist artist = new UserArtist(1, 1, "short", Map.of(
                 "artist1", 2, "artist2", 1
-        ), LocalDate.now());
+        ), LocalDate.of(2023, 1, 1));
         when(artistRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "short"))
                 .thenReturn(Optional.of(artist));
 
@@ -166,6 +169,7 @@ public class StatsServiceImplUnitTest {
         assertEquals(dto.getItemTopArtists().get(1).getName(), returnDto.getItemTopArtists().get(1).getName());
         assertEquals(1, returnDto.getItemTopArtists().get(0).getDifference(), "Artist1 was on second place and now should be at first place");
         assertEquals(-1, returnDto.getItemTopArtists().get(1).getDifference(), "Artist2 was on first place and now should be at second place");
+        assertEquals(artist.getDate(), returnDto.getDate());
     }
 
     @Test
@@ -173,7 +177,7 @@ public class StatsServiceImplUnitTest {
         TopArtistsDTO dto = new TopArtistsDTO("2", List.of(
                 new ItemTopArtists(List.of(), List.of(), "artist1", "uri", new SpotifyURL(), 0),
                 new ItemTopArtists(List.of(), List.of(), "artist2", "uri", new SpotifyURL(), 0)
-        ), "short");
+        ), "short", null);
         when(artistRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "short"))
                 .thenReturn(Optional.empty());
 
@@ -186,6 +190,7 @@ public class StatsServiceImplUnitTest {
         assertEquals(dto.getItemTopArtists().get(1).getName(), returnDto.getItemTopArtists().get(1).getName());
         assertEquals(dto.getItemTopArtists().get(0).getDifference(), returnDto.getItemTopArtists().get(0).getDifference());
         assertEquals(dto.getItemTopArtists().get(1).getDifference(), returnDto.getItemTopArtists().get(1).getDifference());
+        assertNull(returnDto.getDate());
     }
 
     @Test
@@ -193,7 +198,7 @@ public class StatsServiceImplUnitTest {
         TopArtistsDTO dto = new TopArtistsDTO("2", List.of(
                 new ItemTopArtists(List.of(), List.of(), "artist1", "uri", new SpotifyURL(), 0),
                 new ItemTopArtists(List.of(), List.of(), "artist2", "uri", new SpotifyURL(), 0)
-        ), "wrong");
+        ), "wrong", null);
         when(artistRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "wrong"))
                 .thenReturn(Optional.empty());
 
@@ -206,6 +211,7 @@ public class StatsServiceImplUnitTest {
         assertEquals(dto.getItemTopArtists().get(1).getName(), returnDto.getItemTopArtists().get(1).getName());
         assertEquals(dto.getItemTopArtists().get(0).getDifference(), returnDto.getItemTopArtists().get(0).getDifference());
         assertEquals(dto.getItemTopArtists().get(1).getDifference(), returnDto.getItemTopArtists().get(1).getDifference());
+        assertNull(returnDto.getDate());
     }
 
     @Test
@@ -214,11 +220,11 @@ public class StatsServiceImplUnitTest {
                 new Genre("genre1", 20),
                 new Genre("genre2", 15),
                 new Genre("genre3", 8)
-        ), "short");
+        ), "short", null);
 
         UserGenre genre = new UserGenre(1, 1, "short", Map.of(
                 "genre1", 10, "genre2", 30, "genre4", 5
-        ), LocalDate.now());
+        ), LocalDate.of(2023, 1, 1));
         when(genreRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "short"))
                 .thenReturn(Optional.of(genre));
 
@@ -231,6 +237,7 @@ public class StatsServiceImplUnitTest {
         assertEquals(10, returnDto.getGenres().get(0).getDifference());
         assertEquals(-15, returnDto.getGenres().get(1).getDifference());
         assertNull(returnDto.getGenres().get(2).getDifference());
+        assertEquals(genre.getDate(), returnDto.getDate());
     }
 
     @Test
@@ -239,7 +246,7 @@ public class StatsServiceImplUnitTest {
                 new Genre("genre1", 20),
                 new Genre("genre2", 15),
                 new Genre("genre3", 8)
-        ), "short");
+        ), "short", null);
         when(genreRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "short"))
                 .thenReturn(Optional.empty());
 
@@ -252,6 +259,7 @@ public class StatsServiceImplUnitTest {
         assertEquals(dto.getGenres().get(0).getDifference(), returnDto.getGenres().get(0).getDifference());
         assertEquals(dto.getGenres().get(1).getDifference(), returnDto.getGenres().get(1).getDifference());
         assertEquals(dto.getGenres().get(2).getDifference(), returnDto.getGenres().get(2).getDifference());
+        assertNull(returnDto.getDate());
     }
 
     @Test
@@ -260,7 +268,7 @@ public class StatsServiceImplUnitTest {
                 new Genre("genre1", 20),
                 new Genre("genre2", 15),
                 new Genre("genre3", 8)
-        ), "wrong");
+        ), "wrong", null);
         when(genreRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "wrong"))
                 .thenReturn(Optional.empty());
 
@@ -273,12 +281,13 @@ public class StatsServiceImplUnitTest {
         assertEquals(dto.getGenres().get(0).getDifference(), returnDto.getGenres().get(0).getDifference());
         assertEquals(dto.getGenres().get(1).getDifference(), returnDto.getGenres().get(1).getDifference());
         assertEquals(dto.getGenres().get(2).getDifference(), returnDto.getGenres().get(2).getDifference());
+        assertNull(returnDto.getDate());
     }
 
     @Test
     void shouldCompareMainstream() {
         MainstreamScoreDTO dto = new MainstreamScoreDTO(60.50, "short");
-        UserMainstream mainstream = new UserMainstream(1, 1, "short", LocalDate.now(), 30.76);
+        UserMainstream mainstream = new UserMainstream(1, 1, "short", LocalDate.of(2023, 1, 1), 30.76);
         when(mainstreamRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "short"))
                 .thenReturn(Optional.of(mainstream));
 
@@ -287,6 +296,7 @@ public class StatsServiceImplUnitTest {
         assertEquals(dto.getRange(), returnDto.getRange());
         assertEquals(dto.getScore(), returnDto.getScore());
         assertEquals(29.74, returnDto.getDifference());
+        assertEquals(mainstream.getDate(), returnDto.getDate());
     }
 
     @Test
@@ -300,6 +310,7 @@ public class StatsServiceImplUnitTest {
         assertEquals(dto.getRange(), returnDto.getRange());
         assertEquals(dto.getScore(), returnDto.getScore());
         assertEquals(dto.getDifference(), returnDto.getDifference());
+        assertNull(returnDto.getDate());
     }
 
     @Test
@@ -313,5 +324,6 @@ public class StatsServiceImplUnitTest {
         assertEquals(dto.getRange(), returnDto.getRange());
         assertEquals(dto.getScore(), returnDto.getScore());
         assertEquals(dto.getDifference(), returnDto.getDifference());
+        assertNull(returnDto.getDate());
     }
 }

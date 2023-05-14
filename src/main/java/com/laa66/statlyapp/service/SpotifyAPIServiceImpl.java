@@ -72,7 +72,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
         double sum = sliceGenres.stream().mapToInt(Genre::getScore).sum();
         return statsService.compareGenres(userId, new TopGenresDTO(sliceGenres.stream()
                 .map(item -> new Genre(item.getGenre(), Double.valueOf((item.getScore() / sum) * 100)
-                        .intValue())).collect(Collectors.toList()), range));
+                        .intValue())).collect(Collectors.toList()), range, null));
     }
 
     @Override

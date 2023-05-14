@@ -100,6 +100,7 @@ public class StatsServiceImpl implements StatsService {
     public TopTracksDTO compareTracks(long userId, TopTracksDTO dto) {
         Optional<UserTrack> userTrack = trackRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, dto.getRange());
         userTrack.ifPresent(item -> {
+            dto.setDate(item.getDate());
             IntStream.range(0, dto.getItemTopTracks().size()).forEach(index -> {
                 ItemTopTracks track = dto.getItemTopTracks().get(index);
                 String artist = track.getArtists().get(0).getName();
@@ -118,6 +119,7 @@ public class StatsServiceImpl implements StatsService {
     public TopArtistsDTO compareArtists(long userId, TopArtistsDTO dto) {
         Optional<UserArtist> userArtist = artistRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, dto.getRange());
         userArtist.ifPresent(item -> {
+            dto.setDate(item.getDate());
             IntStream.range(0, dto.getItemTopArtists().size()).forEach(index -> {
                 ItemTopArtists artist = dto.getItemTopArtists().get(index);
                 String name = artist.getName();
@@ -135,6 +137,7 @@ public class StatsServiceImpl implements StatsService {
     public TopGenresDTO compareGenres(long userId, TopGenresDTO dto) {
         Optional<UserGenre> userGenre = genreRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, dto.getRange());
         userGenre.ifPresent(item -> {
+            dto.setDate(item.getDate());
             IntStream.range(0, dto.getGenres().size()).forEach(index -> {
                 Genre genre = dto.getGenres().get(index);
                 String name = genre.getGenre();
@@ -152,6 +155,7 @@ public class StatsServiceImpl implements StatsService {
     public MainstreamScoreDTO compareMainstream(long userId, MainstreamScoreDTO dto) {
         Optional<UserMainstream> userMainstream = mainstreamRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, dto.getRange());
         userMainstream.ifPresent(item -> {
+            dto.setDate(item.getDate());
             double actualScore = dto.getScore();
             double lastScore = userMainstream.get().getScore();
             dto.setDifference(new BigDecimal(actualScore - lastScore).setScale(2, RoundingMode.HALF_UP).doubleValue());

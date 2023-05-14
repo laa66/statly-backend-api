@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.laa66.statlyapp.model.ItemTopTracks;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @JsonPropertyOrder({"items", "total"})
@@ -24,4 +25,6 @@ public class TopTracksDTO {
     private String total;
 
     private String range;
+
+    private LocalDate date;
 }

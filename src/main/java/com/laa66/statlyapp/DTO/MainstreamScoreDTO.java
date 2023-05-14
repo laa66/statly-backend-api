@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDate;
+
 @NoArgsConstructor
 @Getter
 @Setter
@@ -15,6 +17,8 @@ public class MainstreamScoreDTO {
     private String range;
 
     private double difference;
+
+    private LocalDate date;
 
     public MainstreamScoreDTO(double score, String range) {
         this.score = score;

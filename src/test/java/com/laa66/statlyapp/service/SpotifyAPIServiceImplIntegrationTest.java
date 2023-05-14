@@ -117,7 +117,7 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @Test
     void shouldGetTopTracksResponseOk() throws JsonProcessingException {
-        TopTracksDTO data = new TopTracksDTO(List.of(new ItemTopTracks()),"1", "short");
+        TopTracksDTO data = new TopTracksDTO(List.of(new ItemTopTracks()),"1", "short", null);
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.TOP_TRACKS.get() + "short_term"))
                 .andExpect(method(HttpMethod.GET))
@@ -153,7 +153,7 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @Test
     void shouldGetTopArtistsResponseOk() throws JsonProcessingException {
-        TopArtistsDTO data = new TopArtistsDTO("1", new ArrayList<>(), "short");
+        TopArtistsDTO data = new TopArtistsDTO("1", new ArrayList<>(), "short", null);
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.TOP_ARTISTS.get() + "short_term"))
                 .andExpect(method(HttpMethod.GET))
@@ -192,7 +192,7 @@ class SpotifyAPIServiceImplIntegrationTest {
     void shouldGetTopGenresResponseOk() throws JsonProcessingException {
         ItemTopArtists item1 = new ItemTopArtists(List.of("Rock", "Rap", "Rap"), new ArrayList<>(), "artist1", "uri", new SpotifyURL(), 0);
         ItemTopArtists item2 = new ItemTopArtists(List.of("Rock", "Rap"), new ArrayList<>(), "artist2", "uri", new SpotifyURL(), 0);
-        TopArtistsDTO data = new TopArtistsDTO("2", List.of(item1, item2), "short");
+        TopArtistsDTO data = new TopArtistsDTO("2", List.of(item1, item2), "short", null);
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.TOP_ARTISTS.get() + "short_term"))
                 .andExpect(method(HttpMethod.GET))
@@ -236,7 +236,7 @@ class SpotifyAPIServiceImplIntegrationTest {
         item1.setPopularity(30);
         ItemTopTracks item2 = new ItemTopTracks();
         item2.setPopularity(70);
-        TopTracksDTO data = new TopTracksDTO(List.of(item1, item2), "2", "short");
+        TopTracksDTO data = new TopTracksDTO(List.of(item1, item2), "2", "short", null);
 
         mockServer.expect(ExpectedCount.once(),
                 requestTo(SpotifyAPI.TOP_TRACKS.get() + "short_term"))
@@ -316,7 +316,7 @@ class SpotifyAPIServiceImplIntegrationTest {
         UserDTO user = new UserDTO("1", "test@mail.com", "user", new ArrayList<>());
         ItemTopTracks track = new ItemTopTracks();
         track.setUri("trackId");
-        TopTracksDTO topTracks = new TopTracksDTO(List.of(track), "1", "short");
+        TopTracksDTO topTracks = new TopTracksDTO(List.of(track), "1", "short", null);
         PlaylistDTO playlist = new PlaylistDTO("1", new SpotifyURL());
         String data = "playlist";
 

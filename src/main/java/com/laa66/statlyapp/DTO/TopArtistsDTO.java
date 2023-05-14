@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.laa66.statlyapp.model.ItemTopArtists;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @JsonPropertyOrder({"total", "items"})
@@ -24,4 +25,6 @@ public class TopArtistsDTO {
     private List<ItemTopArtists> itemTopArtists;
 
     private String range;
+
+    private LocalDate date;
 }
