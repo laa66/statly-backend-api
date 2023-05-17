@@ -23,6 +23,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,24 +63,31 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     public TopGenresDTO getTopGenres(long userId, String range) {
         TopArtistsDTO response = getTopArtists(userId, range);
         List<ItemTopArtists> topArtists = response.getItemTopArtists();
-        HashMap<String, Integer> map = new HashMap<>();
-        topArtists.forEach(list -> list.getGenres().forEach(item -> {
-                            map.merge(item, 1, (x,y) -> map.get(item)+1);}));
-        List<Genre> genres = new ArrayList<>();
-        map.forEach((x, y) -> genres.add(new Genre(x, y)));
-        genres.sort(Comparator.reverseOrder());
-        List<Genre> sliceGenres = genres.size() > 8 ? genres.subList(0, 8) : genres;
-        double sum = sliceGenres.stream().mapToInt(Genre::getScore).sum();
-        return statsService.compareGenres(userId, new TopGenresDTO(sliceGenres.stream()
-                .map(item -> new Genre(item.getGenre(), Double.valueOf((item.getScore() / sum) * 100)
-                        .intValue())).collect(Collectors.toList()), range, null));
+
+        Map<String, Integer> genreCountMap = topArtists.stream()
+                .flatMap(artist -> artist.getGenres().stream())
+                .collect(Collectors.toMap(Function.identity(), genre -> 1, Integer::sum));
+        List<Genre> sliceGenres = genreCountMap.entrySet().stream()
+                .map(entry -> new Genre(entry.getKey(), entry.getValue()))
+                .sorted(Comparator.reverseOrder())
+                .limit(10)
+                .toList();
+        double sum = sliceGenres.stream()
+                .mapToInt(Genre::getScore)
+                .sum();
+        List<Genre> transformedGenres = sliceGenres.stream()
+                .map(item -> new Genre(item.getGenre(), (int) ((item.getScore() / sum) * 100)))
+                .collect(Collectors.toList());
+        return statsService.compareGenres(userId, new TopGenresDTO(transformedGenres, range, null));
     }
 
     @Override
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
     public MainstreamScoreDTO getMainstreamScore(long userId, String range) {
         TopTracksDTO response = getTopTracks(userId, range);
-        double result = response.getItemTopTracks().stream().mapToInt(ItemTopTracks::getPopularity)
+
+        double result = response.getItemTopTracks().stream()
+                .mapToInt(ItemTopTracks::getPopularity)
                 .average()
                 .orElse(0);
         return statsService.compareMainstream(userId, new MainstreamScoreDTO(result, range));
