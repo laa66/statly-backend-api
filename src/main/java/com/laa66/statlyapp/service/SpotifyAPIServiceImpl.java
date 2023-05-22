@@ -46,7 +46,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
     public TopTracksDTO getTopTracks(long userId, String range) {
         TopTracksDTO body = restTemplate.exchange(SpotifyAPI.TOP_TRACKS.get() + range + "_term", HttpMethod.GET, null, TopTracksDTO.class).getBody();
-        if (body != null) body.setRange(range);
+        if (body != null) body.withRange(range);
         return statsService.compareTracks(userId, body);
     }
 
@@ -54,7 +54,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
     public TopArtistsDTO getTopArtists(long userId, String range) {
         TopArtistsDTO body = restTemplate.exchange(SpotifyAPI.TOP_ARTISTS.get() + range + "_term", HttpMethod.GET, null, TopArtistsDTO.class).getBody();
-        if (body != null) body.setRange(range);
+        if (body != null) body.withRange(range);
         return statsService.compareArtists(userId, body);
     }
 
@@ -62,17 +62,27 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
     public TopGenresDTO getTopGenres(long userId, String range) {
         TopArtistsDTO response = getTopArtists(userId, range);
-        List<ItemTopArtists> topArtists = response.getItemTopArtists();
+        List<ItemTopArtists> topArtists = response.getItemTopArtists(); //handling npe
 
-        Map<String, Integer> genreCountMap = topArtists.stream()
+        List<Genre> sliceGenres = topArtists
+                .stream()
                 .flatMap(artist -> artist.getGenres().stream())
-                .collect(Collectors.toMap(Function.identity(), genre -> 1, Integer::sum));
-        List<Genre> sliceGenres = genreCountMap.entrySet().stream()
+                .collect(Collectors.collectingAndThen(Collectors.toMap(Function.identity(), genre -> 1, Integer::sum),
+                        stringIntegerMap -> stringIntegerMap.entrySet()
+                                .stream()
+                                .map(entry -> new Genre(entry.getKey(), entry.getValue()))
+                                .sorted(Comparator.reverseOrder())
+                                .limit(10)
+                                .toList()
+                        ));
+                //.collect(Collectors.toMap(Function.identity(), genre -> 1, Integer::sum));
+        /*List<Genre> sliceGenres = genreCountMap.entrySet().stream()
                 .map(entry -> new Genre(entry.getKey(), entry.getValue()))
                 .sorted(Comparator.reverseOrder())
                 .limit(10)
-                .toList();
-        double sum = sliceGenres.stream()
+                .toList();*/
+        double sum = sliceGenres
+                .stream()
                 .mapToInt(Genre::getScore)
                 .sum();
         List<Genre> transformedGenres = sliceGenres.stream()
@@ -90,7 +100,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
                 .mapToInt(ItemTopTracks::getPopularity)
                 .average()
                 .orElse(0);
-        return statsService.compareMainstream(userId, new MainstreamScoreDTO(result, range));
+        return statsService.compareMainstream(userId, new MainstreamScoreDTO(result, range, 0, null));
     }
 
     @Override
@@ -116,7 +126,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     }
 
     // helpers
-    public PlaylistDTO postEmptyPlaylist(UserDTO user, String range) {
+    private PlaylistDTO postEmptyPlaylist(UserDTO user, String range) {
         String url = SpotifyAPI.CREATE_TOP_PLAYLIST.get().replace("user_id", user.getId());
         String body;
         try {
@@ -134,7 +144,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
         return restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(body, headers), PlaylistDTO.class).getBody();
     }
 
-    public void postTracksToPlaylist(PlaylistDTO playlist, List<String> uris) {
+    private void postTracksToPlaylist(PlaylistDTO playlist, List<String> uris) {
         SpotifyRequestAddTracks request = new SpotifyRequestAddTracks(uris, 0);
         String body;
         try {
@@ -147,7 +157,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
                         .replace("playlist_id", playlist.getId()), HttpMethod.POST, new HttpEntity<>(body), String.class);
     }
 
-    public void putPlaylistImage(PlaylistDTO playlist, String range) {
+    private void putPlaylistImage(PlaylistDTO playlist, String range) {
         String encodedImage;
         try {
             Resource resource = new ClassPathResource("image/" + range + ".jpg");

@@ -78,7 +78,7 @@ class UserServiceImplUnitTest {
 
     @Test
     void shouldSaveBetaUser() {
-        userService.saveBetaUser(new BetaUserDTO());
+        userService.saveBetaUser(new BetaUserDTO("name", "email", "date"));
         verify(betaUserRepository, times(1)).save(any());
     }
 

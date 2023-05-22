@@ -8,22 +8,17 @@ import lombok.*;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@NoArgsConstructor
+@Value
+@NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
 @AllArgsConstructor
-@Getter
-@Setter
-@ToString
 public class UserDTO {
 
-    @JsonProperty("id")
-    private String id;
+    String id;
 
-    @JsonProperty("email")
-    private String email;
+    String email;
 
     @JsonProperty("display_name")
-    private String displayName;
+    String displayName;
 
-    @JsonProperty("images")
-    private List<Image> images;
+    List<Image> images;
 }

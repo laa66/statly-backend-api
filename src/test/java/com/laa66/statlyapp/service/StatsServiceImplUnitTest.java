@@ -78,7 +78,7 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldSaveUserMainstream() {
-        MainstreamScoreDTO dto = new MainstreamScoreDTO(40.00, "short");
+        MainstreamScoreDTO dto = new MainstreamScoreDTO(40.00, "short", 0, null);
         Map<MainstreamScoreDTO, Long> dtoMap = Collections.singletonMap(dto, 1L);
         statsService.saveUserMainstream(dtoMap);
         verify(mainstreamRepository, times(1)).saveAll(anyList());
@@ -286,7 +286,7 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldCompareMainstream() {
-        MainstreamScoreDTO dto = new MainstreamScoreDTO(60.50, "short");
+        MainstreamScoreDTO dto = new MainstreamScoreDTO(60.50, "short", 0, null);
         UserMainstream mainstream = new UserMainstream(1, 1, "short", LocalDate.of(2023, 1, 1), 30.76);
         when(mainstreamRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "short"))
                 .thenReturn(Optional.of(mainstream));
@@ -301,7 +301,7 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldCompareMainstreamWrongId() {
-        MainstreamScoreDTO dto = new MainstreamScoreDTO(60.50, "short");
+        MainstreamScoreDTO dto = new MainstreamScoreDTO(60.50, "short", 0, null);
         when(mainstreamRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "short"))
                 .thenReturn(Optional.empty());
 
@@ -315,7 +315,7 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldCompareMainstreamWrongRange() {
-        MainstreamScoreDTO dto = new MainstreamScoreDTO(60.50, "wrong");
+        MainstreamScoreDTO dto = new MainstreamScoreDTO(60.50, "wrong", 0, null);
         when(mainstreamRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "wrong"))
                 .thenReturn(Optional.empty());
 

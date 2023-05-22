@@ -9,11 +9,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 @ToString
 public class TopGenresDTO {
 
     private List<Genre> genres;
     private String range;
     private LocalDate date;
+
+    public void withRange(String range) {
+        this.range = range;
+    }
+
+    public void withDate(LocalDate date) {
+        this.date = date;
+    }
 }

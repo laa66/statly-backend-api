@@ -129,7 +129,7 @@ class ApiControllerUnitTest {
 
     @Test
     void shouldGetMainstreamScoreAuthenticated() throws Exception {
-        MainstreamScoreDTO mainstreamScoreDTO = new MainstreamScoreDTO(75.00, "short");
+        MainstreamScoreDTO mainstreamScoreDTO = new MainstreamScoreDTO(75.00, "short", 0, null);
         when(spotifyAPIService.getMainstreamScore(1, "short"))
                 .thenReturn(mainstreamScoreDTO);
         mockMvc.perform(get("/api/score").with(oauth2Login()

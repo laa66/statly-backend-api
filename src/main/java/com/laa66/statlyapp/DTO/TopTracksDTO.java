@@ -14,17 +14,23 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 @ToString
 public class TopTracksDTO {
 
     @JsonProperty("items")
     private List<ItemTopTracks> itemTopTracks;
 
-    @JsonProperty("total")
     private String total;
 
     private String range;
 
     private LocalDate date;
+
+    public void withRange(String range) {
+        this.range = range;
+    }
+
+    public void withDate(LocalDate date) {
+        this.date = date;
+    }
 }

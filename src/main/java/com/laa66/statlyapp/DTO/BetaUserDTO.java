@@ -2,13 +2,11 @@ package com.laa66.statlyapp.DTO;
 
 import lombok.*;
 
-@NoArgsConstructor
+@Value
+@NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
 @AllArgsConstructor
-@Getter
-@Setter
-@ToString
 public class BetaUserDTO {
-    private String fullName;
-    private String email;
-    private String date;
+    String fullName;
+    String email;
+    String date;
 }

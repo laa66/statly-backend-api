@@ -1,15 +1,12 @@
 package com.laa66.statlyapp.DTO;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
-@Setter
 @ToString
 public class MainstreamScoreDTO {
     private double score;
@@ -20,9 +17,16 @@ public class MainstreamScoreDTO {
 
     private LocalDate date;
 
-    public MainstreamScoreDTO(double score, String range) {
-        this.score = score;
+    public void withRange(String range) {
         this.range = range;
+    }
+
+    public void withDifference(double difference) {
+        this.difference = difference;
+    }
+
+    public void withDate(LocalDate date) {
+        this.date = date;
     }
 
 }

@@ -6,16 +6,14 @@ import com.laa66.statlyapp.model.SpotifyURL;
 import lombok.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@NoArgsConstructor
+@Value
+@NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
 @AllArgsConstructor
-@Getter
-@Setter
-@ToString
 public class PlaylistDTO {
 
-    @JsonProperty("id")
-    private String id;
+    String id;
 
     @JsonProperty("external_urls")
-    private SpotifyURL url;
+    SpotifyURL url;
+
 }

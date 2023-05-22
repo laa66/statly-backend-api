@@ -10,16 +10,13 @@ import java.util.List;
 
 @JsonPropertyOrder({"total", "items"})
 @JsonIgnoreProperties(ignoreUnknown = true)
-@NoArgsConstructor
+@Value
+@NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
 @AllArgsConstructor
-@Getter
-@Setter
-@ToString
 public class RecentlyPlayedDTO {
 
-    @JsonProperty("total")
-    private String total;
+    String total;
 
     @JsonProperty("items")
-    private List<ItemRecentlyPlayed> itemRecentlyPlayedList;
+    List<ItemRecentlyPlayed> itemRecentlyPlayedList;
 }

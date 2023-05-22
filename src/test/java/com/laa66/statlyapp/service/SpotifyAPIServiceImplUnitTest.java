@@ -101,7 +101,7 @@ class SpotifyAPIServiceImplUnitTest {
         ItemTopTracks track2 = new ItemTopTracks();
         track2.setPopularity(70);
         TopTracksDTO tracksDTO = new TopTracksDTO(List.of(track1, track2), "2", "long", null);
-        MainstreamScoreDTO mainstreamScoreDTO = new MainstreamScoreDTO(55.00, "long");
+        MainstreamScoreDTO mainstreamScoreDTO = new MainstreamScoreDTO(55.00, "long", 0, null);
         when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS.get() + "long_term"),
                 eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
                 .thenReturn(new ResponseEntity<>(tracksDTO, HttpStatus.OK));
