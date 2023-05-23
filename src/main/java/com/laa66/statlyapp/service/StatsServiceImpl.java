@@ -15,6 +15,7 @@ import com.laa66.statlyapp.repository.ArtistRepository;
 import com.laa66.statlyapp.repository.GenreRepository;
 import com.laa66.statlyapp.repository.MainstreamRepository;
 import com.laa66.statlyapp.repository.TrackRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Slf4j
-@Service
+@RequiredArgsConstructor
 @Transactional
 public class StatsServiceImpl implements StatsService {
 
@@ -39,13 +40,6 @@ public class StatsServiceImpl implements StatsService {
     private final ArtistRepository artistRepository;
     private final GenreRepository genreRepository;
     private final MainstreamRepository mainstreamRepository;
-
-    public StatsServiceImpl(TrackRepository trackRepository, ArtistRepository artistRepository, GenreRepository genreRepository, MainstreamRepository mainstreamRepository) {
-        this.trackRepository = trackRepository;
-        this.artistRepository = artistRepository;
-        this.genreRepository = genreRepository;
-        this.mainstreamRepository = mainstreamRepository;
-    }
 
     @Override
     public void saveUserTracks(Map<TopTracksDTO, Long> dtoMap) {

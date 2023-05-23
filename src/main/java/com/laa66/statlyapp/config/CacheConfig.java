@@ -1,6 +1,8 @@
 package com.laa66.statlyapp.config;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.laa66.statlyapp.service.StatsService;
+import com.laa66.statlyapp.task.CacheTask;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
@@ -8,7 +10,6 @@ import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 @Configuration
 @EnableCaching
@@ -24,5 +25,10 @@ public class CacheConfig {
     @Bean("customKeyGenerator")
     public KeyGenerator keyGenerator() {
         return (target, method, params) -> method.getName() + "_" + StringUtils.arrayToDelimitedString(params, "_");
+    }
+
+    @Bean
+    public CacheTask cacheTask(CacheManager cacheManager, StatsService statsService) {
+        return new CacheTask(cacheManager, statsService);
     }
 }

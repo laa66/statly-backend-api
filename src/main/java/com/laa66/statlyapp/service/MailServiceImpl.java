@@ -1,32 +1,26 @@
 package com.laa66.statlyapp.service;
 
 import com.laa66.statlyapp.DTO.BetaUserDTO;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
-@Service
 @Slf4j
+@RequiredArgsConstructor
 public class MailServiceImpl implements MailService {
 
     private final JavaMailSender mailSender;
     private final String email;
     private final JSONParser parser = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
-
-    public MailServiceImpl(JavaMailSender mailSender, @Value("${statly.api.admin-email}") String email) {
-        this.mailSender = mailSender;
-        this.email = email;
-    }
 
     @Override
     public void sendJoinBetaNotification() {

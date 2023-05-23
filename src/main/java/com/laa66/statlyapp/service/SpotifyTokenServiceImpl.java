@@ -2,11 +2,10 @@ package com.laa66.statlyapp.service;
 
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.model.AccessToken;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -15,14 +14,10 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
 
-@Service
+@RequiredArgsConstructor
 public class SpotifyTokenServiceImpl implements SpotifyTokenService {
 
     private final RestTemplate restTemplate;
-
-    public SpotifyTokenServiceImpl(@Qualifier("restTemplate") RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
 
     @Override
     public OAuth2AccessToken refreshAccessToken(OAuth2AuthorizedClient client) {

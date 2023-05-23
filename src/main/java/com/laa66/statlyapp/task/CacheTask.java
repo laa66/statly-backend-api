@@ -6,26 +6,21 @@ import com.laa66.statlyapp.DTO.TopArtistsDTO;
 import com.laa66.statlyapp.DTO.TopGenresDTO;
 import com.laa66.statlyapp.DTO.TopTracksDTO;
 import com.laa66.statlyapp.service.StatsService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
 @Slf4j
+@RequiredArgsConstructor
 public class CacheTask {
 
     private final CacheManager cacheManager;
     private final StatsService statsService;
-
-    public CacheTask(CacheManager cacheManager, StatsService statsService) {
-        this.cacheManager = cacheManager;
-        this.statsService = statsService;
-    }
 
     @Scheduled(cron = "0 59 21 * * *")
     public void saveCache() {

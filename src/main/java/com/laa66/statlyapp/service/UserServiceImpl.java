@@ -4,23 +4,18 @@ import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.entity.*;
 import com.laa66.statlyapp.exception.UserNotFoundException;
 import com.laa66.statlyapp.repository.*;
-import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service
+@RequiredArgsConstructor
 @Transactional
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BetaUserRepository betaUserRepository;
-
-    public UserServiceImpl(UserRepository userRepository, BetaUserRepository betaUserRepository) {
-        this.userRepository = userRepository;
-        this.betaUserRepository = betaUserRepository;
-    }
 
     @Override
     public Optional<User> findUserByEmail(String email) {

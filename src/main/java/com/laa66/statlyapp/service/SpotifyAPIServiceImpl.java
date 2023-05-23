@@ -6,6 +6,7 @@ import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
 import com.laa66.statlyapp.model.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ClassPathResource;
@@ -26,16 +27,11 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Service
+@RequiredArgsConstructor
 public class SpotifyAPIServiceImpl implements SpotifyAPIService {
 
     private final RestTemplate restTemplate;
     private final StatsService statsService;
-
-    public SpotifyAPIServiceImpl(@Qualifier("restTemplateInterceptor") RestTemplate restTemplate, StatsService statsService) {
-        this.restTemplate = restTemplate;
-        this.statsService = statsService;
-    }
 
     @Override
     public UserDTO getCurrentUser() {

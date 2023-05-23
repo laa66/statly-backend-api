@@ -4,18 +4,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.config.TestSecurityConfig;
 import com.laa66.statlyapp.model.*;
+import com.laa66.statlyapp.repository.*;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.MockBeans;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -28,11 +33,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ApiController.class)
 @ExtendWith(SpringExtension.class)
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class})
+@MockBeans({@MockBean(TrackRepository.class), @MockBean(ArtistRepository.class), @MockBean(GenreRepository.class),
+        @MockBean(MainstreamRepository.class), @MockBean(UserRepository.class), @MockBean(BetaUserRepository.class)})
 class ApiControllerUnitTest {
 
     @MockBean
     SpotifyAPIService spotifyAPIService;
+
+    @MockBean
+    JavaMailSender javaMailSender;
+
+    @MockBean
+    @Qualifier("restTemplateInterceptor")
+    RestTemplate restTemplateInterceptor;
+
+    @MockBean
+    @Qualifier("restTemplate")
+    RestTemplate restTemplate;
 
     @Autowired
     ApiController controller;

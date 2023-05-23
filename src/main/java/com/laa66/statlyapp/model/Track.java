@@ -10,20 +10,13 @@ import java.util.Objects;
 
 @JsonPropertyOrder({"album", "artists", "name"})
 @JsonIgnoreProperties(ignoreUnknown = true)
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
-@ToString
+@Data
 public class Track {
 
-    @JsonProperty("album")
     private Album album;
 
-    @JsonProperty("artists")
     private List<Artist> artists;
 
-    @JsonProperty("name")
     private String name;
 
     @JsonProperty("external_urls")

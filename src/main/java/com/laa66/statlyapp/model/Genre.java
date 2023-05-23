@@ -1,14 +1,8 @@
 package com.laa66.statlyapp.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-@NoArgsConstructor
-@Getter
-@Setter
-@ToString
+@Data
 public class Genre implements Comparable<Genre> {
 
     private String genre;

@@ -9,28 +9,21 @@ import java.util.List;
 
 @JsonPropertyOrder({"genres", "images", "name", "url"})
 @JsonIgnoreProperties(ignoreUnknown = true)
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
-@Getter
-@Setter
-@ToString
+@NoArgsConstructor
 public class ItemTopArtists {
 
-    @JsonProperty("genres")
     private List<String> genres;
 
-    @JsonProperty("images")
     private List<Image> images;
 
-    @JsonProperty("name")
     private String name;
 
-    @JsonProperty("uri")
     private String uri;
 
     @JsonProperty("external_urls")
     private SpotifyURL url;
 
-    @JsonProperty("difference")
     private Integer difference;
 }

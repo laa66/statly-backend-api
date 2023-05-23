@@ -5,16 +5,11 @@ import lombok.*;
 
 import java.util.List;
 
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
-@Getter
-@Setter
-@ToString
 public class SpotifyRequestAddTracks {
 
-    @JsonProperty("uris")
     private List<String> uris;
 
-    @JsonProperty("position")
     private int position;
 }

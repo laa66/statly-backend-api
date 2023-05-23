@@ -25,15 +25,11 @@ import java.io.IOException;
 
 
 @Slf4j
+@RequiredArgsConstructor
 public class HeaderModifierTokenRefresherInterceptor implements ClientHttpRequestInterceptor {
 
     private final OAuth2AuthorizedClientService clientService;
     private final SpotifyTokenService tokenService;
-
-    public HeaderModifierTokenRefresherInterceptor(OAuth2AuthorizedClientService clientService, SpotifyTokenService tokenService) {
-        this.clientService = clientService;
-        this.tokenService = tokenService;
-    }
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {

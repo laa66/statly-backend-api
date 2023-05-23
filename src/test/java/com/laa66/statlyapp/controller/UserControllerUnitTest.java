@@ -4,21 +4,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.config.TestSecurityConfig;
 import com.laa66.statlyapp.model.*;
+import com.laa66.statlyapp.repository.*;
 import com.laa66.statlyapp.service.MailService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.UserService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.MockBeans;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,7 +41,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(UserController.class)
 @ExtendWith(SpringExtension.class)
 @Import(TestSecurityConfig.class)
+@MockBeans({@MockBean(TrackRepository.class), @MockBean(ArtistRepository.class), @MockBean(GenreRepository.class),
+        @MockBean(MainstreamRepository.class), @MockBean(UserRepository.class), @MockBean(BetaUserRepository.class)})
 class UserControllerUnitTest {
+
+    @MockBean
+    @Qualifier("restTemplate")
+    RestTemplate restTemplate;
 
     @MockBean
     SpotifyAPIService spotifyAPIService;

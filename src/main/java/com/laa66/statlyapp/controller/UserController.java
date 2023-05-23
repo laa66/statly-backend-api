@@ -18,25 +18,19 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 
 @RestController
 @RequestMapping("/user")
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
     private final SpotifyAPIService spotifyApiService;
     private final MailService mailService;
-    private final String reactUrl;
 
-    public UserController(UserService userService, SpotifyAPIService spotifyApiService, MailService mailService, @Value("${api.react-app.url}") String reactUrl) {
-        this.userService = userService;
-        this.spotifyApiService = spotifyApiService;
-        this.mailService = mailService;
-        this.reactUrl = reactUrl;
-    }
+    @Value("${api.react-app.url}")
+    private final String reactUrl;
 
     @GetMapping("/auth")
     public void authenticate(HttpServletRequest request, HttpServletResponse response) {
