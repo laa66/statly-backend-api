@@ -3,8 +3,11 @@ package com.laa66.statlyapp.service;
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.entity.*;
 import com.laa66.statlyapp.exception.UserNotFoundException;
+import com.laa66.statlyapp.model.Image;
 import com.laa66.statlyapp.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -16,6 +19,19 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BetaUserRepository betaUserRepository;
+
+    @Value("${api.react-app.url}")
+    private final String reactUrl;
+
+    @Override
+    public String authenticateUser(UserDTO userDTO) {
+        String imageUrl = userDTO.getImages().stream()
+                .findFirst()
+                .map(Image::getUrl)
+                .orElse("none");
+        return reactUrl + "/callback?name=" + StringUtils.stripAccents(userDTO.getDisplayName()) + "&url=" + (imageUrl.equals("none") ? "./account.png"  : imageUrl);
+
+    }
 
     @Override
     public Optional<User> findUserByEmail(String email) {

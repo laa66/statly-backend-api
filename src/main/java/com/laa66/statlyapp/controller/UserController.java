@@ -29,17 +29,9 @@ public class UserController {
     private final SpotifyAPIService spotifyApiService;
     private final MailService mailService;
 
-    @Value("${api.react-app.url}")
-    private final String reactUrl;
-
     @GetMapping("/auth")
     public void authenticate(HttpServletRequest request, HttpServletResponse response) {
-        UserDTO userDTO = spotifyApiService.getCurrentUser();
-        String imageUrl = userDTO.getImages().stream()
-                .findFirst()
-                .map(Image::getUrl)
-                .orElse("none");
-        String redirectUrl = reactUrl + "/callback?name=" + StringUtils.stripAccents(userDTO.getDisplayName()) + "&url=" + (imageUrl.equals("none") ? "./account.png"  : imageUrl);
+        String redirectUrl = userService.authenticateUser(spotifyApiService.getCurrentUser());
         response.setStatus(HttpStatus.TEMPORARY_REDIRECT.value());
         response.setHeader(HttpHeaders.LOCATION, redirectUrl);
     }

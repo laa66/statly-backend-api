@@ -39,8 +39,10 @@ public class AppConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public UserService userService(UserRepository userRepository, BetaUserRepository betaUserRepository) {
-        return new UserServiceImpl(userRepository, betaUserRepository);
+    public UserService userService(UserRepository userRepository,
+                                   BetaUserRepository betaUserRepository,
+                                   @Value("${api.react-app.url}") String reactUrl) {
+        return new UserServiceImpl(userRepository, betaUserRepository, reactUrl);
     }
 
     @Bean

@@ -66,19 +66,16 @@ class UserControllerUnitTest {
 
     ObjectMapper mapper = new ObjectMapper();
 
-    @Value("${api.react-app.url}")
-    String REACT_URL;
-    
-
     @Test
     void shouldAuthUser() throws Exception {
         Image image = new Image();
         image.setUrl("imageurl");
         UserDTO userDTO = new UserDTO("testuser", "test@mail.com", "testuser", List.of(image));
         when(spotifyAPIService.getCurrentUser()).thenReturn(userDTO);
+        when(userService.authenticateUser(userDTO)).thenReturn("url/callback?name=testuser&url=imageurl");
         mockMvc.perform(MockMvcRequestBuilders.get("/user/auth").with(oauth2Login()))
                 .andExpect(status().isTemporaryRedirect())
-                .andExpect(header().string("location", REACT_URL + "/callback?name=testuser&url=imageurl"));
+                .andExpect(header().string("location", "url/callback?name=testuser&url=imageurl"));
     }
 
     @Test

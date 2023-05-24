@@ -8,6 +8,8 @@ import lombok.*;
 @JsonPropertyOrder({"url", "height", "width"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Image {
 
     private String url;
