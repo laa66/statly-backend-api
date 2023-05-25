@@ -4,15 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.constants.SpotifyAPI;
+import com.laa66.statlyapp.exception.SpotifyAPIEmptyResponseException;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
 import com.laa66.statlyapp.model.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -42,7 +41,8 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
     public TopTracksDTO getTopTracks(long userId, String range) {
         TopTracksDTO body = restTemplate.exchange(SpotifyAPI.TOP_TRACKS.get() + range + "_term", HttpMethod.GET, null, TopTracksDTO.class).getBody();
-        if (body != null) body.withRange(range);
+        if (body == null) throw new SpotifyAPIEmptyResponseException("Empty Spotify API response", HttpStatus.NO_CONTENT.value());
+        body.withRange(range);
         return statsService.compareTracks(userId, body);
     }
 
@@ -50,7 +50,8 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
     public TopArtistsDTO getTopArtists(long userId, String range) {
         TopArtistsDTO body = restTemplate.exchange(SpotifyAPI.TOP_ARTISTS.get() + range + "_term", HttpMethod.GET, null, TopArtistsDTO.class).getBody();
-        if (body != null) body.withRange(range);
+        if (body == null) throw new SpotifyAPIEmptyResponseException("Empty Spotify API response", HttpStatus.NO_CONTENT.value());
+        body.withRange(range);
         return statsService.compareArtists(userId, body);
     }
 
@@ -58,8 +59,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
     public TopGenresDTO getTopGenres(long userId, String range) {
         TopArtistsDTO response = getTopArtists(userId, range);
-        List<ItemTopArtists> topArtists = response.getItemTopArtists(); //handling npe
-
+        List<ItemTopArtists> topArtists = response.getItemTopArtists();
         List<Genre> sliceGenres = topArtists
                 .stream()
                 .flatMap(artist -> artist.getGenres().stream())
@@ -71,12 +71,6 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
                                 .limit(10)
                                 .toList()
                         ));
-                //.collect(Collectors.toMap(Function.identity(), genre -> 1, Integer::sum));
-        /*List<Genre> sliceGenres = genreCountMap.entrySet().stream()
-                .map(entry -> new Genre(entry.getKey(), entry.getValue()))
-                .sorted(Comparator.reverseOrder())
-                .limit(10)
-                .toList();*/
         double sum = sliceGenres
                 .stream()
                 .mapToInt(Genre::getScore)
@@ -91,7 +85,6 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
     public MainstreamScoreDTO getMainstreamScore(long userId, String range) {
         TopTracksDTO response = getTopTracks(userId, range);
-
         double result = response.getItemTopTracks().stream()
                 .mapToInt(ItemTopTracks::getPopularity)
                 .average()
@@ -137,7 +130,9 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        return restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(body, headers), PlaylistDTO.class).getBody();
+        PlaylistDTO playlist = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(body, headers), PlaylistDTO.class).getBody();
+        if (playlist == null) throw new SpotifyAPIEmptyResponseException("Empty Spotify API response", HttpStatus.NO_CONTENT.value());
+        return playlist;
     }
 
     private void postTracksToPlaylist(PlaylistDTO playlist, List<String> uris) {
@@ -147,7 +142,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
             ObjectMapper mapper = new ObjectMapper();
             body = mapper.writeValueAsString(request);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e.getMessage(), e);
         }
         restTemplate.exchange(SpotifyAPI.ADD_PLAYLIST_TRACK.get()
                         .replace("playlist_id", playlist.getId()), HttpMethod.POST, new HttpEntity<>(body), String.class);

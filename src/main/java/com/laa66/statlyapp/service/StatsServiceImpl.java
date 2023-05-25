@@ -8,6 +8,7 @@ import com.laa66.statlyapp.entity.UserArtist;
 import com.laa66.statlyapp.entity.UserGenre;
 import com.laa66.statlyapp.entity.UserMainstream;
 import com.laa66.statlyapp.entity.UserTrack;
+import com.laa66.statlyapp.model.Artist;
 import com.laa66.statlyapp.model.Genre;
 import com.laa66.statlyapp.model.ItemTopArtists;
 import com.laa66.statlyapp.model.ItemTopTracks;
@@ -46,7 +47,10 @@ public class StatsServiceImpl implements StatsService {
                     .getItemTopTracks()
                     .stream()
                     .collect(Collectors
-                            .toMap(item -> item.getArtists().get(0).getName() + "_" + item.getName(), s -> counter.getAndIncrement()));
+                            .toMap(item -> {
+                                List<Artist> artists = item.getArtists();
+                                return (artists != null && !artists.isEmpty() ? artists.get(0).getName() : null) + "_" + item.getName(); //added null check
+                            }, s -> counter.getAndIncrement()));
             return new UserTrack(0, entry.getValue(), entry.getKey().getRange(), tracks, LocalDate.now());
         }).toList();
         trackRepository.saveAll(userTrackList);
@@ -93,14 +97,18 @@ public class StatsServiceImpl implements StatsService {
                 .map(item -> {
                     dto.withDate(item.getDate());
                     IntStream.range(0, dto.getItemTopTracks().size()).forEach(index -> {
-                        ItemTopTracks track = dto.getItemTopTracks().get(index);
-                        String artist = track.getArtists().get(0).getName(); // handling npe
-                        String name = track.getName();
-                        int actualPosition = index + 1;
-                        Integer lastPosition = item.getTracks().getOrDefault(artist + "_" + name, null);
-                        Integer difference = lastPosition != null ? (lastPosition - actualPosition) : null;
-                        track.setDifference(difference);
-                        //log.info("Today: " + name + " - " + actualPosition + " / Yesterday: " + name + " - " + lastPosition + " / diff: " + track.getDifference());
+                        try { //handled npe
+                            ItemTopTracks track = dto.getItemTopTracks().get(index);
+                            String artist = track.getArtists().get(0).getName();
+                            String name = track.getName();
+                            int actualPosition = index + 1;
+                            Integer lastPosition = item.getTracks().getOrDefault(artist + "_" + name, null);
+                            Integer difference = lastPosition != null ? (lastPosition - actualPosition) : null;
+                            track.setDifference(difference);
+                            //log.info("Today: " + name + " - " + actualPosition + " / Yesterday: " + name + " - " + lastPosition + " / diff: " + track.getDifference());
+                        } catch (NullPointerException | IndexOutOfBoundsException e) {
+                            log.error("Error occurred because there are no artists.", e);
+                        }
                     });
                     return dto;
                 }).orElse(dto);
@@ -146,10 +154,10 @@ public class StatsServiceImpl implements StatsService {
     public MainstreamScoreDTO compareMainstream(long userId, MainstreamScoreDTO dto) {
         return mainstreamRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, dto.getRange())
                 .map(item -> {
-                    dto.withDate(item.getDate());
                     double actualScore = dto.getScore();
                     double lastScore = item.getScore();
                     dto.withDifference(new BigDecimal(actualScore - lastScore).setScale(2, RoundingMode.HALF_UP).doubleValue());
+                    dto.withDate(item.getDate());
                     //log.info("Today: " + actualScore + " / Yesterday: " + lastScore + " / diff: " + dto.getDifference());
                     return dto;
                 }).orElse(dto);

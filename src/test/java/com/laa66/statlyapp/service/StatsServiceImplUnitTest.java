@@ -109,6 +109,30 @@ public class StatsServiceImplUnitTest {
     }
 
     @Test
+    void shouldCompareTracksNullAndEmptyArtists() {
+        TopTracksDTO dto = new TopTracksDTO(List.of(
+                new ItemTopTracks(new Album(), null, "track1", 50, "uri", new SpotifyURL(), 0),
+                new ItemTopTracks(new Album(), List.of(), "track2", 50, "uri", new SpotifyURL(), 0)
+        ), "2", "short", null);
+        UserTrack track = new UserTrack(1, 1, "short", Map.of(
+                "artist1_track1", 2, "artist2_track2", 1
+        ), LocalDate.of(2023, 1, 1));
+        when(trackRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "short"))
+                .thenReturn(Optional.of(track));
+
+        TopTracksDTO returnDto = statsService.compareTracks(1L, dto);
+        assertNotNull(returnDto);
+        assertEquals(dto.getRange(), returnDto.getRange());
+        assertEquals(dto.getTotal(), returnDto.getTotal());
+        assertEquals(dto.getItemTopTracks().size(), returnDto.getItemTopTracks().size());
+        assertEquals(dto.getItemTopTracks().get(0).getName(), returnDto.getItemTopTracks().get(0).getName());
+        assertEquals(dto.getItemTopTracks().get(1).getName(), returnDto.getItemTopTracks().get(1).getName());
+        assertEquals(0, returnDto.getItemTopTracks().get(0).getDifference());
+        assertEquals(0, returnDto.getItemTopTracks().get(1).getDifference());
+        assertEquals(track.getDate(), returnDto.getDate());
+    }
+
+    @Test
     void shouldNotCompareTracksWrongId() {
         TopTracksDTO dto = new TopTracksDTO(List.of(
                 new ItemTopTracks(new Album(), List.of(new Artist("artist1")), "track1", 50, "uri", new SpotifyURL(), 0),

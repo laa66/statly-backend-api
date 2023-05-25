@@ -2,6 +2,7 @@ package com.laa66.statlyapp.service;
 
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.constants.SpotifyAPI;
+import com.laa66.statlyapp.exception.SpotifyAPIEmptyResponseException;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
 import com.laa66.statlyapp.model.*;
 import org.junit.jupiter.api.Test;
@@ -64,6 +65,14 @@ class SpotifyAPIServiceImplUnitTest {
     }
 
     @Test
+    void shouldGetTopTracksEmptyBody() {
+        when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS.get() + "long_term"),
+                eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
+                .thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
+        assertThrows(SpotifyAPIEmptyResponseException.class, () -> spotifyAPIService.getTopTracks(1, "long"));
+    }
+
+    @Test
     void shouldGetTopTracksWithNotValidUrl() {
         when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS.get() + "wrong_term"),
                 eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
@@ -83,6 +92,14 @@ class SpotifyAPIServiceImplUnitTest {
         assertEquals(dto.getItemTopArtists().size(), returnDto.getItemTopArtists().size());
         assertEquals(dto.getTotal(), returnDto.getTotal());
         assertEquals(dto.getRange(), returnDto.getRange());
+    }
+
+    @Test
+    void shouldGetTopArtistsEmptyBody() {
+        when(restTemplate.exchange(eq(SpotifyAPI.TOP_ARTISTS.get() + "long_term"),
+                eq(HttpMethod.GET), any(), eq(TopArtistsDTO.class)))
+                .thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
+        assertThrows(SpotifyAPIEmptyResponseException.class, () -> spotifyAPIService.getTopArtists(1, "long"));
     }
 
     @Test
@@ -113,6 +130,14 @@ class SpotifyAPIServiceImplUnitTest {
     }
 
     @Test
+    void shouldGetMainstreamScoreEmptyBody() {
+        when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS.get() + "long_term"),
+                eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
+                .thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
+        assertThrows(SpotifyAPIEmptyResponseException.class, () -> spotifyAPIService.getMainstreamScore(1, "long"));
+    }
+
+    @Test
     void shouldGetMainStreamScoreWithNotValidUrl() {
         when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS.get() + "wrong_term"),
                 eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
@@ -140,6 +165,14 @@ class SpotifyAPIServiceImplUnitTest {
         assertEquals(60, returnDto.getGenres().get(0).getScore());
         assertEquals(40, returnDto.getGenres().get(1).getScore());
         assertEquals(artistsDTO.getRange(), returnDto.getRange());
+    }
+
+    @Test
+    void shouldGetTopGenresEmptyBody() {
+        when(restTemplate.exchange(eq(SpotifyAPI.TOP_ARTISTS.get() + "long_term"),
+                eq(HttpMethod.GET), any(), eq(TopArtistsDTO.class)))
+                .thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
+        assertThrows(SpotifyAPIEmptyResponseException.class, () -> spotifyAPIService.getTopGenres(1, "long"));
     }
 
     @Test
@@ -197,6 +230,35 @@ class SpotifyAPIServiceImplUnitTest {
                 eq(HttpMethod.GET), any(), eq(UserDTO.class)))
                 .thenReturn(new ResponseEntity<>(userDTO, HttpStatus.CREATED));
         assertThrows(SpotifyAPIException.class, () -> spotifyAPIService.postTopTracksPlaylist(1, "wrong"));
+    }
+
+    @Test
+    void shouldPostTopTracksPlaylistEmptyPlaylistBody() {
+        UserDTO userDTO = new UserDTO("testuser", "test@mail.com", "testuser", List.of(new Image()));
+        when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER.get()),
+                eq(HttpMethod.GET), any(), eq(UserDTO.class)))
+                .thenReturn(new ResponseEntity<>(userDTO, HttpStatus.OK));
+        when(restTemplate.exchange(eq(SpotifyAPI.CREATE_TOP_PLAYLIST.get().replace("user_id",
+                userDTO.getId())), eq(HttpMethod.POST), any(), eq(PlaylistDTO.class)))
+                .thenReturn(new ResponseEntity<>(null, HttpStatus.CREATED));
+        assertThrows(SpotifyAPIEmptyResponseException.class, () -> spotifyAPIService.postTopTracksPlaylist(1, "long"));
+    }
+
+    @Test
+    void shouldPostTopTracksPlaylistEmptyTopTracksBody() {
+        UserDTO userDTO = new UserDTO("testuser", "test@mail.com", "testuser", List.of(new Image()));
+        PlaylistDTO playlistDTO = new PlaylistDTO("1", new SpotifyURL());
+
+        when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER.get()),
+                eq(HttpMethod.GET), any(), eq(UserDTO.class)))
+                .thenReturn(new ResponseEntity<>(userDTO, HttpStatus.OK));
+        when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS.get() + "long_term"),
+                eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
+                .thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
+        when(restTemplate.exchange(eq(SpotifyAPI.CREATE_TOP_PLAYLIST.get().replace("user_id",
+                userDTO.getId())), eq(HttpMethod.POST), any(), eq(PlaylistDTO.class)))
+                .thenReturn(new ResponseEntity<>(playlistDTO, HttpStatus.CREATED));
+       assertThrows(SpotifyAPIEmptyResponseException.class, () -> spotifyAPIService.postTopTracksPlaylist(1, "long"));
     }
 
     @Test

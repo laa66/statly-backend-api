@@ -30,6 +30,7 @@ import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withServiceUnavailable;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 @SpringBootTest(classes = {TestOAuth2RestTemplateConfig.class, SpotifyAPIServiceImpl.class, StatsServiceImpl.class})
@@ -96,6 +98,16 @@ class SpotifyAPIServiceImplIntegrationTest {
     }
 
     @Test
+    void shouldGetCurrentUserServiceUnavailable() {
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(SpotifyAPI.CURRENT_USER.get()))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withServiceUnavailable());
+        assertThrows(RestClientException.class, () -> spotifyAPIService.getCurrentUser());
+        mockServer.verify();
+    }
+
+    @Test
     void shouldGetCurrentUserResponseClientError() {
         mockServer.expect(ExpectedCount.once(),
                 requestTo(SpotifyAPI.CURRENT_USER.get()))
@@ -129,6 +141,16 @@ class SpotifyAPIServiceImplIntegrationTest {
         assertEquals(data.getItemTopTracks().size(), response.getItemTopTracks().size());
         assertEquals(data.getTotal(), response.getTotal());
         assertEquals(data.getRange(), response.getRange());
+    }
+
+    @Test
+    void shouldGetTopTracksResponseServiceUnavailable() {
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(SpotifyAPI.TOP_TRACKS.get() + "short_term"))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withServiceUnavailable());
+        assertThrows(RestClientException.class, () -> spotifyAPIService.getTopTracks(1, "short"));
+        mockServer.verify();
     }
 
     @Test
@@ -169,6 +191,16 @@ class SpotifyAPIServiceImplIntegrationTest {
     }
 
     @Test
+    void shouldGetTopArtistsServiceUnavailable() {
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(SpotifyAPI.TOP_ARTISTS.get() + "short_term"))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withServiceUnavailable());
+        assertThrows(RestClientException.class, () -> spotifyAPIService.getTopArtists(1, "short"));
+        mockServer.verify();
+    }
+
+    @Test
     void shouldGetTopArtistsResponseClientError() {
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.TOP_ARTISTS.get() + "short_term"))
@@ -206,6 +238,17 @@ class SpotifyAPIServiceImplIntegrationTest {
         assertEquals("Rap", response.getGenres().get(0).getGenre());
         assertEquals("Rock", response.getGenres().get(1).getGenre());
         assertEquals(data.getRange(), response.getRange());
+    }
+
+    @Test
+    void shouldGetTopGenresServiceUnavailable() {
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(SpotifyAPI.TOP_ARTISTS.get() + "short_term"))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withServiceUnavailable());
+        assertThrows(RestClientException.class,
+                () -> spotifyAPIService.getTopGenres(1, "short"));
+        mockServer.verify();
     }
 
     @Test
@@ -252,6 +295,17 @@ class SpotifyAPIServiceImplIntegrationTest {
     }
 
     @Test
+    void shouldGetMainstreamScoreServiceUnavailable() {
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(SpotifyAPI.TOP_TRACKS.get() + "short_term"))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withServiceUnavailable());
+        assertThrows(RestClientException.class,
+                () -> spotifyAPIService.getMainstreamScore(1, "short"));
+        mockServer.verify();
+    }
+
+    @Test
     void shouldGetMainstreamScoreResponseClientError() {
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.TOP_TRACKS.get() + "short_term"))
@@ -287,6 +341,17 @@ class SpotifyAPIServiceImplIntegrationTest {
         mockServer.verify();
         assertEquals(data.getTotal(), response.getTotal());
         assertEquals(data.getItemRecentlyPlayedList().size(), response.getItemRecentlyPlayedList().size());
+    }
+
+    @Test
+    void shouldGetRecentlyPlayedServiceUnavailable() {
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(SpotifyAPI.RECENTLY_PLAYED_TRACKS.get()))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withServiceUnavailable());
+        assertThrows(RestClientException.class,
+                () -> spotifyAPIService.getRecentlyPlayed());
+        mockServer.verify();
     }
 
     @Test
