@@ -54,20 +54,4 @@ public class MailServiceImpl implements MailService {
             throw new RuntimeException("Failed to read mail template.", e);
         }
     }
-    /*
-    private void sendMail(BetaUserDTO dto, Resource resource) {
-        try {
-            JSONObject object = (JSONObject) parser.parse(resource.getInputStream());
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(dto.getEmail());
-            message.setSubject((String) object.get("subject"));
-            String text = ((String) object.get("text")).replace("{fullname}", dto.getFullName());
-            message.setText(text);
-            mailSender.send(message);
-        } catch (MailException e) {
-            log.warn("Error while sending notification email.");
-        } catch (IOException | ParseException e) {
-            throw new RuntimeException("Failed to read mail template.", e);
-        }
-    }*/
 }

@@ -81,8 +81,8 @@ You can view full documentation of this project in different paths:
 
 #### Technologies & tools used:
 
-- JDK 19
-- Spring Boot 3 (Spring MVC, Spring Security, Spring AOP)
+- Java 19
+- Spring Boot 3 (Spring MVC, Spring Security, Spring AOP, Spring Mail)
 - Hibernate & JPA
 - Maven
 - OAuth 2.0
@@ -109,12 +109,9 @@ You can view full documentation of this project in different paths:
 
 ## To-do 💡
 
-- Add functionality for saving beta-testers details to database and e-mail notification
-- Add functionality for comparing full user statistics history
-- Make app stateless with JWT authentication
-- Rebuild the Mainstream Score section in the React-app
-- Add custom playlist image to exported playlists
-- Create section with user track analysis that describes the track structure and musical content, rhythm etc.
-- Add small web player to the React-app which will play user's top songs inside the browser
-- Create functionality that will allow users to add friends and check their statistics
-- Move Spotify-powered app from development mode to extended modem, allowing anyone to use Statly without registering for the beta
+- Implement functionality for comparing user listening habits over the past 6 months
+- Develop functionality to analyze tracks structure in the user's library 
+- Configure app to be stateless with JWT authentication
+- Integrate small web player into the React-app that can play user's top songs within the browser
+- Implement functionality that will allow users to add friends and check their statistics
+- Move Spotify-powered app from development mode to extended modem, enabling anyone to use Statly without needing to register for the beta

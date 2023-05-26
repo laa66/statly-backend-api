@@ -31,11 +31,6 @@ class CacheTaskUnitTest {
     @InjectMocks
     CacheTask cacheTask;
 
-    @BeforeEach
-    void setup() {
-
-    }
-
     @Test
     void shouldSaveCache() {
         CaffeineCache cache = new CaffeineCache("api", Caffeine.newBuilder().build());

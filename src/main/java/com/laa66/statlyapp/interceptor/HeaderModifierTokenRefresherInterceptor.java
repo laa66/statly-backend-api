@@ -1,6 +1,7 @@
 package com.laa66.statlyapp.interceptor;
 
 import com.laa66.statlyapp.exception.ClientAuthorizationException;
+import com.laa66.statlyapp.exception.EmptyTokenException;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
 import com.laa66.statlyapp.exception.UserAuthenticationException;
 import com.laa66.statlyapp.service.SpotifyTokenService;
@@ -19,8 +20,9 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 
 import java.io.IOException;
+import java.util.Optional;
 
-
+// TODO: 26.05.2023 Validate refactoring
 @Slf4j
 @RequiredArgsConstructor
 public class HeaderModifierTokenRefresherInterceptor implements ClientHttpRequestInterceptor {
@@ -29,35 +31,81 @@ public class HeaderModifierTokenRefresherInterceptor implements ClientHttpReques
     private final SpotifyTokenService tokenService;
 
     @Override
-    public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null) throw new UserAuthenticationException("User not authenticated");
+    public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) {
+        Authentication authentication = getAuthentication();
+        OAuth2AuthorizedClient client = getAuthorizedClient(authentication);
+        OAuth2AccessToken accessToken = getAccessToken(client);
+        log.info("Token: " + accessToken.getIssuedAt() + ", Expires at: " + accessToken.getExpiresAt());
+        setBearerToken(request, accessToken);
+
+        try {
+            ClientHttpResponse response = execution.execute(request, body);
+
+            if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+                log.info("-->> Spotify API access forbidden, refreshing token and sending new request...");
+                OAuth2AccessToken newAccessToken = refreshAccessToken(client);
+                OAuth2AuthorizedClient newAuthorizedClient = createAuthorizedClient(client, newAccessToken);
+                Authentication newAuthentication = createOAuth2AuthenticationToken(authentication);
+                updateAuthorizedClient(client, newAuthorizedClient, newAuthentication);
+
+                request.getHeaders().clearContentHeaders();
+                setBearerToken(request, newAccessToken);
+                response = execution.execute(request, body);
+            } else if (response.getStatusCode().isError()) {
+                throw new SpotifyAPIException("Spotify API error", response.getStatusCode().value());
+            }
+            return response;
+        } catch (IOException e) {
+            throw new SpotifyAPIException("Server cannot reach Spotify API", HttpStatus.SERVICE_UNAVAILABLE.value());
+        }
+    }
+
+    //helpers
+    private Authentication getAuthentication() {
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .orElseThrow(() -> new UserAuthenticationException("User not authenticated"));
+    }
+
+    private OAuth2AuthorizedClient getAuthorizedClient(Authentication authentication) {
         OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
         OAuth2AuthorizedClient client = clientService.loadAuthorizedClient(token.getAuthorizedClientRegistrationId(), token.getName());
+        return Optional.ofNullable(client)
+                .orElseThrow(() -> new ClientAuthorizationException("Client cannot be loaded"));
+    }
 
-        if (client == null) throw new ClientAuthorizationException("Client is null");
-        request.getHeaders().setBearerAuth(client.getAccessToken().getTokenValue());
-        ClientHttpResponse response = execution.execute(request, body);
+    private OAuth2AccessToken getAccessToken(OAuth2AuthorizedClient client) {
+        return Optional.ofNullable(client.getAccessToken())
+                .orElseThrow(() -> new EmptyTokenException("User access token is missing"));
+    }
 
-        if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-            log.info("-->> Spotify API access forbidden, refreshing token and sending new request...");
-            // get refreshed token
-            OAuth2AccessToken accessToken = tokenService.refreshAccessToken(client);
+    private OAuth2AccessToken refreshAccessToken(OAuth2AuthorizedClient client) {
+        return tokenService.refreshAccessToken(client);
+    }
 
-            // re-authenticate user
-            OAuth2AuthorizedClient newAuthorizedClient = new OAuth2AuthorizedClient(client.getClientRegistration(),
-                    client.getPrincipalName(), accessToken, client.getRefreshToken());
-            Authentication newPrincipal = new OAuth2AuthenticationToken(token.getPrincipal(), token.getAuthorities(), token.getAuthorizedClientRegistrationId());
-            clientService.removeAuthorizedClient(token.getAuthorizedClientRegistrationId(), client.getPrincipalName());
-            clientService.saveAuthorizedClient(newAuthorizedClient, newPrincipal);
+    private OAuth2AuthorizedClient createAuthorizedClient(OAuth2AuthorizedClient client, OAuth2AccessToken newAccessToken) {
+        return new OAuth2AuthorizedClient(
+                client.getClientRegistration(),
+                client.getPrincipalName(),
+                newAccessToken,
+                client.getRefreshToken()
+        );
+    }
 
-            // execute request with new token
-            request.getHeaders().clearContentHeaders();
-            request.getHeaders().setBearerAuth(accessToken.getTokenValue());
-            response = execution.execute(request, body);
-        } else if (response.getStatusCode().isError()) {
-            throw new SpotifyAPIException("Spotify API error", response.getStatusCode().value());
-        }
-        return response;
+    private Authentication createOAuth2AuthenticationToken(Authentication authentication) {
+        OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
+        return new OAuth2AuthenticationToken(
+                token.getPrincipal(),
+                token.getAuthorities(),
+                token.getAuthorizedClientRegistrationId()
+        );
+    }
+
+    private void setBearerToken(HttpRequest request, OAuth2AccessToken accessToken) {
+        request.getHeaders().setBearerAuth(accessToken.getTokenValue());
+    }
+
+    private void updateAuthorizedClient(OAuth2AuthorizedClient oldClient, OAuth2AuthorizedClient newClient, Authentication newAuthentication) {
+        clientService.removeAuthorizedClient(oldClient.getClientRegistration().getRegistrationId(), oldClient.getPrincipalName());
+        clientService.saveAuthorizedClient(newClient, newAuthentication);
     }
 }

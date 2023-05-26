@@ -1,8 +1,10 @@
 package com.laa66.statlyapp.service;
 
 import com.laa66.statlyapp.constants.SpotifyAPI;
+import com.laa66.statlyapp.exception.EmptyTokenException;
 import com.laa66.statlyapp.model.AccessToken;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,17 +31,20 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class SpotifyTokenServiceImplUnitTest {
 
-    static OAuth2AuthorizedClient client;
-
     @Mock
     RestTemplate restTemplate;
 
     @InjectMocks
     SpotifyTokenServiceImpl spotifyTokenService;
 
+    static ClientRegistration clientRegistration;
+    OAuth2AuthorizedClient client;
+    OAuth2AccessToken accessToken;
+    OAuth2RefreshToken refreshToken;
+
     @BeforeAll
     static void prepare() {
-        ClientRegistration clientRegistration = ClientRegistration.withRegistrationId("client")
+        clientRegistration = ClientRegistration.withRegistrationId("client")
                 .clientName("client")
                 .clientId("CLIENT_ID")
                 .clientSecret("CLIENT_SECRET")
@@ -52,9 +57,13 @@ class SpotifyTokenServiceImplUnitTest {
                 .userInfoUri("/me")
                 .userNameAttributeName("name")
                 .build();
-        OAuth2AccessToken accessToken =
+    }
+
+    @BeforeEach
+    void init() {
+        accessToken =
                 new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER, "access", Instant.EPOCH, Instant.EPOCH.plusSeconds(10));
-        OAuth2RefreshToken refreshToken =
+        refreshToken =
                 new OAuth2RefreshToken("refresh", Instant.EPOCH, Instant.EPOCH.plusSeconds(30));
         client = new OAuth2AuthorizedClient(clientRegistration, "user", accessToken, refreshToken);
     }
@@ -69,5 +78,15 @@ class SpotifyTokenServiceImplUnitTest {
         OAuth2AccessToken refreshedToken = spotifyTokenService.refreshAccessToken(client);
         assertEquals(OAuth2AccessToken.TokenType.BEARER, refreshedToken.getTokenType(), "Token type should be BEARER");
         assertNotEquals(client.getAccessToken().getTokenValue(), refreshedToken.getTokenValue(), "Returned Token should have different value");
+    }
+
+    @Test
+    void shouldRefreshAccessTokenEmptyToken() {
+        client = new OAuth2AuthorizedClient(
+                clientRegistration,
+                "user", accessToken,
+                null);
+        assertThrows(EmptyTokenException.class,
+                () -> spotifyTokenService.refreshAccessToken(client));
     }
 }
