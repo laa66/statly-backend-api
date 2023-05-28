@@ -35,7 +35,6 @@ public class HeaderModifierTokenRefresherInterceptor implements ClientHttpReques
         Authentication authentication = getAuthentication();
         OAuth2AuthorizedClient client = getAuthorizedClient(authentication);
         OAuth2AccessToken accessToken = getAccessToken(client);
-        log.info("Token: " + accessToken.getIssuedAt() + ", Expires at: " + accessToken.getExpiresAt());
         setBearerToken(request, accessToken);
 
         try {

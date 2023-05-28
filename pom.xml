@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.laa66</groupId>
-	<artifactId>statly-app</artifactId>
+	<artifactId>statly-backend-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>statlyapp</name>
+	<name>statly-backend-api</name>
 	<description>Spotify stats on demand</description>
 	<properties>
 		<java.version>19</java.version>

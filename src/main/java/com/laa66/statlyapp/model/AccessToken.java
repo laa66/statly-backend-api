@@ -5,6 +5,7 @@ import lombok.*;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class AccessToken {
 
     @JsonProperty("access_token")
