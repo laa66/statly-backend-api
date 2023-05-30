@@ -4,6 +4,7 @@ import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.laa66.statlyapp.DTO.BetaUserDTO;
+import com.laa66.statlyapp.repository.MySQLBaseContainerTest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
-class MailServiceImplIntegrationTest {
+class MailServiceImplIntegrationTest extends MySQLBaseContainerTest {
 
     @Autowired
     MailService mailService;

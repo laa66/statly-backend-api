@@ -3,8 +3,7 @@ package com.laa66.statlyapp.repository;
 import com.laa66.statlyapp.entity.UserMainstream;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -12,9 +11,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DataJpaTest
-@Sql({"/repositories_test_data.sql"})
-public class MainstreamRepositoryIntegrationTest {
+@SpringBootTest
+public class MainstreamRepositoryIntegrationTest extends MySQLBaseContainerTest {
 
     @Autowired
     MainstreamRepository mainstreamRepository;

@@ -3,8 +3,7 @@ package com.laa66.statlyapp.repository;
 import com.laa66.statlyapp.entity.UserGenre;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -13,9 +12,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DataJpaTest
-@Sql({"/repositories_test_data.sql"})
-public class GenreRepositoryIntegrationTest {
+@SpringBootTest
+public class GenreRepositoryIntegrationTest extends MySQLBaseContainerTest {
 
     @Autowired
     GenreRepository genreRepository;
