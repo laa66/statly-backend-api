@@ -22,7 +22,6 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import java.io.IOException;
 import java.util.Optional;
 
-// TODO: 26.05.2023 Validate refactoring
 @Slf4j
 @RequiredArgsConstructor
 public class HeaderModifierTokenRefresherInterceptor implements ClientHttpRequestInterceptor {

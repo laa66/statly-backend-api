@@ -12,8 +12,8 @@ public class OAuth2RestTemplateConfig {
 
     /**
      *  Rest template bean with interceptor for adding
-     *  header and checking if tokens need to be refreshed.
-     *  If exchange status code is 401 - send request to refresh token,
+     *  header and checking if token needs to be refreshed.
+     *  If response status code is 401 - send request to refresh token,
      *  re-authenticate user and repeat request.
      *
      **/
