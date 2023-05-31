@@ -154,7 +154,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
         String encodedImage;
         try {
             Resource resource = new ClassPathResource("image/" + range + ".jpg");
-            byte[] fileBytes = Files.readAllBytes(Paths.get(resource.getURI()));
+            byte[] fileBytes = resource.getInputStream().readAllBytes();
             encodedImage = Base64.getEncoder().encodeToString(fileBytes);
         } catch (IOException e) {
             throw new RuntimeException("Failed to read image", e);

@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
                 .findFirst()
                 .map(Image::getUrl)
                 .orElse("none");
-        return reactUrl + "/callback?name=" + StringUtils.stripAccents(userDTO.getDisplayName()) + "&url=" + (imageUrl.equals("none") ? "./account.png"  : imageUrl);
+        return reactUrl + "/statly-frontend/#/callback?name=" + StringUtils.stripAccents(userDTO.getDisplayName()) + "&url=" + (imageUrl.equals("none") ? "./account.png"  : imageUrl);
 
     }
 

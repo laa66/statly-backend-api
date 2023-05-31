@@ -48,7 +48,10 @@ public class CacheTask {
                     statsService.saveUserMainstream(mainstreamScoreDTOMap);
                     caffeineCache.invalidate();
                     log.info("-->> API Cache saved to database and cleared.");
-                        }, () -> log.error("-->> API Cache will not be saved."));
+
+                    },
+                        () -> log.error("-->> API Cache will not be saved.")
+                );
     }
 
 }
