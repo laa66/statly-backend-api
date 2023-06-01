@@ -118,3 +118,16 @@ You can view full documentation of this project in different paths:
 - Develop 'Silent-disco room' functionality
 - Integrate small web player into the React-app that can play user's top songs within the browser
 - Move Spotify-powered app from development mode to extended modem, enabling anyone to use Statly without needing to register for the beta
+
+## Screenshots 🛣️
+
+![Statly-home](src/main/resources/image/statly-home.png)
+![Statly-home-2](src/main/resources/image/statly-home-2.png)
+![Statly-home-tracks](src/main/resources/image/statly-tracks.png)
+![Statly-artists](src/main/resources/image/statly-artists.png)
+![Statly-genres](src/main/resources/image/statly-genres.png)
+![Statly-mainstream](src/main/resources/image/statly-mainstream.png)
+![Statly-dashboard](src/main/resources/image/statly-dashboard.png)
+![Statly-settings](src/main/resources/image/statly-settings.png)
+![Statly-beta](src/main/resources/image/statly-beta.png)
+
