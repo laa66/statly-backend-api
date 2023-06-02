@@ -8,8 +8,6 @@ public interface SpotifyAPIService {
 
     TopArtistsDTO getTopArtists(long userId, String range);
 
-    TopGenresDTO getTopGenres(long userId, String range);
-
     RecentlyPlayedDTO getRecentlyPlayed();
 
     MainstreamScoreDTO getMainstreamScore(long userId, String range);

@@ -5,6 +5,7 @@ import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.config.TestSecurityConfig;
 import com.laa66.statlyapp.model.*;
 import com.laa66.statlyapp.repository.*;
+import com.laa66.statlyapp.service.LibraryAnalysisService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +38,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @MockBeans({@MockBean(TrackRepository.class), @MockBean(ArtistRepository.class), @MockBean(GenreRepository.class),
         @MockBean(MainstreamRepository.class), @MockBean(UserRepository.class), @MockBean(BetaUserRepository.class)})
 class ApiControllerUnitTest {
+
+    @MockBean
+    LibraryAnalysisService libraryAnalysisService;
 
     @MockBean
     SpotifyAPIService spotifyAPIService;
@@ -108,7 +112,9 @@ class ApiControllerUnitTest {
     @Test
     void shouldGetTopGenresAuthenticated() throws Exception {
         TopGenresDTO genresDTO = new TopGenresDTO(List.of(new Genre("rock", 2)), "short", null);
-        when(spotifyAPIService.getTopGenres(1, "short")).thenReturn(genresDTO);
+        TopArtistsDTO artistsDTO = new TopArtistsDTO("1", List.of(new ItemTopArtists()), "short", null);
+        when(spotifyAPIService.getTopArtists(1, "short")).thenReturn(artistsDTO);
+        when(libraryAnalysisService.getTopGenres(1, "short", artistsDTO)).thenReturn(genresDTO);
         mockMvc.perform(get("/api/top/genres").with(oauth2Login()
                                 .attributes(map -> map.put("userId", 1L)))
                 .contentType(MediaType.APPLICATION_JSON)

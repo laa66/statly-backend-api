@@ -147,44 +147,6 @@ class SpotifyAPIServiceImplUnitTest {
     }
 
     @Test
-    void shouldGetTopGenresWithValidUrl() {
-        ItemTopArtists artist1 = new ItemTopArtists();
-        artist1.setGenres(List.of("classic", "classic", "classic", "rock", "rock", "rock", "rock"));
-        ItemTopArtists artist2 = new ItemTopArtists();
-        artist2.setGenres(List.of("classic", "classic", "classic"));
-        TopArtistsDTO artistsDTO = new TopArtistsDTO("2", List.of(artist1, artist2), "long", null);
-        TopGenresDTO genresDTO = new TopGenresDTO(List.of(new Genre("classic", 60), new Genre("rock", 40)), "long", null);
-        when(restTemplate.exchange(eq(SpotifyAPI.TOP_ARTISTS.get() + "long_term"),
-                eq(HttpMethod.GET), any(), eq(TopArtistsDTO.class)))
-                .thenReturn(new ResponseEntity<>(artistsDTO, HttpStatus.OK));
-        when(statsService.compareArtists(1, artistsDTO)).thenReturn(artistsDTO);
-        when(statsService.compareGenres(eq(1L), any())).thenReturn(genresDTO);
-        TopGenresDTO returnDto = spotifyAPIService.getTopGenres(1, "long");
-
-        assertEquals(2, returnDto.getGenres().size());
-        assertEquals(60, returnDto.getGenres().get(0).getScore());
-        assertEquals(40, returnDto.getGenres().get(1).getScore());
-        assertEquals(artistsDTO.getRange(), returnDto.getRange());
-    }
-
-    @Test
-    void shouldGetTopGenresEmptyBody() {
-        when(restTemplate.exchange(eq(SpotifyAPI.TOP_ARTISTS.get() + "long_term"),
-                eq(HttpMethod.GET), any(), eq(TopArtistsDTO.class)))
-                .thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
-        assertThrows(SpotifyAPIEmptyResponseException.class, () -> spotifyAPIService.getTopGenres(1, "long"));
-    }
-
-    @Test
-    void shouldGetTopGenresWithNotValidUrl() {
-        when(restTemplate.exchange(eq(SpotifyAPI.TOP_ARTISTS.get() + "wrong_term"),
-                eq(HttpMethod.GET), any(), eq(TopArtistsDTO.class)))
-                .thenThrow(HttpClientErrorException.class);
-        assertThrows(HttpClientErrorException.class,
-                () -> spotifyAPIService.getTopGenres(1, "wrong"));
-    }
-
-    @Test
     void shouldGetRecentlyPlayed() {
         RecentlyPlayedDTO dto = new RecentlyPlayedDTO("2", List.of(new ItemRecentlyPlayed(), new ItemRecentlyPlayed()));
         when(restTemplate.exchange(eq(SpotifyAPI.RECENTLY_PLAYED_TRACKS.get()),

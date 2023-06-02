@@ -221,59 +221,6 @@ class SpotifyAPIServiceImplIntegrationTest {
     }
 
     @Test
-    void shouldGetTopGenresResponseOk() throws JsonProcessingException {
-        ItemTopArtists item1 = new ItemTopArtists(List.of("Rock", "Rap", "Rap"), new ArrayList<>(), "artist1", "uri", new SpotifyURL(), 0);
-        ItemTopArtists item2 = new ItemTopArtists(List.of("Rock", "Rap"), new ArrayList<>(), "artist2", "uri", new SpotifyURL(), 0);
-        TopArtistsDTO data = new TopArtistsDTO("2", List.of(item1, item2), "short", null);
-        mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.TOP_ARTISTS.get() + "short_term"))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.OK)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(mapper.writeValueAsString(data)));
-
-        TopGenresDTO response = spotifyAPIService.getTopGenres(1, "short");
-        mockServer.verify();
-        assertEquals(2, response.getGenres().size());
-        assertEquals("Rap", response.getGenres().get(0).getGenre());
-        assertEquals("Rock", response.getGenres().get(1).getGenre());
-        assertEquals(data.getRange(), response.getRange());
-    }
-
-    @Test
-    void shouldGetTopGenresServiceUnavailable() {
-        mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.TOP_ARTISTS.get() + "short_term"))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withServiceUnavailable());
-        assertThrows(RestClientException.class,
-                () -> spotifyAPIService.getTopGenres(1, "short"));
-        mockServer.verify();
-    }
-
-    @Test
-    void shouldGetTopGenresResponseClientError() {
-        mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.TOP_ARTISTS.get() + "short_term"))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.TOO_MANY_REQUESTS));
-        assertThrows(HttpClientErrorException.class,
-                () -> spotifyAPIService.getTopGenres(1, "short"));
-        mockServer.verify();
-    }
-
-    @Test
-    void shouldGetTopGenresResponseServerError() {
-        mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.TOP_ARTISTS.get() + "short_term"))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
-        assertThrows(HttpServerErrorException.class,
-                () -> spotifyAPIService.getTopGenres(1, "short"));
-        mockServer.verify();
-    }
-
-    @Test
     void shouldGetMainstreamScoreResponseOk() throws JsonProcessingException {
         ItemTopTracks item1 = new ItemTopTracks();
         item1.setPopularity(30);

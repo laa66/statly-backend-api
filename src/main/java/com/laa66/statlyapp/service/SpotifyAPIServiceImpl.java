@@ -18,13 +18,9 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class SpotifyAPIServiceImpl implements SpotifyAPIService {
@@ -59,32 +55,6 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
 
     @Override
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
-    public TopGenresDTO getTopGenres(long userId, String range) {
-        TopArtistsDTO response = getTopArtists(userId, range);
-        List<ItemTopArtists> topArtists = response.getItemTopArtists();
-        List<Genre> sliceGenres = topArtists
-                .stream()
-                .flatMap(artist -> artist.getGenres().stream())
-                .collect(Collectors.collectingAndThen(Collectors.toMap(Function.identity(), genre -> 1, Integer::sum),
-                        stringIntegerMap -> stringIntegerMap.entrySet()
-                                .stream()
-                                .map(entry -> new Genre(entry.getKey(), entry.getValue()))
-                                .sorted(Comparator.reverseOrder())
-                                .limit(10)
-                                .toList()
-                        ));
-        double sum = sliceGenres
-                .stream()
-                .mapToInt(Genre::getScore)
-                .sum();
-        List<Genre> transformedGenres = sliceGenres.stream()
-                .map(item -> new Genre(item.getGenre(), (int) ((item.getScore() / sum) * 100)))
-                .collect(Collectors.toList());
-        return statsService.compareGenres(userId, new TopGenresDTO(transformedGenres, range, null));
-    }
-
-    @Override
-    @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
     public MainstreamScoreDTO getMainstreamScore(long userId, String range) {
         TopTracksDTO response = getTopTracks(userId, range);
         double result = response.getItemTopTracks().stream()
@@ -110,7 +80,10 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
             default -> throw new SpotifyAPIException("Wrong data range", HttpStatus.BAD_REQUEST.value());
         }
         PlaylistDTO playlist = postEmptyPlaylist(user, playlistRange);
-        List<String> uris = getTopTracks(userId, range).getItemTopTracks().stream().map(ItemTopTracks::getUri).toList();
+        List<String> uris = getTopTracks(userId, range).getItemTopTracks()
+                .stream()
+                .map(ItemTopTracks::getUri)
+                .toList();
         postTracksToPlaylist(playlist, uris);
         putPlaylistImage(playlist, range);
         return playlist;

@@ -31,6 +31,11 @@ public class AppConfig implements WebMvcConfigurer {
     }
 
     @Bean
+    public LibraryAnalysisService libraryAnalysisService(StatsService statsService) {
+        return new LibraryAnalysisServiceImpl(statsService);
+    }
+
+    @Bean
     public StatsService statsService(TrackRepository trackRepository,
                                      ArtistRepository artistRepository,
                                      GenreRepository genreRepository,
