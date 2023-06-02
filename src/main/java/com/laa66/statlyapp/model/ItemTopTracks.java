@@ -7,7 +7,7 @@ import lombok.*;
 
 import java.util.List;
 
-@JsonPropertyOrder({"album", "artists", "name", "popularity", "uri"})
+@JsonPropertyOrder({"album", "artists", "name", "popularity", "uri", "external_urls", "id"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @NoArgsConstructor
@@ -26,6 +26,8 @@ public class ItemTopTracks {
 
     @JsonProperty("external_urls")
     private SpotifyURL url;
+
+    private String id;
 
     private Integer difference;
 }

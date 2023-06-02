@@ -123,6 +123,36 @@ class SpotifyAPIServiceImplUnitTest {
     }
 
     @Test
+    void shouldGetTracksAnalysis() {
+        ResponseTracksAnalysis response = new ResponseTracksAnalysis(List.of(new TrackAnalysis(
+                0.15,
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                -30.0,
+                0.5,
+                0.5,
+                0.5
+        )));
+        when(restTemplate.exchange(eq(SpotifyAPI.TRACKS_ANALYSIS.get() + "id"),
+                eq(HttpMethod.GET), any(), eq(ResponseTracksAnalysis.class)))
+                .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
+        ResponseTracksAnalysis returnResponse = spotifyAPIService.getTracksAnalysis("id");
+        assertEquals(1, returnResponse.getTracksAnalysis().size());
+        assertEquals(0.15, returnResponse.getTracksAnalysis().get(0).getAcousticness());
+        assertEquals(0.5, returnResponse.getTracksAnalysis().get(0).getValence());
+    }
+
+    @Test
+    void shouldGetTracksAnalysisEmptyBody() {
+        when(restTemplate.exchange(eq(SpotifyAPI.TRACKS_ANALYSIS.get() + "id"),
+                eq(HttpMethod.GET), any(), eq(ResponseTracksAnalysis.class)))
+                .thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
+        assertThrows(SpotifyAPIEmptyResponseException.class, () -> spotifyAPIService.getTracksAnalysis("id"));
+    }
+
+    @Test
     void shouldPostTopTracksPlaylistWithValidUrl() {
         UserDTO userDTO = new UserDTO("testuser", "test@mail.com", "testuser", List.of(new Image()));
         TopTracksDTO tracksDTO = new TopTracksDTO(List.of(new ItemTopTracks(), new ItemTopTracks()), "2", "long", null);

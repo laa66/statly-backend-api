@@ -31,16 +31,15 @@ public class AppConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public LibraryAnalysisService libraryAnalysisService(StatsService statsService) {
-        return new LibraryAnalysisServiceImpl(statsService);
+    public LibraryAnalysisService libraryAnalysisService(StatsService statsService, SpotifyAPIService spotifyAPIService) {
+        return new LibraryAnalysisServiceImpl(statsService, spotifyAPIService);
     }
 
     @Bean
     public StatsService statsService(TrackRepository trackRepository,
                                      ArtistRepository artistRepository,
-                                     GenreRepository genreRepository,
-                                     MainstreamRepository mainstreamRepository) {
-        return new StatsServiceImpl(trackRepository, artistRepository, genreRepository, mainstreamRepository);
+                                     GenreRepository genreRepository) {
+        return new StatsServiceImpl(trackRepository, artistRepository, genreRepository);
     }
 
     @Bean

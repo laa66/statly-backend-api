@@ -18,10 +18,7 @@ import java.util.stream.Collectors;
 public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
 
     private final StatsService statsService;
-
-    public LibraryAnalysisDTO getDLibraryAnalysis(TopTracksDTO tracksDTO) {
-        return null;
-    }
+    private final SpotifyAPIService spotifyAPIService;
 
     @Override
     public double getMainstreamScore(TopTracksDTO tracksDTO) {

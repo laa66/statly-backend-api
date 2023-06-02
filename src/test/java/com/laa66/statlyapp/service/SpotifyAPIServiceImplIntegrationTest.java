@@ -6,21 +6,18 @@ import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.config.TestOAuth2RestTemplateConfig;
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
-import com.laa66.statlyapp.model.Artist;
-import com.laa66.statlyapp.model.ItemTopArtists;
 import com.laa66.statlyapp.model.ItemTopTracks;
+import com.laa66.statlyapp.model.ResponseTracksAnalysis;
 import com.laa66.statlyapp.model.SpotifyURL;
+import com.laa66.statlyapp.model.TrackAnalysis;
 import com.laa66.statlyapp.repository.ArtistRepository;
 import com.laa66.statlyapp.repository.GenreRepository;
-import com.laa66.statlyapp.repository.MainstreamRepository;
 import com.laa66.statlyapp.repository.TrackRepository;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
@@ -39,7 +36,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServiceUnavailable;
@@ -63,9 +59,6 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @MockBean
     GenreRepository genreRepository;
-
-    @MockBean
-    MainstreamRepository mainstreamRepository;
 
     @Autowired
     @InjectMocks
@@ -266,6 +259,65 @@ class SpotifyAPIServiceImplIntegrationTest {
                 .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
         assertThrows(HttpServerErrorException.class,
                 () -> spotifyAPIService.getRecentlyPlayed());
+        mockServer.verify();
+    }
+
+    @Test
+    void shouldGetTracksAnalysisResponseOk() throws JsonProcessingException {
+        ResponseTracksAnalysis response = new ResponseTracksAnalysis(List.of(new TrackAnalysis(
+                0.15,
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                -30.0,
+                0.5,
+                0.5,
+                0.5
+        )));
+        mockServer.expect(ExpectedCount.once(),
+                requestTo(SpotifyAPI.TRACKS_ANALYSIS.get() + "id"))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(response)));
+        ResponseTracksAnalysis returnResponse = spotifyAPIService.getTracksAnalysis("id");
+        mockServer.verify();
+        assertEquals(1, returnResponse.getTracksAnalysis().size());
+        assertEquals(0.15, returnResponse.getTracksAnalysis().get(0).getAcousticness());
+        assertEquals(0.5, returnResponse.getTracksAnalysis().get(0).getValence());
+    }
+
+    @Test
+    void shouldGetTracksAnalysisServiceUnavailable() {
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(SpotifyAPI.TRACKS_ANALYSIS.get() + "id"))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withServiceUnavailable());
+        assertThrows(RestClientException.class,
+                () -> spotifyAPIService.getTracksAnalysis("id"));
+        mockServer.verify();
+    }
+
+    @Test
+    void shouldGetTracksAnalysisResponseClientError() {
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(SpotifyAPI.TRACKS_ANALYSIS.get() + "id"))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.TOO_MANY_REQUESTS));
+        assertThrows(HttpClientErrorException.class,
+                () -> spotifyAPIService.getTracksAnalysis("id"));
+        mockServer.verify();
+    }
+
+    @Test
+    void shouldGetTracksAnalysisResponseServerError() {
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(SpotifyAPI.TRACKS_ANALYSIS.get() + "id"))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
+        assertThrows(HttpServerErrorException.class,
+                () -> spotifyAPIService.getTracksAnalysis("id"));
         mockServer.verify();
     }
 

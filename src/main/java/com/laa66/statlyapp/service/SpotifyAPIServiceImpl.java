@@ -59,6 +59,15 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     }
 
     @Override
+    public ResponseTracksAnalysis getTracksAnalysis(String tracksIds) {
+        String analysisUrl = SpotifyAPI.TRACKS_ANALYSIS.get() + tracksIds;
+        ResponseTracksAnalysis body = restTemplate
+                .exchange(analysisUrl, HttpMethod.GET, null, ResponseTracksAnalysis.class).getBody();
+        return Optional.ofNullable(body)
+                .orElseThrow(() -> new SpotifyAPIEmptyResponseException("Empty Spotify API response", HttpStatus.NO_CONTENT.value()));
+    }
+
+    @Override
     public PlaylistDTO postTopTracksPlaylist(long userId, String range) {
         UserDTO user = getCurrentUser();
         String playlistRange;

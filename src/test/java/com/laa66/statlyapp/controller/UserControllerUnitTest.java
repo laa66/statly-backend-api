@@ -41,8 +41,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(UserController.class)
 @ExtendWith(SpringExtension.class)
 @Import(TestSecurityConfig.class)
-@MockBeans({@MockBean(TrackRepository.class), @MockBean(ArtistRepository.class), @MockBean(GenreRepository.class),
-        @MockBean(MainstreamRepository.class), @MockBean(UserRepository.class), @MockBean(BetaUserRepository.class)})
+@MockBeans({@MockBean(TrackRepository.class),
+        @MockBean(ArtistRepository.class), @MockBean(GenreRepository.class),
+        @MockBean(UserRepository.class), @MockBean(BetaUserRepository.class)})
 class UserControllerUnitTest {
 
     @MockBean

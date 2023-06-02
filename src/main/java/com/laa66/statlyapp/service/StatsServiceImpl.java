@@ -12,7 +12,6 @@ import com.laa66.statlyapp.model.ItemTopArtists;
 import com.laa66.statlyapp.model.ItemTopTracks;
 import com.laa66.statlyapp.repository.ArtistRepository;
 import com.laa66.statlyapp.repository.GenreRepository;
-import com.laa66.statlyapp.repository.MainstreamRepository;
 import com.laa66.statlyapp.repository.TrackRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +32,6 @@ public class StatsServiceImpl implements StatsService {
     private final TrackRepository trackRepository;
     private final ArtistRepository artistRepository;
     private final GenreRepository genreRepository;
-    private final MainstreamRepository mainstreamRepository;
 
     @Override
     public void saveUserTracks(Map<TopTracksDTO, Long> dtoMap) {
