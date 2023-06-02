@@ -1,13 +1,10 @@
 package com.laa66.statlyapp.task;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.laa66.statlyapp.DTO.MainstreamScoreDTO;
 import com.laa66.statlyapp.DTO.TopArtistsDTO;
 import com.laa66.statlyapp.DTO.TopGenresDTO;
 import com.laa66.statlyapp.DTO.TopTracksDTO;
 import com.laa66.statlyapp.service.StatsService;
-import com.laa66.statlyapp.service.UserService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,16 +34,14 @@ class CacheTaskUnitTest {
         cache.put("getTopTracks_1_short", new TopTracksDTO());
         cache.put("getTopArtists_1_short", new TopArtistsDTO());
         cache.put("getTopGenres_1_short", new TopGenresDTO());
-        cache.put("getMainstreamScore_1_short", new MainstreamScoreDTO());
 
-        assertEquals(4, cache.getNativeCache().asMap().size());
+        assertEquals(3, cache.getNativeCache().asMap().size());
         when(cacheManager.getCache("api")).thenReturn(cache);
         cacheTask.saveCache();
 
         verify(statsService, times(1)).saveUserTracks(anyMap());
         verify(statsService, times(1)).saveUserArtists(anyMap());
         verify(statsService, times(1)).saveUserGenres(anyMap());
-        verify(statsService, times(1)).saveUserMainstream(anyMap());
         assertEquals(0, cache.getNativeCache().asMap().size());
     }
 }

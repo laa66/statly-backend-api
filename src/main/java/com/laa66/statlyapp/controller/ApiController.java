@@ -47,13 +47,6 @@ public class ApiController {
 
     }
 
-    @GetMapping("/score")
-    public ResponseEntity<MainstreamScoreDTO> mainstreamScore(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
-        long userId = (long) principal.getAttributes().get("userId");
-        MainstreamScoreDTO mainstreamScoreDTO = spotifyApiService.getMainstreamScore(userId, range);
-        return ResponseEntity.ok(mainstreamScoreDTO);
-    }
-
     @PostMapping("/playlist/create")
     public ResponseEntity<PlaylistDTO> createPlaylist(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
         long userId = (long) principal.getAttributes().get("userId");

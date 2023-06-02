@@ -54,17 +54,6 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     }
 
     @Override
-    @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
-    public MainstreamScoreDTO getMainstreamScore(long userId, String range) {
-        TopTracksDTO response = getTopTracks(userId, range);
-        double result = response.getItemTopTracks().stream()
-                .mapToInt(ItemTopTracks::getPopularity)
-                .average()
-                .orElse(0);
-        return statsService.compareMainstream(userId, new MainstreamScoreDTO(result, range, 0, null));
-    }
-
-    @Override
     public RecentlyPlayedDTO getRecentlyPlayed() {
         return restTemplate.exchange(SpotifyAPI.RECENTLY_PLAYED_TRACKS.get(), HttpMethod.GET, null, RecentlyPlayedDTO.class).getBody();
     }

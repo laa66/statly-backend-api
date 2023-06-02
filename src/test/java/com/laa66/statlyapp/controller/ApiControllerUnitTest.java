@@ -152,26 +152,6 @@ class ApiControllerUnitTest {
     }
 
     @Test
-    void shouldGetMainstreamScoreAuthenticated() throws Exception {
-        MainstreamScoreDTO mainstreamScoreDTO = new MainstreamScoreDTO(75.00, "short", 0, null);
-        when(spotifyAPIService.getMainstreamScore(1, "short"))
-                .thenReturn(mainstreamScoreDTO);
-        mockMvc.perform(get("/api/score").with(oauth2Login()
-                                .attributes(map -> map.put("userId", 1L)))
-                .contentType(MediaType.APPLICATION_JSON)
-                .param("range", "short"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.score", is(75.00)));
-    }
-
-    @Test
-    void shouldGetMainstreamScoreNotAuthenticated() throws Exception {
-        mockMvc.perform(get("/api/score")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isFound());
-    }
-
-    @Test
     void shouldCreatePlaylistAuthenticated() throws Exception {
         PlaylistDTO playlistDTO = new PlaylistDTO("1", new SpotifyURL());
         when(spotifyAPIService.postTopTracksPlaylist(1, "short"))

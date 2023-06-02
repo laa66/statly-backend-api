@@ -1,6 +1,5 @@
 package com.laa66.statlyapp.service;
 
-import com.laa66.statlyapp.DTO.MainstreamScoreDTO;
 import com.laa66.statlyapp.DTO.TopArtistsDTO;
 import com.laa66.statlyapp.DTO.TopGenresDTO;
 import com.laa66.statlyapp.DTO.TopTracksDTO;
@@ -15,14 +14,10 @@ public interface StatsService {
 
     void saveUserGenres(Map<TopGenresDTO, Long> dtoMap);
 
-    void saveUserMainstream(Map<MainstreamScoreDTO, Long> dtoMap);
-
     TopTracksDTO compareTracks(long userId, TopTracksDTO dto);
 
     TopArtistsDTO compareArtists(long userId, TopArtistsDTO dto);
 
     TopGenresDTO compareGenres(long userId, TopGenresDTO dto);
-
-    MainstreamScoreDTO compareMainstream(long userId, MainstreamScoreDTO dto);
 
 }

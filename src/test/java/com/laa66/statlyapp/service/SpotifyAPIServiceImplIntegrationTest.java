@@ -221,60 +221,6 @@ class SpotifyAPIServiceImplIntegrationTest {
     }
 
     @Test
-    void shouldGetMainstreamScoreResponseOk() throws JsonProcessingException {
-        ItemTopTracks item1 = new ItemTopTracks();
-        item1.setPopularity(30);
-        ItemTopTracks item2 = new ItemTopTracks();
-        item2.setPopularity(70);
-        TopTracksDTO data = new TopTracksDTO(List.of(item1, item2), "2", "short", null);
-
-        mockServer.expect(ExpectedCount.once(),
-                requestTo(SpotifyAPI.TOP_TRACKS.get() + "short_term"))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.OK)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(mapper.writeValueAsString(data)));
-
-        MainstreamScoreDTO response = spotifyAPIService.getMainstreamScore(1, "short");
-        mockServer.verify();
-        assertEquals(50.00, response.getScore());
-        assertEquals(data.getRange(), response.getRange());
-    }
-
-    @Test
-    void shouldGetMainstreamScoreServiceUnavailable() {
-        mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.TOP_TRACKS.get() + "short_term"))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withServiceUnavailable());
-        assertThrows(RestClientException.class,
-                () -> spotifyAPIService.getMainstreamScore(1, "short"));
-        mockServer.verify();
-    }
-
-    @Test
-    void shouldGetMainstreamScoreResponseClientError() {
-        mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.TOP_TRACKS.get() + "short_term"))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.TOO_MANY_REQUESTS));
-        assertThrows(HttpClientErrorException.class,
-                () -> spotifyAPIService.getMainstreamScore(1, "short"));
-        mockServer.verify();
-    }
-
-    @Test
-    void shouldGetMainstreamScoreResponseServerError() {
-        mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.TOP_TRACKS.get() + "short_term"))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
-        assertThrows(HttpServerErrorException.class,
-                () -> spotifyAPIService.getMainstreamScore(1, "short"));
-        mockServer.verify();
-    }
-
-    @Test
     void shouldGetRecentlyPlayedResponseOk() throws JsonProcessingException {
         RecentlyPlayedDTO data = new RecentlyPlayedDTO("2", new ArrayList<>());
         mockServer.expect(ExpectedCount.once(),

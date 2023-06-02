@@ -1,6 +1,5 @@
 package com.laa66.statlyapp.service;
 
-import com.laa66.statlyapp.DTO.MainstreamScoreDTO;
 import com.laa66.statlyapp.DTO.TopArtistsDTO;
 import com.laa66.statlyapp.DTO.TopGenresDTO;
 import com.laa66.statlyapp.DTO.TopTracksDTO;
@@ -74,14 +73,6 @@ public class StatsServiceImplUnitTest {
         Map<TopGenresDTO, Long> dtoMap = Collections.singletonMap(dto, 1L);
         statsService.saveUserGenres(dtoMap);
         verify(genreRepository, times(1)).saveAll(anyList());
-    }
-
-    @Test
-    void shouldSaveUserMainstream() {
-        MainstreamScoreDTO dto = new MainstreamScoreDTO(40.00, "short", 0, null);
-        Map<MainstreamScoreDTO, Long> dtoMap = Collections.singletonMap(dto, 1L);
-        statsService.saveUserMainstream(dtoMap);
-        verify(mainstreamRepository, times(1)).saveAll(anyList());
     }
 
     @Test
@@ -305,49 +296,6 @@ public class StatsServiceImplUnitTest {
         assertEquals(dto.getGenres().get(0).getDifference(), returnDto.getGenres().get(0).getDifference());
         assertEquals(dto.getGenres().get(1).getDifference(), returnDto.getGenres().get(1).getDifference());
         assertEquals(dto.getGenres().get(2).getDifference(), returnDto.getGenres().get(2).getDifference());
-        assertNull(returnDto.getDate());
-    }
-
-    @Test
-    void shouldCompareMainstream() {
-        MainstreamScoreDTO dto = new MainstreamScoreDTO(60.50, "short", 0, null);
-        UserMainstream mainstream = new UserMainstream(1, 1, "short", LocalDate.of(2023, 1, 1), 30.76);
-        when(mainstreamRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "short"))
-                .thenReturn(Optional.of(mainstream));
-
-        MainstreamScoreDTO returnDto = statsService.compareMainstream(1L, dto);
-        assertNotNull(returnDto);
-        assertEquals(dto.getRange(), returnDto.getRange());
-        assertEquals(dto.getScore(), returnDto.getScore());
-        assertEquals(29.74, returnDto.getDifference());
-        assertEquals(mainstream.getDate(), returnDto.getDate());
-    }
-
-    @Test
-    void shouldCompareMainstreamWrongId() {
-        MainstreamScoreDTO dto = new MainstreamScoreDTO(60.50, "short", 0, null);
-        when(mainstreamRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "short"))
-                .thenReturn(Optional.empty());
-
-        MainstreamScoreDTO returnDto = statsService.compareMainstream(1L, dto);
-        assertNotNull(returnDto);
-        assertEquals(dto.getRange(), returnDto.getRange());
-        assertEquals(dto.getScore(), returnDto.getScore());
-        assertEquals(dto.getDifference(), returnDto.getDifference());
-        assertNull(returnDto.getDate());
-    }
-
-    @Test
-    void shouldCompareMainstreamWrongRange() {
-        MainstreamScoreDTO dto = new MainstreamScoreDTO(60.50, "wrong", 0, null);
-        when(mainstreamRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "wrong"))
-                .thenReturn(Optional.empty());
-
-        MainstreamScoreDTO returnDto = statsService.compareMainstream(1L, dto);
-        assertNotNull(returnDto);
-        assertEquals(dto.getRange(), returnDto.getRange());
-        assertEquals(dto.getScore(), returnDto.getScore());
-        assertEquals(dto.getDifference(), returnDto.getDifference());
         assertNull(returnDto.getDate());
     }
 }

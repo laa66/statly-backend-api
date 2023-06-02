@@ -2,20 +2,17 @@ package com.laa66.statlyapp.service;
 
 import com.laa66.statlyapp.DTO.TopArtistsDTO;
 import com.laa66.statlyapp.DTO.TopGenresDTO;
-import com.laa66.statlyapp.constants.SpotifyAPI;
-import com.laa66.statlyapp.exception.SpotifyAPIEmptyResponseException;
+import com.laa66.statlyapp.DTO.TopTracksDTO;
 import com.laa66.statlyapp.model.Genre;
 import com.laa66.statlyapp.model.ItemTopArtists;
+import com.laa66.statlyapp.model.ItemTopTracks;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,7 +30,7 @@ class LibraryAnalysisServiceImplUnitTest {
     LibraryAnalysisServiceImpl libraryAnalysisService;
 
     @Test
-    void shouldGetTopGenresWithValidUrl() {
+    void shouldGetTopGenresArtistsValid() {
         ItemTopArtists artist1 = new ItemTopArtists();
         artist1.setGenres(List.of("classic", "classic", "classic", "rock", "rock", "rock", "rock"));
         ItemTopArtists artist2 = new ItemTopArtists();
@@ -48,4 +45,38 @@ class LibraryAnalysisServiceImplUnitTest {
         assertEquals(40, returnDto.getGenres().get(1).getScore());
         assertEquals(artistsDTO.getRange(), returnDto.getRange());
     }
+
+    @Test
+    void shouldGetTopGenresArtistEmpty() {
+        assertThrows(RuntimeException.class,
+                () -> libraryAnalysisService.getTopGenres(1, "long", null));
+        assertThrows(RuntimeException.class,
+                () -> libraryAnalysisService.getTopGenres(1, "long", new TopArtistsDTO("0", null, "long", LocalDate.now())));
+    }
+
+    @Test
+    void shouldGetMainstreamScoreTracksValid() {
+        ItemTopTracks track1 = new ItemTopTracks();
+        track1.setPopularity(40);
+        ItemTopTracks track2 = new ItemTopTracks();
+        track2.setPopularity(70);
+        TopTracksDTO tracksDTO = new TopTracksDTO(List.of(track1, track2), "2", "long", null);
+        double result = libraryAnalysisService.getMainstreamScore(tracksDTO);
+        assertEquals(55.0, result);
+    }
+
+    @Test
+    void shouldGetMainstreamScoreTrackListEmpty() {
+        TopTracksDTO tracksDTO = new TopTracksDTO(List.of(), "0", "long", null);
+        double result = libraryAnalysisService.getMainstreamScore(tracksDTO);
+        assertEquals(0, result);
+    }
+
+    @Test
+    void shouldGetMainstreamScoreTrackEmpty() {
+        TopTracksDTO tracksDTO = new TopTracksDTO(null, "0", "long", null);
+        assertThrows(RuntimeException.class, () -> libraryAnalysisService.getMainstreamScore(tracksDTO));
+        assertThrows(RuntimeException.class, () -> libraryAnalysisService.getMainstreamScore(null));
+    }
+
 }

@@ -1,12 +1,10 @@
 package com.laa66.statlyapp.service;
 
-import com.laa66.statlyapp.DTO.MainstreamScoreDTO;
 import com.laa66.statlyapp.DTO.TopArtistsDTO;
 import com.laa66.statlyapp.DTO.TopGenresDTO;
 import com.laa66.statlyapp.DTO.TopTracksDTO;
 import com.laa66.statlyapp.entity.UserArtist;
 import com.laa66.statlyapp.entity.UserGenre;
-import com.laa66.statlyapp.entity.UserMainstream;
 import com.laa66.statlyapp.entity.UserTrack;
 import com.laa66.statlyapp.model.Artist;
 import com.laa66.statlyapp.model.Genre;
@@ -20,8 +18,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -84,14 +80,6 @@ public class StatsServiceImpl implements StatsService {
     }
 
     @Override
-    public void saveUserMainstream(Map<MainstreamScoreDTO, Long> dtoMap) {
-        List<UserMainstream> userMainstreamList = dtoMap.entrySet().stream().map(entry ->
-                new UserMainstream(0, entry.getValue(), entry.getKey().getRange(), LocalDate.now(), entry.getKey().getScore()))
-                .toList();
-        mainstreamRepository.saveAll(userMainstreamList);
-    }
-
-    @Override
     public TopTracksDTO compareTracks(long userId, TopTracksDTO dto) {
         return trackRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, dto.getRange())
                 .map(item -> {
@@ -146,19 +134,6 @@ public class StatsServiceImpl implements StatsService {
                         genre.setDifference(difference);
                         //log.info("Today: " + name + " - " + actualScore + " / Yesterday: " + name + " - " + lastScore + " / diff: " + genre.getDifference());
                     });
-                    return dto;
-                }).orElse(dto);
-    }
-
-    @Override
-    public MainstreamScoreDTO compareMainstream(long userId, MainstreamScoreDTO dto) {
-        return mainstreamRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, dto.getRange())
-                .map(item -> {
-                    double actualScore = dto.getScore();
-                    double lastScore = item.getScore();
-                    dto.withDifference(new BigDecimal(actualScore - lastScore).setScale(2, RoundingMode.HALF_UP).doubleValue());
-                    dto.withDate(item.getDate());
-                    //log.info("Today: " + actualScore + " / Yesterday: " + lastScore + " / diff: " + dto.getDifference());
                     return dto;
                 }).orElse(dto);
     }

@@ -10,8 +10,6 @@ public interface SpotifyAPIService {
 
     RecentlyPlayedDTO getRecentlyPlayed();
 
-    MainstreamScoreDTO getMainstreamScore(long userId, String range);
-
     UserDTO getCurrentUser();
 
     PlaylistDTO postTopTracksPlaylist(long userId, String range);

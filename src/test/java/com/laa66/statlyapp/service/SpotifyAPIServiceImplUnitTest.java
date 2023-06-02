@@ -112,41 +112,6 @@ class SpotifyAPIServiceImplUnitTest {
     }
 
     @Test
-    void shouldGetMainstreamScoreWithValidUrl() {
-        ItemTopTracks track1 = new ItemTopTracks();
-        track1.setPopularity(40);
-        ItemTopTracks track2 = new ItemTopTracks();
-        track2.setPopularity(70);
-        TopTracksDTO tracksDTO = new TopTracksDTO(List.of(track1, track2), "2", "long", null);
-        MainstreamScoreDTO mainstreamScoreDTO = new MainstreamScoreDTO(55.00, "long", 0, null);
-        when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS.get() + "long_term"),
-                eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
-                .thenReturn(new ResponseEntity<>(tracksDTO, HttpStatus.OK));
-        when(statsService.compareTracks(1, tracksDTO)).thenReturn(tracksDTO);
-        when(statsService.compareMainstream(eq(1L), any())).thenReturn(mainstreamScoreDTO);
-        MainstreamScoreDTO returnDto = spotifyAPIService.getMainstreamScore(1, "long");
-        assertEquals(mainstreamScoreDTO.getScore(), returnDto.getScore());
-        assertEquals(mainstreamScoreDTO.getRange(), returnDto.getRange());
-    }
-
-    @Test
-    void shouldGetMainstreamScoreEmptyBody() {
-        when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS.get() + "long_term"),
-                eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
-                .thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
-        assertThrows(SpotifyAPIEmptyResponseException.class, () -> spotifyAPIService.getMainstreamScore(1, "long"));
-    }
-
-    @Test
-    void shouldGetMainStreamScoreWithNotValidUrl() {
-        when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS.get() + "wrong_term"),
-                eq(HttpMethod.GET), any(), eq(TopTracksDTO.class)))
-                .thenThrow(HttpClientErrorException.class);
-        assertThrows(HttpClientErrorException.class,
-                () -> spotifyAPIService.getMainstreamScore(1, "wrong"));
-    }
-
-    @Test
     void shouldGetRecentlyPlayed() {
         RecentlyPlayedDTO dto = new RecentlyPlayedDTO("2", List.of(new ItemRecentlyPlayed(), new ItemRecentlyPlayed()));
         when(restTemplate.exchange(eq(SpotifyAPI.RECENTLY_PLAYED_TRACKS.get()),
