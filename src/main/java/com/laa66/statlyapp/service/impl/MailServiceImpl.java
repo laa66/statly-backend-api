@@ -1,6 +1,7 @@
-package com.laa66.statlyapp.service;
+package com.laa66.statlyapp.service.impl;
 
 import com.laa66.statlyapp.DTO.BetaUserDTO;
+import com.laa66.statlyapp.service.MailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;

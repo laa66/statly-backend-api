@@ -3,7 +3,7 @@ package com.laa66.statlyapp.DTO;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.laa66.statlyapp.model.ItemRecentlyPlayed;
+import com.laa66.statlyapp.model.PlaybackEvent;
 import lombok.*;
 
 import java.util.List;
@@ -18,5 +18,5 @@ public class RecentlyPlayedDTO {
     String total;
 
     @JsonProperty("items")
-    List<ItemRecentlyPlayed> itemRecentlyPlayedList;
+    List<PlaybackEvent> playbackEvents;
 }

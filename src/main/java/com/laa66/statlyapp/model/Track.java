@@ -6,11 +6,12 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.*;
 
 import java.util.List;
-import java.util.Objects;
 
-@JsonPropertyOrder({"album", "artists", "name"})
+@JsonPropertyOrder({"album", "artists", "name", "popularity", "uri", "external_urls", "id"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Track {
 
     private Album album;
@@ -19,6 +20,14 @@ public class Track {
 
     private String name;
 
+    private int popularity;
+
+    private String uri;
+
     @JsonProperty("external_urls")
     private SpotifyURL url;
+
+    private String id;
+
+    private Integer difference;
 }

@@ -5,15 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.*;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @JsonPropertyOrder({"track", "played_at"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class ItemRecentlyPlayed {
+public class PlaybackEvent {
 
     private Track track;
 

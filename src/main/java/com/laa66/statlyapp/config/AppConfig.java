@@ -2,7 +2,7 @@ package com.laa66.statlyapp.config;
 
 import com.laa66.statlyapp.repository.*;
 import com.laa66.statlyapp.service.*;
-import com.laa66.statlyapp.task.CacheTask;
+import com.laa66.statlyapp.service.impl.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.server.CookieSameSiteSupplier;

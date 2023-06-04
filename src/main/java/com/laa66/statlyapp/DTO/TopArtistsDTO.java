@@ -3,7 +3,7 @@ package com.laa66.statlyapp.DTO;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.laa66.statlyapp.model.ItemTopArtists;
+import com.laa66.statlyapp.model.Artist;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -20,7 +20,7 @@ public class TopArtistsDTO {
     private String total;
 
     @JsonProperty("items")
-    private List<ItemTopArtists> itemTopArtists;
+    private List<Artist> itemTopArtists;
 
     private String range;
 

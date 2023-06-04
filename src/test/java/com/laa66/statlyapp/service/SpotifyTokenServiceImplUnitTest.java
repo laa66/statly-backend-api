@@ -3,6 +3,7 @@ package com.laa66.statlyapp.service;
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.EmptyTokenException;
 import com.laa66.statlyapp.model.AccessToken;
+import com.laa66.statlyapp.service.impl.SpotifyTokenServiceImpl;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

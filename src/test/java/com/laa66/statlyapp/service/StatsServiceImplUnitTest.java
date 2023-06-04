@@ -5,10 +5,10 @@ import com.laa66.statlyapp.DTO.TopGenresDTO;
 import com.laa66.statlyapp.DTO.TopTracksDTO;
 import com.laa66.statlyapp.entity.UserArtist;
 import com.laa66.statlyapp.entity.UserGenre;
-import com.laa66.statlyapp.entity.UserMainstream;
 import com.laa66.statlyapp.entity.UserTrack;
 import com.laa66.statlyapp.model.*;
 import com.laa66.statlyapp.repository.*;
+import com.laa66.statlyapp.service.impl.StatsServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -44,8 +44,10 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldSaveUserTracks() {
-        ItemTopTracks item = new ItemTopTracks();
-        item.setArtists(Collections.singletonList(new Artist("artist")));
+        Track item = new Track();
+        Artist artist = new Artist();
+        artist.setName("artist");
+        item.setArtists(Collections.singletonList(artist));
         item.setName("song");
         TopTracksDTO dto = new TopTracksDTO(Collections.singletonList(item), "1", "short", null);
         Map<TopTracksDTO, Long> dtoMap = Collections.singletonMap(dto, 1L);
@@ -55,7 +57,7 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldSaveUserArtists() {
-        ItemTopArtists item = new ItemTopArtists();
+        Artist item = new Artist();
         item.setName("artist");
         TopArtistsDTO dto = new TopArtistsDTO("1", Collections.singletonList(item), "short", null);
         Map<TopArtistsDTO, Long> dtoMap = Collections.singletonMap(dto, 1L);
@@ -74,9 +76,13 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldCompareTracks() {
+        Artist artist1 = new Artist();
+        Artist artist2 = new Artist();
+        artist1.setName("artist1");
+        artist2.setName("artist2");
         TopTracksDTO dto = new TopTracksDTO(List.of(
-                new ItemTopTracks(new Album(), List.of(new Artist("artist1")), "track1", 50, "uri", new SpotifyURL(), "id", 0),
-                new ItemTopTracks(new Album(), List.of(new Artist("artist2")), "track2", 50, "uri", new SpotifyURL(), "id", 0)
+                new Track(new Album(), List.of(artist1), "track1", 50, "uri", new SpotifyURL(), "id", 0),
+                new Track(new Album(), List.of(artist2), "track2", 50, "uri", new SpotifyURL(), "id", 0)
         ), "2", "short", null);
         UserTrack track = new UserTrack(1, 1, "short", Map.of(
                 "artist1_track1", 2, "artist2_track2", 1
@@ -99,8 +105,8 @@ public class StatsServiceImplUnitTest {
     @Test
     void shouldCompareTracksNullAndEmptyArtists() {
         TopTracksDTO dto = new TopTracksDTO(List.of(
-                new ItemTopTracks(new Album(), null, "track1", 50, "uri", new SpotifyURL(), "id", 0),
-                new ItemTopTracks(new Album(), List.of(), "track2", 50, "uri", new SpotifyURL(), "id", 0)
+                new Track(new Album(), null, "track1", 50, "uri", new SpotifyURL(), "id", 0),
+                new Track(new Album(), List.of(), "track2", 50, "uri", new SpotifyURL(), "id", 0)
         ), "2", "short", null);
         UserTrack track = new UserTrack(1, 1, "short", Map.of(
                 "artist1_track1", 2, "artist2_track2", 1
@@ -122,9 +128,13 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldNotCompareTracksWrongId() {
+        Artist artist1 = new Artist();
+        Artist artist2 = new Artist();
+        artist1.setName("artist1");
+        artist2.setName("artist2");
         TopTracksDTO dto = new TopTracksDTO(List.of(
-                new ItemTopTracks(new Album(), List.of(new Artist("artist1")), "track1", 50, "uri", new SpotifyURL(), "id", 0),
-                new ItemTopTracks(new Album(), List.of(new Artist("artist2")), "track2", 50, "uri", new SpotifyURL(), "id", 0)
+                new Track(new Album(), List.of(artist1), "track1", 50, "uri", new SpotifyURL(), "id", 0),
+                new Track(new Album(), List.of(artist2), "track2", 50, "uri", new SpotifyURL(), "id", 0)
         ), "2", "short", null);
         when(trackRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "short"))
                 .thenReturn(Optional.empty());
@@ -142,9 +152,13 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldNotCompareTracksWrongRangeInDto() {
+        Artist artist1 = new Artist();
+        Artist artist2 = new Artist();
+        artist1.setName("artist1");
+        artist2.setName("artist2");
         TopTracksDTO dto = new TopTracksDTO(List.of(
-                new ItemTopTracks(new Album(), List.of(new Artist("artist1")), "track1", 50, "uri", new SpotifyURL(), "id", 0),
-                new ItemTopTracks(new Album(), List.of(new Artist("artist2")), "track2", 50, "uri", new SpotifyURL(), "id", 0)
+                new Track(new Album(), List.of(artist1), "track1", 50, "uri", new SpotifyURL(), "id", 0),
+                new Track(new Album(), List.of(artist2), "track2", 50, "uri", new SpotifyURL(), "id", 0)
         ), "2", "wrong", null);
         when(trackRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "wrong"))
                 .thenReturn(Optional.empty());
@@ -163,8 +177,8 @@ public class StatsServiceImplUnitTest {
     @Test
     void shouldCompareArtists() {
         TopArtistsDTO dto = new TopArtistsDTO("2", List.of(
-                new ItemTopArtists(List.of(), List.of(), "artist1", "uri", new SpotifyURL(), 0),
-                new ItemTopArtists(List.of(), List.of(), "artist2", "uri", new SpotifyURL(), 0)
+                new Artist(List.of(), List.of(), "artist1", "uri", new SpotifyURL(), 0),
+                new Artist(List.of(), List.of(), "artist2", "uri", new SpotifyURL(), 0)
         ), "short", null);
         UserArtist artist = new UserArtist(1, 1, "short", Map.of(
                 "artist1", 2, "artist2", 1
@@ -187,8 +201,8 @@ public class StatsServiceImplUnitTest {
     @Test
     void shouldNotCompareArtistsWrongId() {
         TopArtistsDTO dto = new TopArtistsDTO("2", List.of(
-                new ItemTopArtists(List.of(), List.of(), "artist1", "uri", new SpotifyURL(), 0),
-                new ItemTopArtists(List.of(), List.of(), "artist2", "uri", new SpotifyURL(), 0)
+                new Artist(List.of(), List.of(), "artist1", "uri", new SpotifyURL(), 0),
+                new Artist(List.of(), List.of(), "artist2", "uri", new SpotifyURL(), 0)
         ), "short", null);
         when(artistRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "short"))
                 .thenReturn(Optional.empty());
@@ -208,8 +222,8 @@ public class StatsServiceImplUnitTest {
     @Test
     void shouldNotCompareArtistsWrongRange() {
         TopArtistsDTO dto = new TopArtistsDTO("2", List.of(
-                new ItemTopArtists(List.of(), List.of(), "artist1", "uri", new SpotifyURL(), 0),
-                new ItemTopArtists(List.of(), List.of(), "artist2", "uri", new SpotifyURL(), 0)
+                new Artist(List.of(), List.of(), "artist1", "uri", new SpotifyURL(), 0),
+                new Artist(List.of(), List.of(), "artist2", "uri", new SpotifyURL(), 0)
         ), "wrong", null);
         when(artistRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "wrong"))
                 .thenReturn(Optional.empty());

@@ -12,6 +12,8 @@ import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
 import com.laa66.statlyapp.repository.ArtistRepository;
 import com.laa66.statlyapp.repository.GenreRepository;
 import com.laa66.statlyapp.repository.TrackRepository;
+import com.laa66.statlyapp.service.impl.SpotifyAPIServiceImpl;
+import com.laa66.statlyapp.service.impl.StatsServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -24,8 +26,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -101,7 +101,7 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @Test
     void shouldGetTopTracksResponseOk() throws JsonProcessingException {
-        TopTracksDTO data = new TopTracksDTO(List.of(new ItemTopTracks()),"1", "short", null);
+        TopTracksDTO data = new TopTracksDTO(List.of(new Track()),"1", "short", null);
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.TOP_TRACKS.get() + "short_term"))
                 .andExpect(method(HttpMethod.GET))
@@ -165,7 +165,7 @@ class SpotifyAPIServiceImplIntegrationTest {
         RecentlyPlayedDTO response = spotifyAPIService.getRecentlyPlayed();
         mockServer.verify();
         assertEquals(data.getTotal(), response.getTotal());
-        assertEquals(data.getItemRecentlyPlayedList().size(), response.getItemRecentlyPlayedList().size());
+        assertEquals(data.getPlaybackEvents().size(), response.getPlaybackEvents().size());
     }
 
     @Test
@@ -268,7 +268,7 @@ class SpotifyAPIServiceImplIntegrationTest {
     @Test
     void shouldPostTopTracksResponseOk() throws JsonProcessingException {
         UserDTO user = new UserDTO("1", "test@mail.com", "user", new ArrayList<>());
-        ItemTopTracks track = new ItemTopTracks();
+        Track track = new Track();
         track.setUri("trackId");
         TopTracksDTO topTracks = new TopTracksDTO(List.of(track), "1", "short", null);
         PlaylistDTO playlist = new PlaylistDTO("1", new SpotifyURL());

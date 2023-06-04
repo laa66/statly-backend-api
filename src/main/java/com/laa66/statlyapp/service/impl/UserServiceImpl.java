@@ -1,10 +1,11 @@
-package com.laa66.statlyapp.service;
+package com.laa66.statlyapp.service.impl;
 
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.entity.*;
 import com.laa66.statlyapp.exception.UserNotFoundException;
 import com.laa66.statlyapp.model.Image;
 import com.laa66.statlyapp.repository.*;
+import com.laa66.statlyapp.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;

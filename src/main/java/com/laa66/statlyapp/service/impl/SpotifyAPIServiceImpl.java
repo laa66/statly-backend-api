@@ -1,4 +1,4 @@
-package com.laa66.statlyapp.service;
+package com.laa66.statlyapp.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,8 +7,11 @@ import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.SpotifyAPIEmptyResponseException;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
 import com.laa66.statlyapp.model.*;
+import com.laa66.statlyapp.model.request.RequestUpdatePlaylist;
 import com.laa66.statlyapp.model.response.ResponsePlaylists;
 import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
+import com.laa66.statlyapp.service.SpotifyAPIService;
+import com.laa66.statlyapp.service.StatsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ClassPathResource;
@@ -93,7 +96,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
         PlaylistDTO playlist = postEmptyPlaylist(user, playlistRange);
         List<String> uris = getTopTracks(userId, range).getItemTopTracks()
                 .stream()
-                .map(ItemTopTracks::getUri)
+                .map(Track::getUri)
                 .toList();
         postTracksToPlaylist(playlist, uris);
         putPlaylistImage(playlist, range);
@@ -122,7 +125,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     }
 
     private void postTracksToPlaylist(PlaylistDTO playlist, List<String> uris) {
-        SpotifyRequestAddTracks request = new SpotifyRequestAddTracks(uris, 0);
+        RequestUpdatePlaylist request = new RequestUpdatePlaylist(uris, 0);
         String body;
         try {
             ObjectMapper mapper = new ObjectMapper();

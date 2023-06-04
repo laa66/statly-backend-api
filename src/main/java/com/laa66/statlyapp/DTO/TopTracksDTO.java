@@ -3,7 +3,7 @@ package com.laa66.statlyapp.DTO;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.laa66.statlyapp.model.ItemTopTracks;
+import com.laa66.statlyapp.model.Track;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -18,7 +18,7 @@ import java.util.List;
 public class TopTracksDTO {
 
     @JsonProperty("items")
-    private List<ItemTopTracks> itemTopTracks;
+    private List<Track> itemTopTracks;
 
     private String total;
 

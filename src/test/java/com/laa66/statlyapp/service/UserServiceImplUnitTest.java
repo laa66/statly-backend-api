@@ -5,17 +5,12 @@ import com.laa66.statlyapp.entity.*;
 import com.laa66.statlyapp.exception.UserNotFoundException;
 import com.laa66.statlyapp.model.Image;
 import com.laa66.statlyapp.repository.*;
-import org.junit.Before;
-import org.junit.jupiter.api.BeforeAll;
+import com.laa66.statlyapp.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDateTime;
 import java.util.*;

@@ -1,12 +1,15 @@
-package com.laa66.statlyapp.service;
+package com.laa66.statlyapp.service.impl;
 
 import com.laa66.statlyapp.DTO.LibraryAnalysisDTO;
 import com.laa66.statlyapp.DTO.TopArtistsDTO;
 import com.laa66.statlyapp.DTO.TopGenresDTO;
 import com.laa66.statlyapp.DTO.TopTracksDTO;
 import com.laa66.statlyapp.model.Genre;
-import com.laa66.statlyapp.model.ItemTopTracks;
+import com.laa66.statlyapp.model.Track;
 import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
+import com.laa66.statlyapp.service.LibraryAnalysisService;
+import com.laa66.statlyapp.service.SpotifyAPIService;
+import com.laa66.statlyapp.service.StatsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -69,7 +72,7 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
     private double getMainstreamScore(TopTracksDTO tracksDTO) {
         return tracksDTO.getItemTopTracks()
                 .stream()
-                .mapToInt(ItemTopTracks::getPopularity)
+                .mapToInt(Track::getPopularity)
                 .average()
                 .orElse(0);
     }
@@ -87,7 +90,7 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
     private String getTracksIds(TopTracksDTO tracksDTO) {
         return tracksDTO.getItemTopTracks()
                 .stream()
-                .map(ItemTopTracks::getId)
+                .map(Track::getId)
                 .collect(Collectors.joining(","));
     }
 

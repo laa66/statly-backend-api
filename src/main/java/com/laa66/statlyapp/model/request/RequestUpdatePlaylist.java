@@ -1,13 +1,12 @@
-package com.laa66.statlyapp.model;
+package com.laa66.statlyapp.model.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class SpotifyRequestAddTracks {
+public class RequestUpdatePlaylist {
 
     private List<String> uris;
 

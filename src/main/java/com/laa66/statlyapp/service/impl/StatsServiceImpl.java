@@ -1,4 +1,4 @@
-package com.laa66.statlyapp.service;
+package com.laa66.statlyapp.service.impl;
 
 import com.laa66.statlyapp.DTO.TopArtistsDTO;
 import com.laa66.statlyapp.DTO.TopGenresDTO;
@@ -6,13 +6,13 @@ import com.laa66.statlyapp.DTO.TopTracksDTO;
 import com.laa66.statlyapp.entity.UserArtist;
 import com.laa66.statlyapp.entity.UserGenre;
 import com.laa66.statlyapp.entity.UserTrack;
-import com.laa66.statlyapp.model.Artist;
 import com.laa66.statlyapp.model.Genre;
-import com.laa66.statlyapp.model.ItemTopArtists;
-import com.laa66.statlyapp.model.ItemTopTracks;
+import com.laa66.statlyapp.model.Artist;
+import com.laa66.statlyapp.model.Track;
 import com.laa66.statlyapp.repository.ArtistRepository;
 import com.laa66.statlyapp.repository.GenreRepository;
 import com.laa66.statlyapp.repository.TrackRepository;
+import com.laa66.statlyapp.service.StatsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,7 +58,7 @@ public class StatsServiceImpl implements StatsService {
                    .getItemTopArtists()
                    .stream()
                    .collect(Collectors
-                           .toMap(ItemTopArtists::getName, s -> counter.getAndIncrement()));
+                           .toMap(Artist::getName, s -> counter.getAndIncrement()));
            return new UserArtist(0, entry.getValue(), entry.getKey().getRange(), artists, LocalDate.now());
         }).toList();
         artistRepository.saveAll(userArtistList);
@@ -84,7 +84,7 @@ public class StatsServiceImpl implements StatsService {
                     dto.withDate(item.getDate());
                     IntStream.range(0, dto.getItemTopTracks().size()).forEach(index -> {
                         try { //handled npe
-                            ItemTopTracks track = dto.getItemTopTracks().get(index);
+                            Track track = dto.getItemTopTracks().get(index);
                             String artist = track.getArtists().get(0).getName();
                             String name = track.getName();
                             int actualPosition = index + 1;
@@ -106,7 +106,7 @@ public class StatsServiceImpl implements StatsService {
                 .map(item -> {
                     dto.withDate(item.getDate());
                     IntStream.range(0, dto.getItemTopArtists().size()).forEach(index -> {
-                        ItemTopArtists artist = dto.getItemTopArtists().get(index);
+                        Artist artist = dto.getItemTopArtists().get(index);
                         String name = artist.getName();
                         int actualPosition = index + 1;
                         Integer lastPosition = item.getArtists().getOrDefault(name, null);
