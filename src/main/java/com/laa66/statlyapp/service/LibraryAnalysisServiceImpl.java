@@ -6,11 +6,13 @@ import com.laa66.statlyapp.DTO.TopGenresDTO;
 import com.laa66.statlyapp.DTO.TopTracksDTO;
 import com.laa66.statlyapp.model.Genre;
 import com.laa66.statlyapp.model.ItemTopTracks;
+import com.laa66.statlyapp.model.ResponseTracksAnalysis;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -21,19 +23,13 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
     private final SpotifyAPIService spotifyAPIService;
 
     @Override
-    public double getMainstreamScore(TopTracksDTO tracksDTO) {
-        return Optional.ofNullable(tracksDTO)
-                .map(TopTracksDTO::getItemTopTracks)
-                .map(items -> items.stream()
-                        .mapToInt(ItemTopTracks::getPopularity)
-                        .average()
-                        .orElse(0))
-                .orElseThrow(() -> new RuntimeException("Tracks cannot be null"));
-    }
-
-    @Override
     public LibraryAnalysisDTO getLibraryAnalysis(TopTracksDTO tracksDTO) {
-        return null;
+        String tracksIds = getTracksIds(tracksDTO);
+        ResponseTracksAnalysis tracksAnalysis = spotifyAPIService.getTracksAnalysis(tracksIds);
+        Map<String, Double> mapAnalysis = mapAnalysis(tracksAnalysis);
+        addToMap(mapAnalysis, "mainstream", getMainstreamScore(tracksDTO));
+        addToMap(mapAnalysis, "boringness", getBoringness(mapAnalysis));
+        return new LibraryAnalysisDTO(mapAnalysis);
     }
 
     @Override
@@ -63,5 +59,66 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
                     return statsService.compareGenres(userId, new TopGenresDTO(transformedGenres, range, null));
                 })
                 .orElseThrow(() -> new RuntimeException("Artists cannot be null"));
+    }
+
+    //helpers
+    private double getMainstreamScore(TopTracksDTO tracksDTO) {
+        return Optional.ofNullable(tracksDTO)
+                .map(TopTracksDTO::getItemTopTracks)
+                .map(items -> items.stream()
+                        .mapToInt(ItemTopTracks::getPopularity)
+                        .average()
+                        .orElse(0))
+                .orElseThrow(() -> new RuntimeException("Tracks cannot be null"));
+    }
+
+    private double getBoringness(Map<String, Double> mapAnalysis) {
+        return new BigDecimal(Double.toString(
+                mapAnalysis.get("tempo")
+                + (mapAnalysis.get("valence") * 100)
+                + (mapAnalysis.get("energy") * 100)
+                + (mapAnalysis.get("danceability") * 100)))
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
+    }
+
+    private String getTracksIds(TopTracksDTO tracksDTO) {
+        return tracksDTO.getItemTopTracks()
+                .stream()
+                .map(ItemTopTracks::getId)
+                .collect(Collectors.joining(","));
+    }
+
+    private Map<String, Double> mapAnalysis(ResponseTracksAnalysis tracksAnalysis) {
+        Map<String, Double> analyzedTracks = new HashMap<>();
+        int trackCount = tracksAnalysis.getTracksAnalysis().size();
+
+        tracksAnalysis.getTracksAnalysis().forEach(
+                track -> {
+                    addToMap(analyzedTracks, "acousticness", track.getAcousticness());
+                    addToMap(analyzedTracks, "danceability", track.getDanceability());
+                    addToMap(analyzedTracks, "energy", track.getEnergy());
+                    addToMap(analyzedTracks, "instrumentalness", track.getInstrumentalness());
+                    addToMap(analyzedTracks, "liveness", track.getLiveness());
+                    addToMap(analyzedTracks, "loudness", track.getLoudness());
+                    addToMap(analyzedTracks, "speechiness", track.getSpeechiness());
+                    addToMap(analyzedTracks, "tempo", track.getTempo());
+                    addToMap(analyzedTracks, "valence", track.getValence());
+                }
+        );
+
+        analyzedTracks.forEach((key, value) -> {
+            double avg = value / trackCount;
+            analyzedTracks.put(key, new BigDecimal(Double
+                            .toString(avg))
+                            .setScale(2, RoundingMode.HALF_UP)
+                            .doubleValue());
+        });
+
+        return analyzedTracks;
+    }
+
+    private void addToMap(Map<String, Double> map, String key, double value) {
+        map.merge(key, value, Double::sum);
     }
 }

@@ -11,6 +11,4 @@ public interface LibraryAnalysisService {
 
     TopGenresDTO getTopGenres(long userId, String range, TopArtistsDTO artistsDTO);
 
-    double getMainstreamScore(TopTracksDTO tracksDTO);
-
 }
