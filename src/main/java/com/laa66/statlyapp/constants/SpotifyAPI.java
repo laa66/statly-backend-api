@@ -11,6 +11,7 @@ public enum SpotifyAPI {
     ADD_PLAYLIST_TRACK("https://api.spotify.com/v1/playlists/playlist_id/tracks"),
     EDIT_PLAYLIST_IMAGE("https://api.spotify.com/v1/playlists/playlist_id/images"),
     TRACKS_ANALYSIS("https://api.spotify.com/v1/audio-features?ids="),
+    USER_PLAYLISTS("https://api.spotify.com/v1/users/user_id/playlists?offset=offset_num&limit=50"),
 
     PLAYLIST_RANGE_SHORT("last 4 weeks"),
     PLAYLIST_RANGE_MEDIUM("last 6 months"),

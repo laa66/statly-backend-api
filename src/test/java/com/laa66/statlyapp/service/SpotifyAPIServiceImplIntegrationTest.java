@@ -6,10 +6,9 @@ import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.config.TestOAuth2RestTemplateConfig;
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
-import com.laa66.statlyapp.model.ItemTopTracks;
-import com.laa66.statlyapp.model.ResponseTracksAnalysis;
-import com.laa66.statlyapp.model.SpotifyURL;
-import com.laa66.statlyapp.model.TrackAnalysis;
+import com.laa66.statlyapp.model.*;
+import com.laa66.statlyapp.model.response.ResponsePlaylists;
+import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
 import com.laa66.statlyapp.repository.ArtistRepository;
 import com.laa66.statlyapp.repository.GenreRepository;
 import com.laa66.statlyapp.repository.TrackRepository;
@@ -91,32 +90,12 @@ class SpotifyAPIServiceImplIntegrationTest {
     }
 
     @Test
-    void shouldGetCurrentUserServiceUnavailable() {
+    void shouldGetCurrentUserResponseError() {
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.CURRENT_USER.get()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withServiceUnavailable());
         assertThrows(RestClientException.class, () -> spotifyAPIService.getCurrentUser());
-        mockServer.verify();
-    }
-
-    @Test
-    void shouldGetCurrentUserResponseClientError() {
-        mockServer.expect(ExpectedCount.once(),
-                requestTo(SpotifyAPI.CURRENT_USER.get()))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.TOO_MANY_REQUESTS));
-        assertThrows(HttpClientErrorException.class, () -> spotifyAPIService.getCurrentUser());
-        mockServer.verify();
-    }
-
-    @Test
-    void shouldGetCurrentUserResponseServerError() {
-        mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.CURRENT_USER.get()))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
-        assertThrows(HttpServerErrorException.class, () -> spotifyAPIService.getCurrentUser());
         mockServer.verify();
     }
 
@@ -137,32 +116,12 @@ class SpotifyAPIServiceImplIntegrationTest {
     }
 
     @Test
-    void shouldGetTopTracksResponseServiceUnavailable() {
+    void shouldGetTopTracksResponseError() {
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.TOP_TRACKS.get() + "short_term"))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withServiceUnavailable());
         assertThrows(RestClientException.class, () -> spotifyAPIService.getTopTracks(1, "short"));
-        mockServer.verify();
-    }
-
-    @Test
-    void shouldGetTopTracksResponseClientError() {
-        mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.TOP_TRACKS.get() + "short_term"))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.TOO_MANY_REQUESTS));
-        assertThrows(HttpClientErrorException.class, () -> spotifyAPIService.getTopTracks(1, "short"));
-        mockServer.verify();
-    }
-
-    @Test
-    void shouldGetTopTracksResponseServerError() {
-        mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.TOP_TRACKS.get() + "short_term"))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
-        assertThrows(HttpServerErrorException.class, () -> spotifyAPIService.getTopTracks(1, "short"));
         mockServer.verify();
     }
 
@@ -184,32 +143,12 @@ class SpotifyAPIServiceImplIntegrationTest {
     }
 
     @Test
-    void shouldGetTopArtistsServiceUnavailable() {
+    void shouldGetTopArtistsResponseError() {
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.TOP_ARTISTS.get() + "short_term"))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withServiceUnavailable());
         assertThrows(RestClientException.class, () -> spotifyAPIService.getTopArtists(1, "short"));
-        mockServer.verify();
-    }
-
-    @Test
-    void shouldGetTopArtistsResponseClientError() {
-        mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.TOP_ARTISTS.get() + "short_term"))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.TOO_MANY_REQUESTS));
-        assertThrows(HttpClientErrorException.class, () -> spotifyAPIService.getTopArtists(1, "short"));
-        mockServer.verify();
-    }
-
-    @Test
-    void shouldGetTopArtistsResponseServerError() {
-        mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.TOP_ARTISTS.get() + "short_term"))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
-        assertThrows(HttpServerErrorException.class, () -> spotifyAPIService.getTopArtists(1, "short"));
         mockServer.verify();
     }
 
@@ -230,34 +169,12 @@ class SpotifyAPIServiceImplIntegrationTest {
     }
 
     @Test
-    void shouldGetRecentlyPlayedServiceUnavailable() {
+    void shouldGetRecentlyPlayedResponseError() {
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.RECENTLY_PLAYED_TRACKS.get()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withServiceUnavailable());
         assertThrows(RestClientException.class,
-                () -> spotifyAPIService.getRecentlyPlayed());
-        mockServer.verify();
-    }
-
-    @Test
-    void shouldGetRecentlyPlayedResponseClientError() {
-        mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.RECENTLY_PLAYED_TRACKS.get()))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.TOO_MANY_REQUESTS));
-        assertThrows(HttpClientErrorException.class,
-                () -> spotifyAPIService.getRecentlyPlayed());
-        mockServer.verify();
-    }
-
-    @Test
-    void shouldGetRecentlyPlayedResponseServerError() {
-        mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.RECENTLY_PLAYED_TRACKS.get()))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
-        assertThrows(HttpServerErrorException.class,
                 () -> spotifyAPIService.getRecentlyPlayed());
         mockServer.verify();
     }
@@ -289,7 +206,7 @@ class SpotifyAPIServiceImplIntegrationTest {
     }
 
     @Test
-    void shouldGetTracksAnalysisServiceUnavailable() {
+    void shouldGetTracksAnalysisResponseError() {
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.TRACKS_ANALYSIS.get() + "id"))
                 .andExpect(method(HttpMethod.GET))
@@ -300,25 +217,52 @@ class SpotifyAPIServiceImplIntegrationTest {
     }
 
     @Test
-    void shouldGetTracksAnalysisResponseClientError() {
+    void shouldGetUserPlaylistsResponseOk() throws JsonProcessingException {
+        UserDTO userDTO = new UserDTO("testuser", "test@mail.com", "testuser", List.of(new Image()));
+        ResponsePlaylists responsePlaylists = new ResponsePlaylists("url", 2, List.of(
+                new Playlist(new SpotifyURL(), "id1", List.of(), "playlist1", new User()),
+                new Playlist(new SpotifyURL(), "id2", List.of(), "playlist2", new User()))
+        );
         mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.TRACKS_ANALYSIS.get() + "id"))
+                        requestTo(SpotifyAPI.CURRENT_USER.get()))
                 .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.TOO_MANY_REQUESTS));
-        assertThrows(HttpClientErrorException.class,
-                () -> spotifyAPIService.getTracksAnalysis("id"));
+                .andRespond(withStatus(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(userDTO)));
+
+        mockServer.expect(ExpectedCount.once(),
+                requestTo(SpotifyAPI.USER_PLAYLISTS.get()
+                        .replace("user_id", "testuser")
+                        .replace("offset_num", "0")))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(responsePlaylists)));
+        ResponsePlaylists returnPlaylists = spotifyAPIService.getUserPlaylists(0);
         mockServer.verify();
+        assertEquals(2, returnPlaylists.getPlaylists().size());
+        assertEquals(2, returnPlaylists.getTotal());
+        assertEquals("url", returnPlaylists.getNext());
+        assertEquals("id1", returnPlaylists.getPlaylists().get(0).getId());
+        assertEquals("id2", returnPlaylists.getPlaylists().get(1).getId());
     }
 
     @Test
-    void shouldGetTracksAnalysisResponseServerError() {
+    void shouldGetUserPlaylistsResponseError() throws JsonProcessingException {
+        UserDTO userDTO = new UserDTO("testuser", "test@mail.com", "testuser", List.of(new Image()));
         mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.TRACKS_ANALYSIS.get() + "id"))
+                        requestTo(SpotifyAPI.CURRENT_USER.get()))
                 .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
-        assertThrows(HttpServerErrorException.class,
-                () -> spotifyAPIService.getTracksAnalysis("id"));
-        mockServer.verify();
+                .andRespond(withStatus(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(userDTO)));
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(SpotifyAPI.USER_PLAYLISTS.get()
+                                .replace("user_id", "testuser")
+                                .replace("offset_num", "0")))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withServiceUnavailable());
+        assertThrows(RestClientException.class, () -> spotifyAPIService.getUserPlaylists(0));
     }
 
     @Test

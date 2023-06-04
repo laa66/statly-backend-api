@@ -6,7 +6,7 @@ import com.laa66.statlyapp.DTO.TopGenresDTO;
 import com.laa66.statlyapp.DTO.TopTracksDTO;
 import com.laa66.statlyapp.model.Genre;
 import com.laa66.statlyapp.model.ItemTopTracks;
-import com.laa66.statlyapp.model.ResponseTracksAnalysis;
+import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -24,12 +24,16 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
 
     @Override
     public LibraryAnalysisDTO getLibraryAnalysis(TopTracksDTO tracksDTO) {
-        String tracksIds = getTracksIds(tracksDTO);
-        ResponseTracksAnalysis tracksAnalysis = spotifyAPIService.getTracksAnalysis(tracksIds);
-        Map<String, Double> mapAnalysis = mapAnalysis(tracksAnalysis);
-        addToMap(mapAnalysis, "mainstream", getMainstreamScore(tracksDTO));
-        addToMap(mapAnalysis, "boringness", getBoringness(mapAnalysis));
-        return new LibraryAnalysisDTO(mapAnalysis);
+        return Optional.ofNullable(tracksDTO).map(
+                tracks -> {
+                    String tracksIds = getTracksIds(tracksDTO);
+                    ResponseTracksAnalysis tracksAnalysis = spotifyAPIService.getTracksAnalysis(tracksIds);
+                    Map<String, Double> mapAnalysis = mapAnalysis(tracksAnalysis);
+                    addToMap(mapAnalysis, "mainstream", getMainstreamScore(tracksDTO));
+                    addToMap(mapAnalysis, "boringness", getBoringness(mapAnalysis));
+                    return new LibraryAnalysisDTO(mapAnalysis);
+                }
+        ).orElseThrow(() -> new RuntimeException("Tracks cannot be null"));
     }
 
     @Override
@@ -63,13 +67,11 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
 
     //helpers
     private double getMainstreamScore(TopTracksDTO tracksDTO) {
-        return Optional.ofNullable(tracksDTO)
-                .map(TopTracksDTO::getItemTopTracks)
-                .map(items -> items.stream()
-                        .mapToInt(ItemTopTracks::getPopularity)
-                        .average()
-                        .orElse(0))
-                .orElseThrow(() -> new RuntimeException("Tracks cannot be null"));
+        return tracksDTO.getItemTopTracks()
+                .stream()
+                .mapToInt(ItemTopTracks::getPopularity)
+                .average()
+                .orElse(0);
     }
 
     private double getBoringness(Map<String, Double> mapAnalysis) {

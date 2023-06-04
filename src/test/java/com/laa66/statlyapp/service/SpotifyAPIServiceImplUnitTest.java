@@ -5,6 +5,8 @@ import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.SpotifyAPIEmptyResponseException;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
 import com.laa66.statlyapp.model.*;
+import com.laa66.statlyapp.model.response.ResponsePlaylists;
+import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,7 +21,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -150,6 +151,44 @@ class SpotifyAPIServiceImplUnitTest {
                 eq(HttpMethod.GET), any(), eq(ResponseTracksAnalysis.class)))
                 .thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
         assertThrows(SpotifyAPIEmptyResponseException.class, () -> spotifyAPIService.getTracksAnalysis("id"));
+    }
+
+    @Test
+    void shouldGetUserPlaylists() {
+        UserDTO userDTO = new UserDTO("testuser", "test@mail.com", "testuser", List.of(new Image()));
+        ResponsePlaylists responsePlaylists = new ResponsePlaylists("url", 2, List.of(
+                new Playlist(new SpotifyURL(), "id1", List.of(), "playlist1", new User()),
+                new Playlist(new SpotifyURL(), "id2", List.of(), "playlist2", new User()))
+        );
+        when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER.get()),
+                eq(HttpMethod.GET), any(), eq(UserDTO.class)))
+                .thenReturn(new ResponseEntity<>(userDTO, HttpStatus.OK));
+        when(restTemplate.exchange(eq(SpotifyAPI.USER_PLAYLISTS.get()
+                        .replace("user_id", "testuser")
+                        .replace("offset_num", "0")),
+                eq(HttpMethod.GET), any(), eq(ResponsePlaylists.class)))
+                .thenReturn(new ResponseEntity<>(responsePlaylists, HttpStatus.OK));
+        ResponsePlaylists returnPlaylists = spotifyAPIService.getUserPlaylists(0);
+        assertEquals(2, returnPlaylists.getPlaylists().size());
+        assertEquals(2, returnPlaylists.getTotal());
+        assertEquals("url", returnPlaylists.getNext());
+        assertEquals("id1", returnPlaylists.getPlaylists().get(0).getId());
+        assertEquals("id2", returnPlaylists.getPlaylists().get(1).getId());
+    }
+
+    @Test
+    void shouldGetUserPlaylistsEmptyBody() {
+        UserDTO userDTO = new UserDTO("testuser", "test@mail.com", "testuser", List.of(new Image()));
+        when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER.get()),
+                eq(HttpMethod.GET), any(), eq(UserDTO.class)))
+                .thenReturn(new ResponseEntity<>(userDTO, HttpStatus.OK));
+        when(restTemplate.exchange(eq(SpotifyAPI.USER_PLAYLISTS.get()
+                        .replace("user_id", "testuser")
+                        .replace("offset_num", "0")),
+                eq(HttpMethod.GET), any(), eq(ResponsePlaylists.class)))
+                .thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
+        assertThrows(SpotifyAPIEmptyResponseException.class,
+                () -> spotifyAPIService.getUserPlaylists(0));
     }
 
     @Test

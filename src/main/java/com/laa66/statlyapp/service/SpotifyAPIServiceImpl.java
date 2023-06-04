@@ -7,6 +7,8 @@ import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.SpotifyAPIEmptyResponseException;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
 import com.laa66.statlyapp.model.*;
+import com.laa66.statlyapp.model.response.ResponsePlaylists;
+import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ClassPathResource;
@@ -60,9 +62,20 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
 
     @Override
     public ResponseTracksAnalysis getTracksAnalysis(String tracksIds) {
-        String analysisUrl = SpotifyAPI.TRACKS_ANALYSIS.get() + tracksIds;
+        String url = SpotifyAPI.TRACKS_ANALYSIS.get() + tracksIds;
         ResponseTracksAnalysis body = restTemplate
-                .exchange(analysisUrl, HttpMethod.GET, null, ResponseTracksAnalysis.class).getBody();
+                .exchange(url, HttpMethod.GET, null, ResponseTracksAnalysis.class).getBody();
+        return Optional.ofNullable(body)
+                .orElseThrow(() -> new SpotifyAPIEmptyResponseException("Empty Spotify API response", HttpStatus.NO_CONTENT.value()));
+    }
+
+    @Override
+    public ResponsePlaylists getUserPlaylists(int offset) {
+        UserDTO user = getCurrentUser();
+        String url = SpotifyAPI.USER_PLAYLISTS.get()
+                .replace("user_id", user.getId())
+                .replace("offset_num", Integer.toString(offset));
+        ResponsePlaylists body = restTemplate.exchange(url, HttpMethod.GET, null, ResponsePlaylists.class).getBody();
         return Optional.ofNullable(body)
                 .orElseThrow(() -> new SpotifyAPIEmptyResponseException("Empty Spotify API response", HttpStatus.NO_CONTENT.value()));
     }

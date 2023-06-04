@@ -8,11 +8,22 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class ResponseTracksAnalysis {
-    @JsonProperty("audio_features")
-    private List<TrackAnalysis> tracksAnalysis;
+@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Playlist {
+
+    @JsonProperty("external_urls")
+    private SpotifyURL urls;
+
+    private String id;
+
+    private List<Image> images;
+
+    private String name;
+
+    @JsonProperty("owner")
+    private User user;
+
 }

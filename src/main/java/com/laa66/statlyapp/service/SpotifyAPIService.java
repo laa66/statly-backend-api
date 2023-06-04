@@ -1,7 +1,8 @@
 package com.laa66.statlyapp.service;
 
 import com.laa66.statlyapp.DTO.*;
-import com.laa66.statlyapp.model.ResponseTracksAnalysis;
+import com.laa66.statlyapp.model.response.ResponsePlaylists;
+import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
 
 public interface SpotifyAPIService {
 
@@ -12,6 +13,8 @@ public interface SpotifyAPIService {
     RecentlyPlayedDTO getRecentlyPlayed();
 
     ResponseTracksAnalysis getTracksAnalysis(String tracksIds);
+
+    ResponsePlaylists getUserPlaylists(int offset);
 
     UserDTO getCurrentUser();
 
