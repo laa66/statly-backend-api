@@ -69,7 +69,7 @@ class ApiControllerUnitTest {
 
     @Test
     void shouldGetTopTracksAuthenticated() throws Exception {
-        TopTracksDTO tracksDTO = new TopTracksDTO(List.of(new Track()), "1", "short", null);
+        TracksDTO tracksDTO = new TracksDTO(List.of(new Track()), "1", "short", null);
         when(spotifyAPIService.getTopTracks(1, "short")).thenReturn(tracksDTO);
         mockMvc.perform(get("/api/top/tracks").with(oauth2Login()
                                 .attributes(map -> map.put("userId", 1L)))
@@ -90,7 +90,7 @@ class ApiControllerUnitTest {
 
     @Test
     void shouldGetTopArtistsAuthenticated() throws Exception {
-        TopArtistsDTO artistsDTO = new TopArtistsDTO("1", List.of(new Artist()), "short", null);
+        ArtistsDTO artistsDTO = new ArtistsDTO("1", List.of(new Artist()), "short", null);
         when(spotifyAPIService.getTopArtists(1, "short")).thenReturn(artistsDTO);
         mockMvc.perform(get("/api/top/artists").with(oauth2Login()
                                 .attributes(map -> map.put("userId", 1L)))
@@ -111,8 +111,8 @@ class ApiControllerUnitTest {
 
     @Test
     void shouldGetTopGenresAuthenticated() throws Exception {
-        TopGenresDTO genresDTO = new TopGenresDTO(List.of(new Genre("rock", 2)), "short", null);
-        TopArtistsDTO artistsDTO = new TopArtistsDTO("1", List.of(new Artist()), "short", null);
+        GenresDTO genresDTO = new GenresDTO(List.of(new Genre("rock", 2)), "short", null);
+        ArtistsDTO artistsDTO = new ArtistsDTO("1", List.of(new Artist()), "short", null);
         when(spotifyAPIService.getTopArtists(1, "short")).thenReturn(artistsDTO);
         when(libraryAnalysisService.getTopGenres(1, "short", artistsDTO)).thenReturn(genresDTO);
         mockMvc.perform(get("/api/top/genres").with(oauth2Login()

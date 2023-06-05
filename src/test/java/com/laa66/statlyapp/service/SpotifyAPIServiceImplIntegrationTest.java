@@ -24,7 +24,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClientException;
@@ -36,7 +35,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServiceUnavailable;
@@ -103,14 +101,14 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @Test
     void shouldGetTopTracksResponseOk() throws JsonProcessingException {
-        TopTracksDTO data = new TopTracksDTO(List.of(new Track()),"1", "short", null);
+        TracksDTO data = new TracksDTO(List.of(new Track()),"1", "short", null);
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.TOP_TRACKS.get() + "short_term"))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(mapper.writeValueAsString(data)));
-        TopTracksDTO response = spotifyAPIService.getTopTracks(1, "short");
+        TracksDTO response = spotifyAPIService.getTopTracks(1, "short");
         mockServer.verify();
         assertEquals(data.getTracks().size(), response.getTracks().size());
         assertEquals(data.getTotal(), response.getTotal());
@@ -129,7 +127,7 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @Test
     void shouldGetTopArtistsResponseOk() throws JsonProcessingException {
-        TopArtistsDTO data = new TopArtistsDTO("1", new ArrayList<>(), "short", null);
+        ArtistsDTO data = new ArtistsDTO("1", new ArrayList<>(), "short", null);
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.TOP_ARTISTS.get() + "short_term"))
                 .andExpect(method(HttpMethod.GET))
@@ -137,7 +135,7 @@ class SpotifyAPIServiceImplIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(mapper.writeValueAsString(data)));
 
-        TopArtistsDTO response = spotifyAPIService.getTopArtists(1, "short");
+        ArtistsDTO response = spotifyAPIService.getTopArtists(1, "short");
         mockServer.verify();
         assertEquals(data.getTotal(), response.getTotal());
         assertEquals(data.getArtists().size(), response.getArtists().size());
@@ -264,9 +262,8 @@ class SpotifyAPIServiceImplIntegrationTest {
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(mapper.writeValueAsString(playlist)));
-        Playlist returnPlaylist = spotifyAPIService.getPlaylistTracks(playlistInfo, "ES");
+        TracksDTO returnPlaylist = spotifyAPIService.getPlaylistTracks(playlistInfo, "ES");
         mockServer.verify();
-        assertEquals(playlistInfo.getName(), returnPlaylist.getName());
         assertEquals(3, returnPlaylist.getTracks().size());
     }
 
@@ -289,7 +286,7 @@ class SpotifyAPIServiceImplIntegrationTest {
         UserDTO user = new UserDTO("1", "test@mail.com", "user", new ArrayList<>());
         Track track = new Track();
         track.setUri("trackId");
-        TopTracksDTO topTracks = new TopTracksDTO(List.of(track), "1", "short", null);
+        TracksDTO topTracks = new TracksDTO(List.of(track), "1", "short", null);
         PlaylistDTO playlist = new PlaylistDTO("1", new SpotifyURL());
         String data = "playlist";
 

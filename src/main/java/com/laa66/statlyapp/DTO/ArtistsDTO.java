@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @ToString
-public class TopArtistsDTO {
+public class ArtistsDTO {
 
     private String total;
 

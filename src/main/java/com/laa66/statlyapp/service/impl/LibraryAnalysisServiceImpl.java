@@ -1,9 +1,9 @@
 package com.laa66.statlyapp.service.impl;
 
 import com.laa66.statlyapp.DTO.LibraryAnalysisDTO;
-import com.laa66.statlyapp.DTO.TopArtistsDTO;
-import com.laa66.statlyapp.DTO.TopGenresDTO;
-import com.laa66.statlyapp.DTO.TopTracksDTO;
+import com.laa66.statlyapp.DTO.ArtistsDTO;
+import com.laa66.statlyapp.DTO.GenresDTO;
+import com.laa66.statlyapp.DTO.TracksDTO;
 import com.laa66.statlyapp.model.Genre;
 import com.laa66.statlyapp.model.Track;
 import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
@@ -26,7 +26,7 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
     private final SpotifyAPIService spotifyAPIService;
 
     @Override
-    public LibraryAnalysisDTO getLibraryAnalysis(TopTracksDTO tracksDTO) {
+    public LibraryAnalysisDTO getLibraryAnalysis(TracksDTO tracksDTO) {
         return Optional.ofNullable(tracksDTO).map(
                 tracks -> {
                     String tracksIds = getTracksIds(tracksDTO);
@@ -41,9 +41,9 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
 
     @Override
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
-    public TopGenresDTO getTopGenres(long userId, String range, TopArtistsDTO artistsDTO) {
+    public GenresDTO getTopGenres(long userId, String range, ArtistsDTO artistsDTO) {
         return Optional.ofNullable(artistsDTO)
-                .map(TopArtistsDTO::getArtists)
+                .map(ArtistsDTO::getArtists)
                 .map(topArtists -> {
                     List<Genre> sliceGenres = topArtists
                             .stream()
@@ -63,13 +63,13 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
                     List<Genre> transformedGenres = sliceGenres.stream()
                             .map(item -> new Genre(item.getGenre(), (int) ((item.getScore() / sum) * 100)))
                             .toList();
-                    return statsService.compareGenres(userId, new TopGenresDTO(transformedGenres, range, null));
+                    return statsService.compareGenres(userId, new GenresDTO(transformedGenres, range, null));
                 })
                 .orElseThrow(() -> new RuntimeException("Artists cannot be null"));
     }
 
     //helpers
-    private double getMainstreamScore(TopTracksDTO tracksDTO) {
+    private double getMainstreamScore(TracksDTO tracksDTO) {
         return tracksDTO.getTracks()
                 .stream()
                 .mapToInt(Track::getPopularity)
@@ -87,7 +87,7 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
                 .doubleValue();
     }
 
-    private String getTracksIds(TopTracksDTO tracksDTO) {
+    private String getTracksIds(TracksDTO tracksDTO) {
         return tracksDTO.getTracks()
                 .stream()
                 .map(Track::getId)

@@ -1,6 +1,7 @@
 package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.DTO.*;
+import com.laa66.statlyapp.model.response.ResponsePlaylists;
 import com.laa66.statlyapp.service.LibraryAnalysisService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import lombok.RequiredArgsConstructor;
@@ -19,24 +20,24 @@ public class ApiController {
     private final LibraryAnalysisService libraryAnalysisService;
 
     @GetMapping("/top/tracks")
-    public ResponseEntity<TopTracksDTO> tracks(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
+    public ResponseEntity<TracksDTO> tracks(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
         long userId = (long) principal.getAttributes().get("userId");
-        TopTracksDTO tracksDTO = spotifyApiService.getTopTracks(userId, range);
+        TracksDTO tracksDTO = spotifyApiService.getTopTracks(userId, range);
         return ResponseEntity.ok(tracksDTO);
     }
 
     @GetMapping("/top/artists")
-    public ResponseEntity<TopArtistsDTO> artists(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
+    public ResponseEntity<ArtistsDTO> artists(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
         long userId = (long) principal.getAttributes().get("userId");
-        TopArtistsDTO artistsDTO = spotifyApiService.getTopArtists(userId, range);
+        ArtistsDTO artistsDTO = spotifyApiService.getTopArtists(userId, range);
         return ResponseEntity.ok(artistsDTO);
     }
 
     @GetMapping("/top/genres")
-    public ResponseEntity<TopGenresDTO> genres(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
+    public ResponseEntity<GenresDTO> genres(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
         long userId = (long) principal.getAttributes().get("userId");
-        TopArtistsDTO artistsDTO = spotifyApiService.getTopArtists(userId, range);
-        TopGenresDTO genresDTO = libraryAnalysisService.getTopGenres(userId, range, artistsDTO);
+        ArtistsDTO artistsDTO = spotifyApiService.getTopArtists(userId, range);
+        GenresDTO genresDTO = libraryAnalysisService.getTopGenres(userId, range, artistsDTO);
         return ResponseEntity.ok(genresDTO);
     }
 

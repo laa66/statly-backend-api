@@ -1,9 +1,9 @@
 package com.laa66.statlyapp.task;
 
 import com.github.benmanes.caffeine.cache.Cache;
-import com.laa66.statlyapp.DTO.TopArtistsDTO;
-import com.laa66.statlyapp.DTO.TopGenresDTO;
-import com.laa66.statlyapp.DTO.TopTracksDTO;
+import com.laa66.statlyapp.DTO.ArtistsDTO;
+import com.laa66.statlyapp.DTO.GenresDTO;
+import com.laa66.statlyapp.DTO.TracksDTO;
 import com.laa66.statlyapp.service.StatsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,15 +27,15 @@ public class CacheTask {
         Optional.ofNullable((CaffeineCache) cacheManager.getCache("api"))
                 .ifPresentOrElse(caffeineCache -> {
                     Cache<Object, Object> nativeCache = caffeineCache.getNativeCache();
-                    Map<TopTracksDTO, Long> tracksDTOMap = new HashMap<>();
-                    Map<TopArtistsDTO, Long> artistsDTOMap = new HashMap<>();
-                    Map<TopGenresDTO, Long> genresDTOMap = new HashMap<>();
+                    Map<TracksDTO, Long> tracksDTOMap = new HashMap<>();
+                    Map<ArtistsDTO, Long> artistsDTOMap = new HashMap<>();
+                    Map<GenresDTO, Long> genresDTOMap = new HashMap<>();
                     nativeCache.asMap().forEach((key, value) -> {
                         String[] params = ((String) key).split("_");
                         switch (params[0]) {
-                            case "getTopTracks" -> tracksDTOMap.put(((TopTracksDTO) value), Long.valueOf(params[1]));
-                            case "getTopArtists" -> artistsDTOMap.put(((TopArtistsDTO) value), Long.valueOf(params[1]));
-                            case "getTopGenres" -> genresDTOMap.put(((TopGenresDTO) value), Long.valueOf(params[1]));
+                            case "getTopTracks" -> tracksDTOMap.put(((TracksDTO) value), Long.valueOf(params[1]));
+                            case "getTopArtists" -> artistsDTOMap.put(((ArtistsDTO) value), Long.valueOf(params[1]));
+                            case "getTopGenres" -> genresDTOMap.put(((GenresDTO) value), Long.valueOf(params[1]));
                         }
                     });
                     statsService.saveUserTracks(tracksDTOMap);

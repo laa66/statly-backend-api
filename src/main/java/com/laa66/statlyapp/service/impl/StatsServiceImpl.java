@@ -1,8 +1,8 @@
 package com.laa66.statlyapp.service.impl;
 
-import com.laa66.statlyapp.DTO.TopArtistsDTO;
-import com.laa66.statlyapp.DTO.TopGenresDTO;
-import com.laa66.statlyapp.DTO.TopTracksDTO;
+import com.laa66.statlyapp.DTO.ArtistsDTO;
+import com.laa66.statlyapp.DTO.GenresDTO;
+import com.laa66.statlyapp.DTO.TracksDTO;
 import com.laa66.statlyapp.entity.UserArtist;
 import com.laa66.statlyapp.entity.UserGenre;
 import com.laa66.statlyapp.entity.UserTrack;
@@ -34,7 +34,7 @@ public class StatsServiceImpl implements StatsService {
     private final GenreRepository genreRepository;
 
     @Override
-    public void saveUserTracks(Map<TopTracksDTO, Long> dtoMap) {
+    public void saveUserTracks(Map<TracksDTO, Long> dtoMap) {
         List<UserTrack> userTrackList = dtoMap.entrySet().stream().map(entry -> {
             AtomicInteger counter = new AtomicInteger(1);
             Map<String, Integer> tracks = entry.getKey()
@@ -51,7 +51,7 @@ public class StatsServiceImpl implements StatsService {
     }
 
     @Override
-    public void saveUserArtists(Map<TopArtistsDTO, Long> dtoMap) {
+    public void saveUserArtists(Map<ArtistsDTO, Long> dtoMap) {
         List<UserArtist> userArtistList = dtoMap.entrySet().stream().map(entry -> {
            AtomicInteger counter = new AtomicInteger(1);
            Map<String, Integer> artists = entry.getKey()
@@ -65,7 +65,7 @@ public class StatsServiceImpl implements StatsService {
     }
 
     @Override
-    public void saveUserGenres(Map<TopGenresDTO, Long> dtoMap) {
+    public void saveUserGenres(Map<GenresDTO, Long> dtoMap) {
         List<UserGenre> userGenreList = dtoMap.entrySet().stream().map(entry -> {
             Map<String, Integer> genres = entry.getKey()
                     .getGenres()
@@ -78,7 +78,7 @@ public class StatsServiceImpl implements StatsService {
     }
 
     @Override
-    public TopTracksDTO compareTracks(long userId, TopTracksDTO dto) {
+    public TracksDTO compareTracks(long userId, TracksDTO dto) {
         return trackRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, dto.getRange())
                 .map(item -> {
                     dto.withDate(item.getDate());
@@ -101,7 +101,7 @@ public class StatsServiceImpl implements StatsService {
     }
 
     @Override
-    public TopArtistsDTO compareArtists(long userId, TopArtistsDTO dto) {
+    public ArtistsDTO compareArtists(long userId, ArtistsDTO dto) {
         return artistRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, dto.getRange())
                 .map(item -> {
                     dto.withDate(item.getDate());
@@ -119,7 +119,7 @@ public class StatsServiceImpl implements StatsService {
     }
 
     @Override
-    public TopGenresDTO compareGenres(long userId, TopGenresDTO dto) {
+    public GenresDTO compareGenres(long userId, GenresDTO dto) {
         return genreRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, dto.getRange())
                 .map(item -> {
                     dto.withDate(item.getDate());

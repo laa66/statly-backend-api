@@ -19,6 +19,7 @@ public enum SpotifyAPI {
     PLAYLIST_RANGE_LONG("all-time");
 
     private final String text;
+
     SpotifyAPI(String text) {
         this.text = text;
     }

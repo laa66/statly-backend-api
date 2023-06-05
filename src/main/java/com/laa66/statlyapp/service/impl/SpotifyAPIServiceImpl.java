@@ -44,8 +44,8 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
 
     @Override
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
-    public TopTracksDTO getTopTracks(long userId, String range) {
-        TopTracksDTO body = restTemplate.exchange(SpotifyAPI.TOP_TRACKS.get() + range + "_term", HttpMethod.GET, null, TopTracksDTO.class).getBody();
+    public TracksDTO getTopTracks(long userId, String range) {
+        TracksDTO body = restTemplate.exchange(SpotifyAPI.TOP_TRACKS.get() + range + "_term", HttpMethod.GET, null, TracksDTO.class).getBody();
         return Optional.ofNullable(body).map(topTracksDTO -> {
             topTracksDTO.withRange(range);
             return statsService.compareTracks(userId, topTracksDTO);
@@ -54,8 +54,8 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
 
     @Override
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
-    public TopArtistsDTO getTopArtists(long userId, String range) {
-        TopArtistsDTO body = restTemplate.exchange(SpotifyAPI.TOP_ARTISTS.get() + range + "_term", HttpMethod.GET, null, TopArtistsDTO.class).getBody();
+    public ArtistsDTO getTopArtists(long userId, String range) {
+        ArtistsDTO body = restTemplate.exchange(SpotifyAPI.TOP_ARTISTS.get() + range + "_term", HttpMethod.GET, null, ArtistsDTO.class).getBody();
         return Optional.ofNullable(body).map(topArtistsDTO -> {
                     topArtistsDTO.withRange(range);
                     return statsService.compareArtists(userId, topArtistsDTO);
@@ -93,7 +93,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     }
 
     @Override
-    public Playlist getPlaylistTracks(PlaylistInfo playlistInfo, String country) {
+    public TracksDTO getPlaylistTracks(PlaylistInfo playlistInfo, String country) {
         String url = SpotifyAPI.PLAYLIST_TRACKS.get().replace("playlist_id", playlistInfo.getId()).replace("country_code", country);
         Playlist playlist = new Playlist(playlistInfo.getName(), null, new LinkedList<>());
         Playlist body;
@@ -104,7 +104,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
             url = body.getNext();
             playlist.addAll(body.getTracks());
         } while (body.getNext() != null);
-        return playlist;
+        return toTracksDTO(playlist);
     }
 
     @Override
@@ -174,5 +174,13 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
         headers.setContentType(MediaType.IMAGE_JPEG);
         restTemplate.exchange(SpotifyAPI.EDIT_PLAYLIST_IMAGE.get().replace("playlist_id", playlist.getId()), HttpMethod.PUT,
                 new HttpEntity<>(encodedImage, headers), Void.class);
+    }
+
+    private TracksDTO toTracksDTO(Playlist playlist) {
+        List<Track> tracks = playlist.getTracks()
+                .stream()
+                .map(PlaylistTrack::getTrack)
+                .toList();
+        return new TracksDTO(tracks, Integer.toString(tracks.size()), null, LocalDate.now());
     }
 }

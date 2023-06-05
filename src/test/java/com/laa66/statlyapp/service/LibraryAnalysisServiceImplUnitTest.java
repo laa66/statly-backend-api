@@ -1,9 +1,9 @@
 package com.laa66.statlyapp.service;
 
 import com.laa66.statlyapp.DTO.LibraryAnalysisDTO;
-import com.laa66.statlyapp.DTO.TopArtistsDTO;
-import com.laa66.statlyapp.DTO.TopGenresDTO;
-import com.laa66.statlyapp.DTO.TopTracksDTO;
+import com.laa66.statlyapp.DTO.ArtistsDTO;
+import com.laa66.statlyapp.DTO.GenresDTO;
+import com.laa66.statlyapp.DTO.TracksDTO;
 import com.laa66.statlyapp.model.*;
 import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
 import com.laa66.statlyapp.service.impl.LibraryAnalysisServiceImpl;
@@ -39,10 +39,10 @@ class LibraryAnalysisServiceImplUnitTest {
         artist1.setGenres(List.of("classic", "classic", "classic", "rock", "rock", "rock", "rock"));
         Artist artist2 = new Artist();
         artist2.setGenres(List.of("classic", "classic", "classic"));
-        TopArtistsDTO artistsDTO = new TopArtistsDTO("2", List.of(artist1, artist2), "long", null);
-        TopGenresDTO genresDTO = new TopGenresDTO(List.of(new Genre("classic", 60), new Genre("rock", 40)), "long", null);
+        ArtistsDTO artistsDTO = new ArtistsDTO("2", List.of(artist1, artist2), "long", null);
+        GenresDTO genresDTO = new GenresDTO(List.of(new Genre("classic", 60), new Genre("rock", 40)), "long", null);
         when(statsService.compareGenres(eq(1L), any())).thenReturn(genresDTO);
-        TopGenresDTO returnDto = libraryAnalysisService.getTopGenres(1, "long", artistsDTO);
+        GenresDTO returnDto = libraryAnalysisService.getTopGenres(1, "long", artistsDTO);
 
         assertEquals(2, returnDto.getGenres().size());
         assertEquals(60, returnDto.getGenres().get(0).getScore());
@@ -55,12 +55,12 @@ class LibraryAnalysisServiceImplUnitTest {
         assertThrows(RuntimeException.class,
                 () -> libraryAnalysisService.getTopGenres(1, "long", null));
         assertThrows(RuntimeException.class,
-                () -> libraryAnalysisService.getTopGenres(1, "long", new TopArtistsDTO("0", null, "long", LocalDate.now())));
+                () -> libraryAnalysisService.getTopGenres(1, "long", new ArtistsDTO("0", null, "long", LocalDate.now())));
     }
 
     @Test
     void shouldGetLibraryAnalysis() {
-        TopTracksDTO tracksDTO = new TopTracksDTO(List.of(
+        TracksDTO tracksDTO = new TracksDTO(List.of(
                 new Track(new Album(), List.of(), "name", 35, "uri", new SpotifyURL(), "id1", 0),
                 new Track(new Album(), List.of(), "name", 75, "uri", new SpotifyURL(), "id2", 0)
         ), "2", "long", LocalDate.now());

@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @ToString
-public class TopGenresDTO {
+public class GenresDTO {
 
     private List<Genre> genres;
     private String range;

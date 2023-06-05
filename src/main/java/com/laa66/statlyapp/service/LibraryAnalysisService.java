@@ -1,14 +1,14 @@
 package com.laa66.statlyapp.service;
 
 import com.laa66.statlyapp.DTO.LibraryAnalysisDTO;
-import com.laa66.statlyapp.DTO.TopArtistsDTO;
-import com.laa66.statlyapp.DTO.TopGenresDTO;
-import com.laa66.statlyapp.DTO.TopTracksDTO;
+import com.laa66.statlyapp.DTO.ArtistsDTO;
+import com.laa66.statlyapp.DTO.GenresDTO;
+import com.laa66.statlyapp.DTO.TracksDTO;
 
 public interface LibraryAnalysisService {
 
-    LibraryAnalysisDTO getLibraryAnalysis(TopTracksDTO tracksDTO);
+    LibraryAnalysisDTO getLibraryAnalysis(TracksDTO tracksDTO);
 
-    TopGenresDTO getTopGenres(long userId, String range, TopArtistsDTO artistsDTO);
+    GenresDTO getTopGenres(long userId, String range, ArtistsDTO artistsDTO);
 
 }

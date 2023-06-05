@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @ToString
-public class TopTracksDTO {
+public class TracksDTO {
 
     @JsonProperty("items")
     private List<Track> tracks;
