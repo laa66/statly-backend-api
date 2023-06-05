@@ -20,7 +20,7 @@ public class TopArtistsDTO {
     private String total;
 
     @JsonProperty("items")
-    private List<Artist> itemTopArtists;
+    private List<Artist> artists;
 
     private String range;
 

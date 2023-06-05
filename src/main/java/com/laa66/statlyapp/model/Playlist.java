@@ -9,21 +9,20 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class Playlist {
-
-    @JsonProperty("external_urls")
-    private SpotifyURL urls;
-
-    private String id;
-
-    private List<Image> images;
 
     private String name;
 
-    @JsonProperty("owner")
-    private User user;
+    private String next;
+
+    @JsonProperty("items")
+    private List<PlaylistTrack> tracks;
+
+    public void addAll(List<PlaylistTrack> playlistTracks) {
+        tracks.addAll(playlistTracks);
+    }
 
 }

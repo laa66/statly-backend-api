@@ -38,7 +38,7 @@ public class StatsServiceImpl implements StatsService {
         List<UserTrack> userTrackList = dtoMap.entrySet().stream().map(entry -> {
             AtomicInteger counter = new AtomicInteger(1);
             Map<String, Integer> tracks = entry.getKey()
-                    .getItemTopTracks()
+                    .getTracks()
                     .stream()
                     .collect(Collectors
                             .toMap(item -> {
@@ -55,7 +55,7 @@ public class StatsServiceImpl implements StatsService {
         List<UserArtist> userArtistList = dtoMap.entrySet().stream().map(entry -> {
            AtomicInteger counter = new AtomicInteger(1);
            Map<String, Integer> artists = entry.getKey()
-                   .getItemTopArtists()
+                   .getArtists()
                    .stream()
                    .collect(Collectors
                            .toMap(Artist::getName, s -> counter.getAndIncrement()));
@@ -82,9 +82,9 @@ public class StatsServiceImpl implements StatsService {
         return trackRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, dto.getRange())
                 .map(item -> {
                     dto.withDate(item.getDate());
-                    IntStream.range(0, dto.getItemTopTracks().size()).forEach(index -> {
+                    IntStream.range(0, dto.getTracks().size()).forEach(index -> {
                         try { //handled npe
-                            Track track = dto.getItemTopTracks().get(index);
+                            Track track = dto.getTracks().get(index);
                             String artist = track.getArtists().get(0).getName();
                             String name = track.getName();
                             int actualPosition = index + 1;
@@ -105,8 +105,8 @@ public class StatsServiceImpl implements StatsService {
         return artistRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, dto.getRange())
                 .map(item -> {
                     dto.withDate(item.getDate());
-                    IntStream.range(0, dto.getItemTopArtists().size()).forEach(index -> {
-                        Artist artist = dto.getItemTopArtists().get(index);
+                    IntStream.range(0, dto.getArtists().size()).forEach(index -> {
+                        Artist artist = dto.getArtists().get(index);
                         String name = artist.getName();
                         int actualPosition = index + 1;
                         Integer lastPosition = item.getArtists().getOrDefault(name, null);

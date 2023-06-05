@@ -61,7 +61,7 @@ class SpotifyAPIServiceImplUnitTest {
                 .thenReturn(new ResponseEntity<>(dto, HttpStatus.OK));
         when(statsService.compareTracks(1, dto)).thenReturn(dto);
         TopTracksDTO returnDto = spotifyAPIService.getTopTracks(1, "long");
-        assertEquals(dto.getItemTopTracks().size(), returnDto.getItemTopTracks().size());
+        assertEquals(dto.getTracks().size(), returnDto.getTracks().size());
         assertEquals(dto.getTotal(), returnDto.getTotal());
         assertEquals(dto.getRange(), returnDto.getRange());
     }
@@ -91,7 +91,7 @@ class SpotifyAPIServiceImplUnitTest {
                 .thenReturn(new ResponseEntity<>(dto, HttpStatus.OK));
         when(statsService.compareArtists(1, dto)).thenReturn(dto);
         TopArtistsDTO returnDto = spotifyAPIService.getTopArtists(1, "long");
-        assertEquals(dto.getItemTopArtists().size(), returnDto.getItemTopArtists().size());
+        assertEquals(dto.getArtists().size(), returnDto.getArtists().size());
         assertEquals(dto.getTotal(), returnDto.getTotal());
         assertEquals(dto.getRange(), returnDto.getRange());
     }
@@ -155,41 +155,125 @@ class SpotifyAPIServiceImplUnitTest {
     }
 
     @Test
-    void shouldGetUserPlaylists() {
-        UserDTO userDTO = new UserDTO("testuser", "test@mail.com", "testuser", List.of(new Image()));
-        ResponsePlaylists responsePlaylists = new ResponsePlaylists("url", 2, List.of(
-                new Playlist(new SpotifyURL(), "id1", List.of(), "playlist1", new User()),
-                new Playlist(new SpotifyURL(), "id2", List.of(), "playlist2", new User()))
+    void shouldGetUserPlaylistsUnder50() {
+        ResponsePlaylists responsePlaylists = new ResponsePlaylists(null, 2, List.of(
+                new PlaylistInfo(new SpotifyURL(), "id1", List.of(), "playlist1", new User()),
+                new PlaylistInfo(new SpotifyURL(), "id2", List.of(), "playlist2", new User()))
         );
-        when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER.get()),
-                eq(HttpMethod.GET), any(), eq(UserDTO.class)))
-                .thenReturn(new ResponseEntity<>(userDTO, HttpStatus.OK));
-        when(restTemplate.exchange(eq(SpotifyAPI.USER_PLAYLISTS.get()
-                        .replace("user_id", "testuser")
-                        .replace("offset_num", "0")),
+        when(restTemplate.exchange(eq(SpotifyAPI.USER_PLAYLISTS.get()),
                 eq(HttpMethod.GET), any(), eq(ResponsePlaylists.class)))
                 .thenReturn(new ResponseEntity<>(responsePlaylists, HttpStatus.OK));
-        ResponsePlaylists returnPlaylists = spotifyAPIService.getUserPlaylists(0);
+        ResponsePlaylists returnPlaylists = spotifyAPIService.getUserPlaylists();
         assertEquals(2, returnPlaylists.getPlaylists().size());
         assertEquals(2, returnPlaylists.getTotal());
-        assertEquals("url", returnPlaylists.getNext());
         assertEquals("id1", returnPlaylists.getPlaylists().get(0).getId());
         assertEquals("id2", returnPlaylists.getPlaylists().get(1).getId());
     }
 
     @Test
+    void shouldGetUserPlaylistsAbove50() {
+        ResponsePlaylists responsePlaylists1 = new ResponsePlaylists("next", 5, List.of(
+                new PlaylistInfo(new SpotifyURL(), "id1", List.of(), "playlist1", new User()),
+                new PlaylistInfo(new SpotifyURL(), "id2", List.of(), "playlist2", new User()))
+        );
+        ResponsePlaylists responsePlaylists2 = new ResponsePlaylists(null, 5, List.of(
+                new PlaylistInfo(new SpotifyURL(), "id3", List.of(), "playlist3", new User()),
+                new PlaylistInfo(new SpotifyURL(), "id4", List.of(), "playlist4", new User()),
+                new PlaylistInfo(new SpotifyURL(), "id5", List.of(), "playlist5", new User()))
+
+        );
+        when(restTemplate.exchange(eq(SpotifyAPI.USER_PLAYLISTS.get()),
+                eq(HttpMethod.GET), any(), eq(ResponsePlaylists.class)))
+                .thenReturn(new ResponseEntity<>(responsePlaylists1, HttpStatus.OK));
+        when(restTemplate.exchange(eq(responsePlaylists1.getNext()),
+                eq(HttpMethod.GET), any(), eq(ResponsePlaylists.class)))
+                .thenReturn(new ResponseEntity<>(responsePlaylists2, HttpStatus.OK));
+        ResponsePlaylists returnPlaylists = spotifyAPIService.getUserPlaylists();
+        assertEquals(5, returnPlaylists.getPlaylists().size());
+        assertEquals(5, returnPlaylists.getTotal());
+        assertEquals("id1", returnPlaylists.getPlaylists().get(0).getId());
+        assertEquals("id5", returnPlaylists.getPlaylists().get(4).getId());
+    }
+
+    @Test
     void shouldGetUserPlaylistsEmptyBody() {
-        UserDTO userDTO = new UserDTO("testuser", "test@mail.com", "testuser", List.of(new Image()));
-        when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER.get()),
-                eq(HttpMethod.GET), any(), eq(UserDTO.class)))
-                .thenReturn(new ResponseEntity<>(userDTO, HttpStatus.OK));
-        when(restTemplate.exchange(eq(SpotifyAPI.USER_PLAYLISTS.get()
-                        .replace("user_id", "testuser")
-                        .replace("offset_num", "0")),
+        when(restTemplate.exchange(eq(SpotifyAPI.USER_PLAYLISTS.get()),
                 eq(HttpMethod.GET), any(), eq(ResponsePlaylists.class)))
                 .thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
         assertThrows(SpotifyAPIEmptyResponseException.class,
-                () -> spotifyAPIService.getUserPlaylists(0));
+                () -> spotifyAPIService.getUserPlaylists());
+    }
+
+    @Test
+    void shouldGetPlaylistTracksUnder50() {
+        PlaylistInfo playlistInfo = new PlaylistInfo();
+        playlistInfo.setId("id");
+        playlistInfo.setName("playlist");
+        Playlist playlist = new Playlist("random", null, List.of(
+                new PlaylistTrack(), new PlaylistTrack(), new PlaylistTrack()
+        ));
+        when(restTemplate.exchange(eq(SpotifyAPI.PLAYLIST_TRACKS.get()
+                .replace("playlist_id", "id")
+                .replace("country_code", "ES")),
+                eq(HttpMethod.GET), any(), eq(Playlist.class)))
+                .thenReturn(new ResponseEntity<>(playlist, HttpStatus.OK));
+        Playlist returnPlaylist = spotifyAPIService.getPlaylistTracks(playlistInfo, "ES");
+        assertEquals(playlistInfo.getName(), returnPlaylist.getName());
+        assertEquals(3, returnPlaylist.getTracks().size());
+    }
+
+    @Test
+    void shouldGetPlaylistTracksAbove50() {
+        PlaylistInfo playlistInfo = new PlaylistInfo();
+        playlistInfo.setId("id");
+        playlistInfo.setName("playlist");
+        Playlist playlist1 = new Playlist("first",
+                SpotifyAPI.PLAYLIST_TRACKS.get() + "next", List.of(
+                new PlaylistTrack(), new PlaylistTrack(), new PlaylistTrack()
+        ));
+        Playlist playlist2 = new Playlist("second", null, List.of(
+                new PlaylistTrack(), new PlaylistTrack()
+        ));
+        when(restTemplate.exchange(eq(SpotifyAPI.PLAYLIST_TRACKS.get()
+                        .replace("playlist_id", "id")
+                        .replace("country_code", "ES")),
+                eq(HttpMethod.GET), any(), eq(Playlist.class)))
+                .thenReturn(new ResponseEntity<>(playlist1, HttpStatus.OK));
+        when(restTemplate.exchange(eq(SpotifyAPI.PLAYLIST_TRACKS.get() + "next"),
+                eq(HttpMethod.GET), any(), eq(Playlist.class)))
+                .thenReturn(new ResponseEntity<>(playlist2, HttpStatus.OK));
+
+        Playlist returnPlaylist = spotifyAPIService.getPlaylistTracks(playlistInfo, "ES");
+        assertEquals(playlistInfo.getName(), returnPlaylist.getName());
+        assertEquals(5, returnPlaylist.getTracks().size());
+    }
+
+    @Test
+    void shouldGetPlaylistTracksEmptyBody() {
+        PlaylistInfo playlistInfo = new PlaylistInfo();
+        playlistInfo.setId("id");
+        playlistInfo.setName("playlist");
+        when(restTemplate.exchange(eq(SpotifyAPI.PLAYLIST_TRACKS.get()
+                        .replace("playlist_id", playlistInfo.getId())
+                        .replace("country_code", "ES")),
+                eq(HttpMethod.GET), any(), eq(Playlist.class)))
+                .thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
+        assertThrows(SpotifyAPIEmptyResponseException.class,
+                () -> spotifyAPIService.getPlaylistTracks(playlistInfo, "ES"));
+    }
+
+    @Test
+    void shouldGetPlaylistTracksWrongCountryCode() {
+        PlaylistInfo playlistInfo = new PlaylistInfo();
+        playlistInfo.setId("id");
+        playlistInfo.setName("playlist");
+        when(restTemplate.exchange(eq(SpotifyAPI.PLAYLIST_TRACKS.get()
+                        .replace("playlist_id", "id")
+                        .replace("country_code", "123")),
+                eq(HttpMethod.GET), any(), eq(Playlist.class)))
+                .thenReturn(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+        assertThrows(SpotifyAPIException.class,
+                () -> spotifyAPIService.getPlaylistTracks(playlistInfo, "123"));
     }
 
     @Test

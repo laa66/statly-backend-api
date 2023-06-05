@@ -94,11 +94,11 @@ public class StatsServiceImplUnitTest {
         assertNotNull(returnDto);
         assertEquals(dto.getRange(), returnDto.getRange());
         assertEquals(dto.getTotal(), returnDto.getTotal());
-        assertEquals(dto.getItemTopTracks().size(), returnDto.getItemTopTracks().size());
-        assertEquals(dto.getItemTopTracks().get(0).getName(), returnDto.getItemTopTracks().get(0).getName());
-        assertEquals(dto.getItemTopTracks().get(1).getName(), returnDto.getItemTopTracks().get(1).getName());
-        assertEquals(1, returnDto.getItemTopTracks().get(0).getDifference(), "Artist1 was on second place and now should be at first place");
-        assertEquals(-1, returnDto.getItemTopTracks().get(1).getDifference(), "Artist2 was on first place and now should be at second place");
+        assertEquals(dto.getTracks().size(), returnDto.getTracks().size());
+        assertEquals(dto.getTracks().get(0).getName(), returnDto.getTracks().get(0).getName());
+        assertEquals(dto.getTracks().get(1).getName(), returnDto.getTracks().get(1).getName());
+        assertEquals(1, returnDto.getTracks().get(0).getDifference(), "Artist1 was on second place and now should be at first place");
+        assertEquals(-1, returnDto.getTracks().get(1).getDifference(), "Artist2 was on first place and now should be at second place");
         assertEquals(track.getDate(), returnDto.getDate());
     }
 
@@ -118,11 +118,11 @@ public class StatsServiceImplUnitTest {
         assertNotNull(returnDto);
         assertEquals(dto.getRange(), returnDto.getRange());
         assertEquals(dto.getTotal(), returnDto.getTotal());
-        assertEquals(dto.getItemTopTracks().size(), returnDto.getItemTopTracks().size());
-        assertEquals(dto.getItemTopTracks().get(0).getName(), returnDto.getItemTopTracks().get(0).getName());
-        assertEquals(dto.getItemTopTracks().get(1).getName(), returnDto.getItemTopTracks().get(1).getName());
-        assertEquals(0, returnDto.getItemTopTracks().get(0).getDifference());
-        assertEquals(0, returnDto.getItemTopTracks().get(1).getDifference());
+        assertEquals(dto.getTracks().size(), returnDto.getTracks().size());
+        assertEquals(dto.getTracks().get(0).getName(), returnDto.getTracks().get(0).getName());
+        assertEquals(dto.getTracks().get(1).getName(), returnDto.getTracks().get(1).getName());
+        assertEquals(0, returnDto.getTracks().get(0).getDifference());
+        assertEquals(0, returnDto.getTracks().get(1).getDifference());
         assertEquals(track.getDate(), returnDto.getDate());
     }
 
@@ -142,11 +142,11 @@ public class StatsServiceImplUnitTest {
         assertNotNull(returnDto);
         assertEquals(dto.getRange(), returnDto.getRange());
         assertEquals(dto.getTotal(), returnDto.getTotal());
-        assertEquals(dto.getItemTopTracks().size(), returnDto.getItemTopTracks().size());
-        assertEquals(dto.getItemTopTracks().get(0).getName(), returnDto.getItemTopTracks().get(0).getName());
-        assertEquals(dto.getItemTopTracks().get(1).getName(), returnDto.getItemTopTracks().get(1).getName());
-        assertEquals(dto.getItemTopTracks().get(0).getDifference(), returnDto.getItemTopTracks().get(0).getDifference());
-        assertEquals(dto.getItemTopTracks().get(1).getDifference(), returnDto.getItemTopTracks().get(1).getDifference());
+        assertEquals(dto.getTracks().size(), returnDto.getTracks().size());
+        assertEquals(dto.getTracks().get(0).getName(), returnDto.getTracks().get(0).getName());
+        assertEquals(dto.getTracks().get(1).getName(), returnDto.getTracks().get(1).getName());
+        assertEquals(dto.getTracks().get(0).getDifference(), returnDto.getTracks().get(0).getDifference());
+        assertEquals(dto.getTracks().get(1).getDifference(), returnDto.getTracks().get(1).getDifference());
         assertNull(returnDto.getDate());
     }
 
@@ -166,11 +166,11 @@ public class StatsServiceImplUnitTest {
         assertNotNull(returnDto);
         assertEquals(dto.getRange(), returnDto.getRange());
         assertEquals(dto.getTotal(), returnDto.getTotal());
-        assertEquals(dto.getItemTopTracks().size(), returnDto.getItemTopTracks().size());
-        assertEquals(dto.getItemTopTracks().get(0).getName(), returnDto.getItemTopTracks().get(0).getName());
-        assertEquals(dto.getItemTopTracks().get(1).getName(), returnDto.getItemTopTracks().get(1).getName());
-        assertEquals(dto.getItemTopTracks().get(0).getDifference(), returnDto.getItemTopTracks().get(0).getDifference());
-        assertEquals(dto.getItemTopTracks().get(1).getDifference(), returnDto.getItemTopTracks().get(1).getDifference());
+        assertEquals(dto.getTracks().size(), returnDto.getTracks().size());
+        assertEquals(dto.getTracks().get(0).getName(), returnDto.getTracks().get(0).getName());
+        assertEquals(dto.getTracks().get(1).getName(), returnDto.getTracks().get(1).getName());
+        assertEquals(dto.getTracks().get(0).getDifference(), returnDto.getTracks().get(0).getDifference());
+        assertEquals(dto.getTracks().get(1).getDifference(), returnDto.getTracks().get(1).getDifference());
         assertNull(returnDto.getDate());
     }
 
@@ -190,11 +190,11 @@ public class StatsServiceImplUnitTest {
         assertNotNull(returnDto);
         assertEquals(dto.getRange(), returnDto.getRange());
         assertEquals(dto.getTotal(), returnDto.getTotal());
-        assertEquals(dto.getItemTopArtists().size(), returnDto.getItemTopArtists().size());
-        assertEquals(dto.getItemTopArtists().get(0).getName(), returnDto.getItemTopArtists().get(0).getName());
-        assertEquals(dto.getItemTopArtists().get(1).getName(), returnDto.getItemTopArtists().get(1).getName());
-        assertEquals(1, returnDto.getItemTopArtists().get(0).getDifference(), "Artist1 was on second place and now should be at first place");
-        assertEquals(-1, returnDto.getItemTopArtists().get(1).getDifference(), "Artist2 was on first place and now should be at second place");
+        assertEquals(dto.getArtists().size(), returnDto.getArtists().size());
+        assertEquals(dto.getArtists().get(0).getName(), returnDto.getArtists().get(0).getName());
+        assertEquals(dto.getArtists().get(1).getName(), returnDto.getArtists().get(1).getName());
+        assertEquals(1, returnDto.getArtists().get(0).getDifference(), "Artist1 was on second place and now should be at first place");
+        assertEquals(-1, returnDto.getArtists().get(1).getDifference(), "Artist2 was on first place and now should be at second place");
         assertEquals(artist.getDate(), returnDto.getDate());
     }
 
@@ -211,11 +211,11 @@ public class StatsServiceImplUnitTest {
         assertNotNull(returnDto);
         assertEquals(dto.getRange(), returnDto.getRange());
         assertEquals(dto.getTotal(), returnDto.getTotal());
-        assertEquals(dto.getItemTopArtists().size(), returnDto.getItemTopArtists().size());
-        assertEquals(dto.getItemTopArtists().get(0).getName(), returnDto.getItemTopArtists().get(0).getName());
-        assertEquals(dto.getItemTopArtists().get(1).getName(), returnDto.getItemTopArtists().get(1).getName());
-        assertEquals(dto.getItemTopArtists().get(0).getDifference(), returnDto.getItemTopArtists().get(0).getDifference());
-        assertEquals(dto.getItemTopArtists().get(1).getDifference(), returnDto.getItemTopArtists().get(1).getDifference());
+        assertEquals(dto.getArtists().size(), returnDto.getArtists().size());
+        assertEquals(dto.getArtists().get(0).getName(), returnDto.getArtists().get(0).getName());
+        assertEquals(dto.getArtists().get(1).getName(), returnDto.getArtists().get(1).getName());
+        assertEquals(dto.getArtists().get(0).getDifference(), returnDto.getArtists().get(0).getDifference());
+        assertEquals(dto.getArtists().get(1).getDifference(), returnDto.getArtists().get(1).getDifference());
         assertNull(returnDto.getDate());
     }
 
@@ -232,11 +232,11 @@ public class StatsServiceImplUnitTest {
         assertNotNull(returnDto);
         assertEquals(dto.getRange(), returnDto.getRange());
         assertEquals(dto.getTotal(), returnDto.getTotal());
-        assertEquals(dto.getItemTopArtists().size(), returnDto.getItemTopArtists().size());
-        assertEquals(dto.getItemTopArtists().get(0).getName(), returnDto.getItemTopArtists().get(0).getName());
-        assertEquals(dto.getItemTopArtists().get(1).getName(), returnDto.getItemTopArtists().get(1).getName());
-        assertEquals(dto.getItemTopArtists().get(0).getDifference(), returnDto.getItemTopArtists().get(0).getDifference());
-        assertEquals(dto.getItemTopArtists().get(1).getDifference(), returnDto.getItemTopArtists().get(1).getDifference());
+        assertEquals(dto.getArtists().size(), returnDto.getArtists().size());
+        assertEquals(dto.getArtists().get(0).getName(), returnDto.getArtists().get(0).getName());
+        assertEquals(dto.getArtists().get(1).getName(), returnDto.getArtists().get(1).getName());
+        assertEquals(dto.getArtists().get(0).getDifference(), returnDto.getArtists().get(0).getDifference());
+        assertEquals(dto.getArtists().get(1).getDifference(), returnDto.getArtists().get(1).getDifference());
         assertNull(returnDto.getDate());
     }
 

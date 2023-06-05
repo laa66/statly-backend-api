@@ -18,7 +18,7 @@ import java.util.List;
 public class TopTracksDTO {
 
     @JsonProperty("items")
-    private List<Track> itemTopTracks;
+    private List<Track> tracks;
 
     private String total;
 

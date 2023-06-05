@@ -26,9 +26,13 @@ import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public class SpotifyAPIServiceImpl implements SpotifyAPIService {
+
+    private static final Supplier<SpotifyAPIEmptyResponseException> SPOTIFY_API_EMPTY_RESPONSE_EXCEPTION_SUPPLIER =
+            () -> new SpotifyAPIEmptyResponseException("Empty Spotify API response", HttpStatus.NO_CONTENT.value());
 
     private final RestTemplate restTemplate;
     private final StatsService statsService;
@@ -45,7 +49,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
         return Optional.ofNullable(body).map(topTracksDTO -> {
             topTracksDTO.withRange(range);
             return statsService.compareTracks(userId, topTracksDTO);
-        }).orElseThrow(() -> new SpotifyAPIEmptyResponseException("Empty Spotify API response", HttpStatus.NO_CONTENT.value()));
+        }).orElseThrow(SPOTIFY_API_EMPTY_RESPONSE_EXCEPTION_SUPPLIER);
     }
 
     @Override
@@ -55,7 +59,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
         return Optional.ofNullable(body).map(topArtistsDTO -> {
                     topArtistsDTO.withRange(range);
                     return statsService.compareArtists(userId, topArtistsDTO);
-        }).orElseThrow(() ->  new SpotifyAPIEmptyResponseException("Empty Spotify API response", HttpStatus.NO_CONTENT.value()));
+        }).orElseThrow(SPOTIFY_API_EMPTY_RESPONSE_EXCEPTION_SUPPLIER);
     }
 
     @Override
@@ -69,18 +73,38 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
         ResponseTracksAnalysis body = restTemplate
                 .exchange(url, HttpMethod.GET, null, ResponseTracksAnalysis.class).getBody();
         return Optional.ofNullable(body)
-                .orElseThrow(() -> new SpotifyAPIEmptyResponseException("Empty Spotify API response", HttpStatus.NO_CONTENT.value()));
+                .orElseThrow(SPOTIFY_API_EMPTY_RESPONSE_EXCEPTION_SUPPLIER);
     }
 
     @Override
-    public ResponsePlaylists getUserPlaylists(int offset) {
-        UserDTO user = getCurrentUser();
-        String url = SpotifyAPI.USER_PLAYLISTS.get()
-                .replace("user_id", user.getId())
-                .replace("offset_num", Integer.toString(offset));
-        ResponsePlaylists body = restTemplate.exchange(url, HttpMethod.GET, null, ResponsePlaylists.class).getBody();
-        return Optional.ofNullable(body)
-                .orElseThrow(() -> new SpotifyAPIEmptyResponseException("Empty Spotify API response", HttpStatus.NO_CONTENT.value()));
+    public ResponsePlaylists getUserPlaylists() {
+        String url = SpotifyAPI.USER_PLAYLISTS.get();
+        ResponsePlaylists responsePlaylists = new ResponsePlaylists(null, 0, new LinkedList<>());
+        ResponsePlaylists body;
+        do {
+            body = Optional
+                    .ofNullable(restTemplate.exchange(url, HttpMethod.GET, null, ResponsePlaylists.class).getBody())
+                    .orElseThrow(SPOTIFY_API_EMPTY_RESPONSE_EXCEPTION_SUPPLIER);
+            url = body.getNext();
+            responsePlaylists.addAll(body.getPlaylists());
+        } while (body.getNext() != null);
+        responsePlaylists.setTotal(body.getTotal());
+        return responsePlaylists;
+    }
+
+    @Override
+    public Playlist getPlaylistTracks(PlaylistInfo playlistInfo, String country) {
+        String url = SpotifyAPI.PLAYLIST_TRACKS.get().replace("playlist_id", playlistInfo.getId()).replace("country_code", country);
+        Playlist playlist = new Playlist(playlistInfo.getName(), null, new LinkedList<>());
+        Playlist body;
+        do {
+            body = Optional
+                    .ofNullable(restTemplate.exchange(url, HttpMethod.GET, null, Playlist.class).getBody())
+                    .orElseThrow(SPOTIFY_API_EMPTY_RESPONSE_EXCEPTION_SUPPLIER);
+            url = body.getNext();
+            playlist.addAll(body.getTracks());
+        } while (body.getNext() != null);
+        return playlist;
     }
 
     @Override
@@ -94,7 +118,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
             default -> throw new SpotifyAPIException("Wrong data range", HttpStatus.BAD_REQUEST.value());
         }
         PlaylistDTO playlist = postEmptyPlaylist(user, playlistRange);
-        List<String> uris = getTopTracks(userId, range).getItemTopTracks()
+        List<String> uris = getTopTracks(userId, range).getTracks()
                 .stream()
                 .map(Track::getUri)
                 .toList();
@@ -121,7 +145,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         PlaylistDTO playlist = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(body, headers), PlaylistDTO.class).getBody();
         return Optional.ofNullable(playlist)
-                .orElseThrow(() -> new SpotifyAPIEmptyResponseException("Empty Spotify API response", HttpStatus.NO_CONTENT.value()));
+                .orElseThrow(SPOTIFY_API_EMPTY_RESPONSE_EXCEPTION_SUPPLIER);
     }
 
     private void postTracksToPlaylist(PlaylistDTO playlist, List<String> uris) {

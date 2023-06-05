@@ -43,7 +43,7 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
     public TopGenresDTO getTopGenres(long userId, String range, TopArtistsDTO artistsDTO) {
         return Optional.ofNullable(artistsDTO)
-                .map(TopArtistsDTO::getItemTopArtists)
+                .map(TopArtistsDTO::getArtists)
                 .map(topArtists -> {
                     List<Genre> sliceGenres = topArtists
                             .stream()
@@ -70,7 +70,7 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
 
     //helpers
     private double getMainstreamScore(TopTracksDTO tracksDTO) {
-        return tracksDTO.getItemTopTracks()
+        return tracksDTO.getTracks()
                 .stream()
                 .mapToInt(Track::getPopularity)
                 .average()
@@ -88,7 +88,7 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
     }
 
     private String getTracksIds(TopTracksDTO tracksDTO) {
-        return tracksDTO.getItemTopTracks()
+        return tracksDTO.getTracks()
                 .stream()
                 .map(Track::getId)
                 .collect(Collectors.joining(","));

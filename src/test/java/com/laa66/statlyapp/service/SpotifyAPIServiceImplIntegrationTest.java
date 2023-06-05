@@ -24,6 +24,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClientException;
@@ -35,6 +36,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServiceUnavailable;
@@ -110,7 +112,7 @@ class SpotifyAPIServiceImplIntegrationTest {
                         .body(mapper.writeValueAsString(data)));
         TopTracksDTO response = spotifyAPIService.getTopTracks(1, "short");
         mockServer.verify();
-        assertEquals(data.getItemTopTracks().size(), response.getItemTopTracks().size());
+        assertEquals(data.getTracks().size(), response.getTracks().size());
         assertEquals(data.getTotal(), response.getTotal());
         assertEquals(data.getRange(), response.getRange());
     }
@@ -138,7 +140,7 @@ class SpotifyAPIServiceImplIntegrationTest {
         TopArtistsDTO response = spotifyAPIService.getTopArtists(1, "short");
         mockServer.verify();
         assertEquals(data.getTotal(), response.getTotal());
-        assertEquals(data.getItemTopArtists().size(), response.getItemTopArtists().size());
+        assertEquals(data.getArtists().size(), response.getArtists().size());
         assertEquals(data.getRange(), response.getRange());
     }
 
@@ -218,51 +220,68 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @Test
     void shouldGetUserPlaylistsResponseOk() throws JsonProcessingException {
-        UserDTO userDTO = new UserDTO("testuser", "test@mail.com", "testuser", List.of(new Image()));
-        ResponsePlaylists responsePlaylists = new ResponsePlaylists("url", 2, List.of(
-                new Playlist(new SpotifyURL(), "id1", List.of(), "playlist1", new User()),
-                new Playlist(new SpotifyURL(), "id2", List.of(), "playlist2", new User()))
+        ResponsePlaylists responsePlaylists = new ResponsePlaylists(null, 2, List.of(
+                new PlaylistInfo(new SpotifyURL(), "id1", List.of(), "playlist1", new User()),
+                new PlaylistInfo(new SpotifyURL(), "id2", List.of(), "playlist2", new User()))
         );
         mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.CURRENT_USER.get()))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.OK)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(mapper.writeValueAsString(userDTO)));
-
-        mockServer.expect(ExpectedCount.once(),
-                requestTo(SpotifyAPI.USER_PLAYLISTS.get()
-                        .replace("user_id", "testuser")
-                        .replace("offset_num", "0")))
+                requestTo(SpotifyAPI.USER_PLAYLISTS.get()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(mapper.writeValueAsString(responsePlaylists)));
-        ResponsePlaylists returnPlaylists = spotifyAPIService.getUserPlaylists(0);
+        ResponsePlaylists returnPlaylists = spotifyAPIService.getUserPlaylists();
         mockServer.verify();
         assertEquals(2, returnPlaylists.getPlaylists().size());
         assertEquals(2, returnPlaylists.getTotal());
-        assertEquals("url", returnPlaylists.getNext());
+        assertNull(returnPlaylists.getNext());
         assertEquals("id1", returnPlaylists.getPlaylists().get(0).getId());
         assertEquals("id2", returnPlaylists.getPlaylists().get(1).getId());
     }
 
     @Test
-    void shouldGetUserPlaylistsResponseError() throws JsonProcessingException {
-        UserDTO userDTO = new UserDTO("testuser", "test@mail.com", "testuser", List.of(new Image()));
+    void shouldGetUserPlaylistsResponseError() {
         mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.CURRENT_USER.get()))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.OK)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(mapper.writeValueAsString(userDTO)));
-        mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.USER_PLAYLISTS.get()
-                                .replace("user_id", "testuser")
-                                .replace("offset_num", "0")))
+                        requestTo(SpotifyAPI.USER_PLAYLISTS.get()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withServiceUnavailable());
-        assertThrows(RestClientException.class, () -> spotifyAPIService.getUserPlaylists(0));
+        assertThrows(RestClientException.class, () -> spotifyAPIService.getUserPlaylists());
+        mockServer.verify();
+    }
+
+    @Test
+    void shouldGetPlaylistTracksResponseOk() throws JsonProcessingException {
+        PlaylistInfo playlistInfo = new PlaylistInfo();
+        playlistInfo.setId("id");
+        playlistInfo.setName("playlist");
+        Playlist playlist = new Playlist("random", null, List.of(
+                new PlaylistTrack(), new PlaylistTrack(), new PlaylistTrack()
+        ));
+        mockServer.expect(ExpectedCount.once(),
+                requestTo(SpotifyAPI.PLAYLIST_TRACKS.get()
+                        .replace("playlist_id", "id")
+                        .replace("country_code", "ES")))
+                .andRespond(withStatus(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(playlist)));
+        Playlist returnPlaylist = spotifyAPIService.getPlaylistTracks(playlistInfo, "ES");
+        mockServer.verify();
+        assertEquals(playlistInfo.getName(), returnPlaylist.getName());
+        assertEquals(3, returnPlaylist.getTracks().size());
+    }
+
+    @Test
+    void shouldGetPlaylistTracksResponseError() {
+        PlaylistInfo playlistInfo = new PlaylistInfo();
+        playlistInfo.setId("id");
+        playlistInfo.setName("playlist");
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(SpotifyAPI.PLAYLIST_TRACKS.get()
+                                .replace("playlist_id", "id")
+                                .replace("country_code", "ES")))
+                .andRespond(withServiceUnavailable());
+        assertThrows(RestClientException.class, () -> spotifyAPIService.getPlaylistTracks(playlistInfo, "ES"));
+        mockServer.verify();
     }
 
     @Test

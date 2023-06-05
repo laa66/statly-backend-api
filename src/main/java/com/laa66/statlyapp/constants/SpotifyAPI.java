@@ -11,14 +11,14 @@ public enum SpotifyAPI {
     ADD_PLAYLIST_TRACK("https://api.spotify.com/v1/playlists/playlist_id/tracks"),
     EDIT_PLAYLIST_IMAGE("https://api.spotify.com/v1/playlists/playlist_id/images"),
     TRACKS_ANALYSIS("https://api.spotify.com/v1/audio-features?ids="),
-    USER_PLAYLISTS("https://api.spotify.com/v1/users/user_id/playlists?offset=offset_num&limit=50"),
+    USER_PLAYLISTS("https://api.spotify.com/v1/me/playlists?limit=50"),
+    PLAYLIST_TRACKS("https://api.spotify.com/v1/playlists/playlist_id/tracks?limit=50&market=country_code"),
 
     PLAYLIST_RANGE_SHORT("last 4 weeks"),
     PLAYLIST_RANGE_MEDIUM("last 6 months"),
     PLAYLIST_RANGE_LONG("all-time");
 
     private final String text;
-
     SpotifyAPI(String text) {
         this.text = text;
     }
