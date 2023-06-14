@@ -54,4 +54,10 @@ public class ApiController {
         PlaylistDTO playlistDTO = spotifyApiService.postTopTracksPlaylist(userId, range);
         return ResponseEntity.status(HttpStatus.CREATED).body(playlistDTO);
     }
+
+    @GetMapping("/playlist/all")
+    public ResponseEntity<ResponsePlaylists> getPlaylists() {
+        ResponsePlaylists playlist = spotifyApiService.getUserPlaylists();
+        return ResponseEntity.ok(playlist);
+    }
 }

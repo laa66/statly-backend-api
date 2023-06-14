@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.config.TestSecurityConfig;
 import com.laa66.statlyapp.model.*;
+import com.laa66.statlyapp.model.response.ResponsePlaylists;
 import com.laa66.statlyapp.repository.*;
 import com.laa66.statlyapp.service.LibraryAnalysisService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
@@ -156,8 +157,8 @@ class ApiControllerUnitTest {
         PlaylistDTO playlistDTO = new PlaylistDTO("1", new SpotifyURL());
         when(spotifyAPIService.postTopTracksPlaylist(1, "short"))
                 .thenReturn(playlistDTO);
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/playlist/create").with(oauth2Login()
-                                .attributes(map -> map.put("userId", 1L)))
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/playlist/create")
+                        .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
                         .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("range", "short"))
@@ -171,6 +172,32 @@ class ApiControllerUnitTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/playlist/create").with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("range", "short"))
+                .andExpect(status().isFound());
+    }
+
+    @Test
+    void shouldGetAllPlaylistsAuthenticated() throws Exception {
+        ResponsePlaylists playlists = new ResponsePlaylists(
+                null,
+                1,
+                List.of(new PlaylistInfo(new SpotifyURL(), "id", List.of(), "playlist", new User())));
+        when(spotifyAPIService.getUserPlaylists())
+                .thenReturn(playlists);
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/playlist/all")
+                .with(oauth2Login())
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.next").doesNotExist())
+                .andExpect(jsonPath("$.total", is(1)))
+                .andExpect(jsonPath("$.items").exists());
+    }
+
+    @Test
+    void shouldGetAllPlaylistsNotAuthenticated() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/playlist/all")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isFound());
     }
 }

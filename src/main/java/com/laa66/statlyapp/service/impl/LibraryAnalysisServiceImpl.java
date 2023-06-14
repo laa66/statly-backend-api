@@ -5,6 +5,7 @@ import com.laa66.statlyapp.DTO.ArtistsDTO;
 import com.laa66.statlyapp.DTO.GenresDTO;
 import com.laa66.statlyapp.DTO.TracksDTO;
 import com.laa66.statlyapp.model.Genre;
+import com.laa66.statlyapp.model.Image;
 import com.laa66.statlyapp.model.Track;
 import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
 import com.laa66.statlyapp.service.LibraryAnalysisService;
@@ -34,7 +35,13 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
                     Map<String, Double> mapAnalysis = mapAnalysis(tracksAnalysis);
                     addToMap(mapAnalysis, "mainstream", getMainstreamScore(tracksDTO));
                     addToMap(mapAnalysis, "boringness", getBoringness(mapAnalysis));
-                    return new LibraryAnalysisDTO(mapAnalysis);
+                    List<Image> images = tracks.getTracks().stream()
+                            .map(track -> Optional
+                                    .ofNullable(track.getAlbum().getImages().get(0))
+                                    .orElseThrow(() -> new RuntimeException("Image cannot be null")))
+                            .limit(22)
+                            .toList();
+                    return new LibraryAnalysisDTO(mapAnalysis, images);
                 }
         ).orElseThrow(() -> new RuntimeException("Tracks cannot be null"));
     }
@@ -112,15 +119,15 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
                 }
         );
 
-        analyzedTracks.forEach((key, value) -> {
-            double avg = value / trackCount;
-            analyzedTracks.put(key, new BigDecimal(Double
-                            .toString(avg))
-                            .setScale(2, RoundingMode.HALF_UP)
-                            .doubleValue());
-        });
-
-        return analyzedTracks;
+        return analyzedTracks.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        value -> new BigDecimal(Double
+                                .toString((value.getValue() / trackCount)))
+                                .setScale(2, RoundingMode.HALF_UP)
+                                .doubleValue(),
+                        (first, conflict) -> first,
+                        LinkedHashMap::new));
     }
 
     private void addToMap(Map<String, Double> map, String key, double value) {

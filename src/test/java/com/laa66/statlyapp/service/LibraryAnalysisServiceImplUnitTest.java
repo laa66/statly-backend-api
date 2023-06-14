@@ -61,8 +61,8 @@ class LibraryAnalysisServiceImplUnitTest {
     @Test
     void shouldGetLibraryAnalysis() {
         TracksDTO tracksDTO = new TracksDTO(List.of(
-                new Track(new Album(), List.of(), "name", 35, "uri", new SpotifyURL(), "id1", 0),
-                new Track(new Album(), List.of(), "name", 75, "uri", new SpotifyURL(), "id2", 0)
+                new Track(new Album(List.of(new Image()), "album1", List.of()), List.of(), "name", 35, "uri", new SpotifyURL(), "id1", 0),
+                new Track(new Album(List.of(new Image(), new Image()), "album2", List.of()), List.of(), "name", 75, "uri", new SpotifyURL(), "id2", 0)
         ), "2", "long", LocalDate.now());
         ResponseTracksAnalysis tracksAnalysis = new ResponseTracksAnalysis(List.of(
                 new TrackAnalysis(0.6, 0.5, 0.15, 0.23, 0.8, -6.0, 0.22, 120.0, 0.5),
@@ -84,6 +84,7 @@ class LibraryAnalysisServiceImplUnitTest {
         assertEquals(0.66, analysisDTO.getLibraryAnalysis().get("valence"));
         assertEquals(55.00, analysisDTO.getLibraryAnalysis().get("mainstream"));
         assertEquals(237.83, analysisDTO.getLibraryAnalysis().get("boringness"));
+        assertEquals(2, analysisDTO.getImages().size());
     }
 
     @Test

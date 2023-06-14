@@ -11,6 +11,8 @@ import java.util.List;
 @JsonPropertyOrder({"images", "name", "genres"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Album {
 
     private List<Image> images;
