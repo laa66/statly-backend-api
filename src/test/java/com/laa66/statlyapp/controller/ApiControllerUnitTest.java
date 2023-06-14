@@ -200,4 +200,35 @@ class ApiControllerUnitTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isFound());
     }
+
+    @Test
+    void shouldGetLibraryAnalysisAuthenticated() throws Exception {
+        TracksDTO tracksDTO = new TracksDTO(List.of(new Track()), "1", "short", null);
+        LibraryAnalysisDTO libraryAnalysisDTO = new LibraryAnalysisDTO(
+                Map.of("acousticness", 0.34, "valence", 0.55),
+                List.of(new Image())
+        );
+        when(spotifyAPIService.getTopTracks(1L, "long"))
+                .thenReturn(tracksDTO);
+        when(libraryAnalysisService.getLibraryAnalysis(tracksDTO))
+                .thenReturn(libraryAnalysisDTO);
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/analysis/library")
+                .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.libraryAnalysis", hasEntry("acousticness", 0.34)),
+                        jsonPath("$.libraryAnalysis", hasEntry("valence", 0.55)),
+                        jsonPath("$.images").exists()
+                );
+    }
+
+    @Test
+    void shouldGetLibraryAnalysisNotAuthenticated() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/analysis/library")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isFound());
+    }
 }
