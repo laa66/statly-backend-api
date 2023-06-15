@@ -203,7 +203,7 @@ class ApiControllerUnitTest {
 
     @Test
     void shouldGetLibraryAnalysisAuthenticated() throws Exception {
-        TracksDTO tracksDTO = new TracksDTO(List.of(new Track()), "1", "short", null);
+        TracksDTO tracksDTO = new TracksDTO(List.of(new Track()), "1", "long", null);
         LibraryAnalysisDTO libraryAnalysisDTO = new LibraryAnalysisDTO(
                 Map.of("acousticness", 0.34, "valence", 0.55),
                 List.of(new Image())
@@ -229,6 +229,41 @@ class ApiControllerUnitTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/analysis/library")
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isFound());
+    }
+
+    @Test
+    void shouldGetPlaylistAnalysisAuthenticated() throws Exception {
+        PlaylistInfo playlistInfo = new PlaylistInfo();
+        TracksDTO tracksDTO = new TracksDTO(List.of(new Track()), "1", "long", null);
+        LibraryAnalysisDTO libraryAnalysisDTO = new LibraryAnalysisDTO(
+                Map.of("acousticness", 0.34, "valence", 0.55),
+                List.of(new Image())
+        );
+        when(spotifyAPIService.getPlaylistTracks(playlistInfo, "ES"))
+                .thenReturn(tracksDTO);
+        when(libraryAnalysisService.getLibraryAnalysis(tracksDTO))
+                .thenReturn(libraryAnalysisDTO);
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/analysis/playlist")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(playlistInfo))
+                .with(csrf())
+                .with(oauth2Login().attributes(map -> map.put("country", "ES"))))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.libraryAnalysis", hasEntry("acousticness", 0.34)),
+                        jsonPath("$.libraryAnalysis", hasEntry("valence", 0.55)),
+                        jsonPath("$.images").exists()
+                );
+
+    }
+
+    @Test
+    void shouldGetPlaylistAnalysisNotAuthenticated() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/analysis/playlist")
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
+                .content(mapper.writeValueAsString(new PlaylistInfo())))
                 .andExpect(status().isFound());
     }
 }

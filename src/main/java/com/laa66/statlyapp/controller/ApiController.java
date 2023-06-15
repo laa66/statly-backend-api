@@ -1,6 +1,7 @@
 package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.DTO.*;
+import com.laa66.statlyapp.model.PlaylistInfo;
 import com.laa66.statlyapp.model.response.ResponsePlaylists;
 import com.laa66.statlyapp.service.LibraryAnalysisService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
@@ -65,6 +66,14 @@ public class ApiController {
     public ResponseEntity<LibraryAnalysisDTO> libraryAnalysis(@AuthenticationPrincipal OAuth2User principal) {
         long userId = (long) principal.getAttributes().get("userId");
         TracksDTO tracksDTO = spotifyApiService.getTopTracks(userId, "long");
+        LibraryAnalysisDTO libraryAnalysisDTO = libraryAnalysisService.getLibraryAnalysis(tracksDTO);
+        return ResponseEntity.ok(libraryAnalysisDTO);
+    }
+
+    @PostMapping("/analysis/playlist")
+    public ResponseEntity<LibraryAnalysisDTO> playlistAnalysis(@AuthenticationPrincipal OAuth2User principal, @RequestBody PlaylistInfo playlistInfo) {
+        String country = (String) principal.getAttributes().get("country");
+        TracksDTO tracksDTO = spotifyApiService.getPlaylistTracks(playlistInfo, country);
         LibraryAnalysisDTO libraryAnalysisDTO = libraryAnalysisService.getLibraryAnalysis(tracksDTO);
         return ResponseEntity.ok(libraryAnalysisDTO);
     }
