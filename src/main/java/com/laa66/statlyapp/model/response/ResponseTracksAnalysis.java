@@ -14,6 +14,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResponseTracksAnalysis {
+
     @JsonProperty("audio_features")
     private List<TrackAnalysis> tracksAnalysis;
+
+    public void addAll(List<TrackAnalysis> tracksAnalysis) {
+        this.tracksAnalysis.addAll(tracksAnalysis);
+    }
 }

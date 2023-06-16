@@ -13,7 +13,7 @@ public interface SpotifyAPIService {
 
     RecentlyPlayedDTO getRecentlyPlayed();
 
-    ResponseTracksAnalysis getTracksAnalysis(String tracksIds);
+    ResponseTracksAnalysis getTracksAnalysis(TracksDTO tracksDTO);
 
     ResponsePlaylists getUserPlaylists();
 

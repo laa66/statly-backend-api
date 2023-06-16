@@ -27,6 +27,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 public class SpotifyAPIServiceImpl implements SpotifyAPIService {
@@ -68,12 +71,29 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     }
 
     @Override
-    public ResponseTracksAnalysis getTracksAnalysis(String tracksIds) {
-        String url = SpotifyAPI.TRACKS_ANALYSIS.get() + tracksIds;
-        ResponseTracksAnalysis body = restTemplate
-                .exchange(url, HttpMethod.GET, null, ResponseTracksAnalysis.class).getBody();
-        return Optional.ofNullable(body)
-                .orElseThrow(SPOTIFY_API_EMPTY_RESPONSE_EXCEPTION_SUPPLIER);
+    public ResponseTracksAnalysis getTracksAnalysis(TracksDTO tracksDTO) {
+        return Optional.ofNullable(tracksDTO)
+                .map(tracks -> {
+                    ResponseTracksAnalysis tracksAnalysis = new ResponseTracksAnalysis(new LinkedList<>());
+                    IntStream.iterate(0, i -> i < tracks.getTracks().size(), i -> i + 100)
+                            .mapToObj(i -> tracks.getTracks().stream()
+                                    .skip(i)
+                                    .limit(100))
+                            .map(trackStream -> getTracksIds(trackStream))
+                            .map(ids -> SpotifyAPI.TRACKS_ANALYSIS.get() + ids)
+                            .map(url -> restTemplate.exchange(url, HttpMethod.GET, null, ResponseTracksAnalysis.class).getBody())
+                            .map(body -> Optional.ofNullable(body)
+                                    .orElseThrow(SPOTIFY_API_EMPTY_RESPONSE_EXCEPTION_SUPPLIER)
+                                    .getTracksAnalysis())
+                            .forEach(tracksAnalysis::addAll);
+                    return tracksAnalysis;
+                }).orElseThrow(() -> new RuntimeException("Tracks cannot be null"));
+    }
+
+    private String getTracksIds(Stream<Track> trackStream) {
+        return trackStream
+                .map(Track::getId)
+                .collect(Collectors.joining(","));
     }
 
     @Override

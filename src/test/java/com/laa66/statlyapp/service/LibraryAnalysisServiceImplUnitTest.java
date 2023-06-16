@@ -69,21 +69,21 @@ class LibraryAnalysisServiceImplUnitTest {
                 new TrackAnalysis(0.4, 0.3, 0.23, 0.13, 0.14, -45.0, 0.52, 150.5, 0.98),
                 new TrackAnalysis(0.5, 0.1, 0.2, 0.3, 0.7, 0, 0.24, 98, 0.5)
         ));
-        when(spotifyAPIService.getTracksAnalysis("id1,id2"))
+        when(spotifyAPIService.getTracksAnalysis(tracksDTO))
                 .thenReturn(tracksAnalysis);
         LibraryAnalysisDTO analysisDTO = libraryAnalysisService.getLibraryAnalysis(tracksDTO);
 
-        assertEquals(0.5, analysisDTO.getLibraryAnalysis().get("acousticness"));
-        assertEquals(0.3, analysisDTO.getLibraryAnalysis().get("danceability"));
-        assertEquals(0.19, analysisDTO.getLibraryAnalysis().get("energy"));
-        assertEquals(0.22, analysisDTO.getLibraryAnalysis().get("instrumentalness"));
-        assertEquals(0.55, analysisDTO.getLibraryAnalysis().get("liveness"));
+        assertEquals(50.0, analysisDTO.getLibraryAnalysis().get("acousticness"));
+        assertEquals(30.0, analysisDTO.getLibraryAnalysis().get("danceability"));
+        assertEquals(19.0, analysisDTO.getLibraryAnalysis().get("energy"));
+        assertEquals(22.0, analysisDTO.getLibraryAnalysis().get("instrumentalness"));
+        assertEquals(55.0, analysisDTO.getLibraryAnalysis().get("liveness"));
         assertEquals(-17, analysisDTO.getLibraryAnalysis().get("loudness"));
-        assertEquals(0.33, analysisDTO.getLibraryAnalysis().get("speechiness"));
-        assertEquals(122.83, analysisDTO.getLibraryAnalysis().get("tempo"));
-        assertEquals(0.66, analysisDTO.getLibraryAnalysis().get("valence"));
-        assertEquals(55.00, analysisDTO.getLibraryAnalysis().get("mainstream"));
-        assertEquals(237.83, analysisDTO.getLibraryAnalysis().get("boringness"));
+        assertEquals(33.0, analysisDTO.getLibraryAnalysis().get("speechiness"));
+        assertEquals(123.0, analysisDTO.getLibraryAnalysis().get("tempo"));
+        assertEquals(66.0, analysisDTO.getLibraryAnalysis().get("valence"));
+        assertEquals(55.0, analysisDTO.getLibraryAnalysis().get("mainstream"));
+        assertEquals(238.0, analysisDTO.getLibraryAnalysis().get("boringness"));
         assertEquals(2, analysisDTO.getImages().size());
     }
 

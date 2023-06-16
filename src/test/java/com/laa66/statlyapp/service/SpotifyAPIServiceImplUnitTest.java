@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -126,6 +127,15 @@ class SpotifyAPIServiceImplUnitTest {
 
     @Test
     void shouldGetTracksAnalysis() {
+        TracksDTO tracksDTO = new TracksDTO(List.of(new Track(
+                new Album(),
+                List.of(),
+                "name",
+                50,
+                "uri",
+                new SpotifyURL(),
+                "id",
+                0)), "1", "long", LocalDate.now());
         ResponseTracksAnalysis response = new ResponseTracksAnalysis(List.of(new TrackAnalysis(
                 0.15,
                 0.5,
@@ -140,7 +150,7 @@ class SpotifyAPIServiceImplUnitTest {
         when(restTemplate.exchange(eq(SpotifyAPI.TRACKS_ANALYSIS.get() + "id"),
                 eq(HttpMethod.GET), any(), eq(ResponseTracksAnalysis.class)))
                 .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
-        ResponseTracksAnalysis returnResponse = spotifyAPIService.getTracksAnalysis("id");
+        ResponseTracksAnalysis returnResponse = spotifyAPIService.getTracksAnalysis(tracksDTO);
         assertEquals(1, returnResponse.getTracksAnalysis().size());
         assertEquals(0.15, returnResponse.getTracksAnalysis().get(0).getAcousticness());
         assertEquals(0.5, returnResponse.getTracksAnalysis().get(0).getValence());
@@ -148,10 +158,19 @@ class SpotifyAPIServiceImplUnitTest {
 
     @Test
     void shouldGetTracksAnalysisEmptyBody() {
+        TracksDTO tracksDTO = new TracksDTO(List.of(new Track(
+                new Album(),
+                List.of(),
+                "name",
+                50,
+                "uri",
+                new SpotifyURL(),
+                "id",
+                0)), "1", "long", LocalDate.now());
         when(restTemplate.exchange(eq(SpotifyAPI.TRACKS_ANALYSIS.get() + "id"),
                 eq(HttpMethod.GET), any(), eq(ResponseTracksAnalysis.class)))
                 .thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
-        assertThrows(SpotifyAPIEmptyResponseException.class, () -> spotifyAPIService.getTracksAnalysis("id"));
+        assertThrows(SpotifyAPIEmptyResponseException.class, () -> spotifyAPIService.getTracksAnalysis(tracksDTO));
     }
 
     @Test

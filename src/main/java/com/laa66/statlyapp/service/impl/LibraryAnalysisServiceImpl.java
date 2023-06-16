@@ -30,10 +30,9 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
     public LibraryAnalysisDTO getLibraryAnalysis(TracksDTO tracksDTO) {
         return Optional.ofNullable(tracksDTO).map(
                 tracks -> {
-                    String tracksIds = getTracksIds(tracksDTO);
-                    ResponseTracksAnalysis tracksAnalysis = spotifyAPIService.getTracksAnalysis(tracksIds);
-                    Map<String, Double> mapAnalysis = mapAnalysis(tracksAnalysis);
-                    addToMap(mapAnalysis, "mainstream", getMainstreamScore(tracksDTO));
+                    ResponseTracksAnalysis tracksAnalysis = spotifyAPIService.getTracksAnalysis(tracks);
+                    Map<String, Double> mapAnalysis = getMapAnalysis(tracksAnalysis);
+                    addToMap(mapAnalysis, "mainstream", getMainstreamScore(tracks));
                     addToMap(mapAnalysis, "boringness", getBoringness(mapAnalysis));
                     List<Image> images = tracks.getTracks().stream()
                             .map(track -> Optional
@@ -77,45 +76,41 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
 
     //helpers
     private double getMainstreamScore(TracksDTO tracksDTO) {
-        return tracksDTO.getTracks()
-                .stream()
-                .mapToInt(Track::getPopularity)
-                .average()
-                .orElse(0);
+        return new BigDecimal(Double.toString(
+                tracksDTO.getTracks()
+                        .stream()
+                        .mapToInt(Track::getPopularity)
+                        .average()
+                        .orElse(0)))
+                .setScale(0, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 
     private double getBoringness(Map<String, Double> mapAnalysis) {
         return new BigDecimal(Double.toString(
                 mapAnalysis.get("tempo")
-                + (mapAnalysis.get("valence") * 100)
-                + (mapAnalysis.get("energy") * 100)
-                + (mapAnalysis.get("danceability") * 100)))
-                .setScale(2, RoundingMode.HALF_UP)
+                + (mapAnalysis.get("valence"))
+                + (mapAnalysis.get("energy"))
+                + (mapAnalysis.get("danceability"))))
+                .setScale(0, RoundingMode.HALF_UP)
                 .doubleValue();
     }
 
-    private String getTracksIds(TracksDTO tracksDTO) {
-        return tracksDTO.getTracks()
-                .stream()
-                .map(Track::getId)
-                .collect(Collectors.joining(","));
-    }
-
-    private Map<String, Double> mapAnalysis(ResponseTracksAnalysis tracksAnalysis) {
+    private Map<String, Double> getMapAnalysis(ResponseTracksAnalysis tracksAnalysis) {
         Map<String, Double> analyzedTracks = new HashMap<>();
         int trackCount = tracksAnalysis.getTracksAnalysis().size();
 
         tracksAnalysis.getTracksAnalysis().forEach(
                 track -> {
-                    addToMap(analyzedTracks, "acousticness", track.getAcousticness());
-                    addToMap(analyzedTracks, "danceability", track.getDanceability());
-                    addToMap(analyzedTracks, "energy", track.getEnergy());
-                    addToMap(analyzedTracks, "instrumentalness", track.getInstrumentalness());
-                    addToMap(analyzedTracks, "liveness", track.getLiveness());
+                    addToMap(analyzedTracks, "acousticness", track.getAcousticness() * 100);
+                    addToMap(analyzedTracks, "danceability", track.getDanceability() * 100);
+                    addToMap(analyzedTracks, "energy", track.getEnergy() * 100);
+                    addToMap(analyzedTracks, "instrumentalness", track.getInstrumentalness() * 100);
+                    addToMap(analyzedTracks, "liveness", track.getLiveness() * 100);
                     addToMap(analyzedTracks, "loudness", track.getLoudness());
-                    addToMap(analyzedTracks, "speechiness", track.getSpeechiness());
+                    addToMap(analyzedTracks, "speechiness", track.getSpeechiness() * 100);
                     addToMap(analyzedTracks, "tempo", track.getTempo());
-                    addToMap(analyzedTracks, "valence", track.getValence());
+                    addToMap(analyzedTracks, "valence", track.getValence() * 100);
                 }
         );
 
@@ -124,7 +119,7 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
                         Map.Entry::getKey,
                         value -> new BigDecimal(Double
                                 .toString((value.getValue() / trackCount)))
-                                .setScale(2, RoundingMode.HALF_UP)
+                                .setScale(0, RoundingMode.HALF_UP)
                                 .doubleValue(),
                         (first, conflict) -> first,
                         LinkedHashMap::new));

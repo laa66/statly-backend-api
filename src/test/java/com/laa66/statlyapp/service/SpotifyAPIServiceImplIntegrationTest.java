@@ -29,6 +29,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -181,6 +182,15 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @Test
     void shouldGetTracksAnalysisResponseOk() throws JsonProcessingException {
+        TracksDTO tracksDTO = new TracksDTO(List.of(new Track(
+                new Album(),
+                List.of(),
+                "name",
+                50,
+                "uri",
+                new SpotifyURL(),
+                "id",
+                0)), "1", "long", LocalDate.now());
         ResponseTracksAnalysis response = new ResponseTracksAnalysis(List.of(new TrackAnalysis(
                 0.15,
                 0.5,
@@ -198,7 +208,7 @@ class SpotifyAPIServiceImplIntegrationTest {
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(mapper.writeValueAsString(response)));
-        ResponseTracksAnalysis returnResponse = spotifyAPIService.getTracksAnalysis("id");
+        ResponseTracksAnalysis returnResponse = spotifyAPIService.getTracksAnalysis(tracksDTO);
         mockServer.verify();
         assertEquals(1, returnResponse.getTracksAnalysis().size());
         assertEquals(0.15, returnResponse.getTracksAnalysis().get(0).getAcousticness());
@@ -207,12 +217,21 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @Test
     void shouldGetTracksAnalysisResponseError() {
+        TracksDTO tracksDTO = new TracksDTO(List.of(new Track(
+                new Album(),
+                List.of(),
+                "name",
+                50,
+                "uri",
+                new SpotifyURL(),
+                "id",
+                0)), "1", "long", LocalDate.now());
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.TRACKS_ANALYSIS.get() + "id"))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withServiceUnavailable());
         assertThrows(RestClientException.class,
-                () -> spotifyAPIService.getTracksAnalysis("id"));
+                () -> spotifyAPIService.getTracksAnalysis(tracksDTO));
         mockServer.verify();
     }
 

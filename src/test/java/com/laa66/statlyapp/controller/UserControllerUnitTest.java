@@ -110,8 +110,7 @@ class UserControllerUnitTest {
                 .andExpect(jsonPath("$[0].fullName", is("user1")))
                 .andExpect(jsonPath("$[0].email", is("user1@mail.com")))
                 .andExpect(jsonPath("$[1].fullName", is("user2")))
-                .andExpect(jsonPath("$[1].email", is("user2@email.com")))
-                .andDo(print());
+                .andExpect(jsonPath("$[1].email", is("user2@email.com")));
     }
 
     @Test
