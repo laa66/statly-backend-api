@@ -1,7 +1,7 @@
 # Statly - Your personal Spotify stats🎵
 
 Statly is a web application powered by Spotify API that lets you view your music
-statistics, account mainstream score, and recently played tracks.
+statistics, analyze your audio library, playlists and check recently played tracks.
 You can also export a playlist to your Spotify account from your favourite tracks in three different
 ranges.
 
@@ -22,25 +22,26 @@ Check out [Statly](https://laa66.github.io/statly-frontend/) to see the applicat
 #### It's simple! Go and check [Statly](https://laa66.github.io/statly-frontend/) or...
 #### Try to run this application on your local machine. You will need to do the following:
 
-1. Obtain a **Client ID** and **Client secret** from [Spotify Developer](https://developer.spotify.com/) panel
-2. Set the ``SPOTIFY_CLIENT_ID``, ``SPOTIFY_CLIENT_SECRET`` environment variables
-   with the values from your Spotify Developer panel and set ``STATLY_APP_URL``
-   variable to ``http://localhost:3000``
-3. Set the ``STATLY_DB_URL``, ``STATLY_DB_USERNAME`` and ``STATLY_DB_PASSWORD`` environment variables with the MySQL details.
-4. Set the ``STATLY_ADMIN_EMAIL`` variable to administrator's email to receive notifications about the app, set ``STATLY_MAIL_ADDRESS`` and ``STATLY_MAIL_PASSWORD`` for Gmail SMTP server properties.
-<!-- end -->
-
       # Clone this repository to your local machine
       $ git clone https://github.com/laa66/statly-backend-api.git
 
-      # Run the backend Spring Boot application in the root project directory:
-      $ ./mvnw spring-boot:run
+Create ``.env`` file in root project directory and set specific key/value pairs within it: 
+1. Obtain a **Client ID** and **Client secret** from [Spotify Developer](https://developer.spotify.com/) panel
+2. Set ``SPOTIFY_CLIENT_ID``, ``SPOTIFY_CLIENT_SECRET`` environment variables
+   with the values from your Spotify Developer panel
+3. Set ``STATLY_APP_URL`` variable to `http://localhost:3000`
+4. Set ``STATLY_ADMIN_EMAIL`` variable to administrator's email to receive notifications about the app
+5. Set ``STATLY_MAIL_ADDRESS`` and ``STATLY_MAIL_PASSWORD`` for Gmail SMTP server properties
+<!-- end -->
 
-      # Clone React-app repository to your local machine
+      # Run statly-backend-api using docker-compose in root directory
+      $ docker-compose up
+
+      # Clone the React-app repository to your local machine
       $ git clone https://github.com/laa66/statly-frontend.git
       
-      # Run the frontend React app in the project root directory: 
-      $ npm start
+      # Run statly-frontend using docker-compose in root directory
+      $ docker-compose up
 
 #### ...and Access the application in your web browser at ``http://localhost:3000``
 
@@ -63,7 +64,9 @@ Check out [Statly](https://laa66.github.io/statly-frontend/) to see the applicat
 
 * Shows users their ``top genres`` over three different time ranges
 
-* Displays a user's ``mainstream score`` based on the popularity of the tracks they listen to
+* Calculate and displays a user's ``library audio analysis`` based on different indicators such as average energy, tempo, mainstream, boringness etc.
+
+* Displays user's ``all playlists`` and give them ability to calculate their energy, tempo, mainstream and boringess score
 
 * Allows users to view their ``recently played`` tracks, giving them easy access to music they have enjoyed
 
@@ -89,16 +92,17 @@ You can view full documentation of this project in different paths:
 - Hibernate & JPA
 - Maven
 - OAuth 2.0
+- Docker
 - SQL
 - React.js
 - HTML & CSS
 - Bootstrap v5.3
-- IntelliJ IDEA Community Edition
-- Visual Studio Code
-- MySQL Workbench
 - PlanetScale
 - Railway Cloud
 - GitHub Pages
+- IntelliJ IDEA Community Edition
+- Visual Studio Code
+- MySQL Workbench
 
 #### Tested with:
 
@@ -112,7 +116,6 @@ You can view full documentation of this project in different paths:
 ## To-do 💡
 
 - Implement functionality for comparing user listening habits over the past 6 months/all time.
-- Develop functionality to analyze tracks structure in the user's Spotify library
 - Implement functionality that will allow users to add friends and check their statistics
 - Develop 'Playlist-battle' functionality
 - Develop 'Silent-disco room' functionality
@@ -122,12 +125,37 @@ You can view full documentation of this project in different paths:
 ## Screenshots 🛣️
 
 ![Statly-home](src/main/resources/image/statly-home.png)
+<hr/>
+
 ![Statly-home-2](src/main/resources/image/statly-home-2.png)
+<hr/>
+
 ![Statly-home-tracks](src/main/resources/image/statly-tracks.png)
+<hr/>
+
 ![Statly-artists](src/main/resources/image/statly-artists.png)
+<hr/>
+
 ![Statly-genres](src/main/resources/image/statly-genres.png)
-![Statly-mainstream](src/main/resources/image/statly-mainstream.png)
+<hr/>
+
+![Statly-analysis](src/main/resources/image/statly-analysis.png)
+<hr/>
+
+![Statly-analysis2](src/main/resources/image/statly-analysis-2.png)
+<hr/>
+
+![Statly-analysis3](src/main/resources/image/statly-analysis-3.png)
+<hr/>
+
 ![Statly-dashboard](src/main/resources/image/statly-dashboard.png)
+<hr/>
+
+![Statly-recently](src/main/resources/image/statly-recently.png)
+<hr/>
+
 ![Statly-settings](src/main/resources/image/statly-settings.png)
+<hr/>
+
 ![Statly-beta](src/main/resources/image/statly-beta.png)
 

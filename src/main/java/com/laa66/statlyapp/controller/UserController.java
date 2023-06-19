@@ -1,16 +1,12 @@
 package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.DTO.BetaUserDTO;
-import com.laa66.statlyapp.DTO.UserDTO;
-import com.laa66.statlyapp.model.Image;
 import com.laa66.statlyapp.service.MailService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,9 +44,9 @@ public class UserController {
         return ResponseEntity.ok(dto);
     }
 
-    @PostMapping("/beta/join")
-    public ResponseEntity<Void> join(@RequestBody BetaUserDTO betaUserDTO) {
-        userService.saveBetaUser(betaUserDTO);
+    @GetMapping("/beta/join")
+    public ResponseEntity<Void> join(@RequestParam("name") String fullName, @RequestParam("email") String email) {
+        userService.saveBetaUser(new BetaUserDTO(fullName, email, null));
         mailService.sendJoinBetaNotification();
         return ResponseEntity.noContent().build();
     }

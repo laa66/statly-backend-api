@@ -8,6 +8,7 @@ import com.laa66.statlyapp.repository.*;
 import com.laa66.statlyapp.service.MailService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.UserService;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,10 +124,10 @@ class UserControllerUnitTest {
 
     @Test
     void shouldJoinBeta() throws Exception {
-        BetaUserDTO dto = new BetaUserDTO("name", "email", null);
-        mockMvc.perform(post("/user/beta/join").with(oauth2Login())
+        mockMvc.perform(get("/user/beta/join").with(oauth2Login())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(dto)))
+                        .param("name", "name")
+                        .param("email", "email"))
                 .andExpect(status().isNoContent());
         verify(userService, times(1)).saveBetaUser(isA(BetaUserDTO.class));
         verify(mailService, times(1)).sendJoinBetaNotification();
