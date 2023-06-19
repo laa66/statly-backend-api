@@ -1,0 +1,47 @@
+version: "3.8"
+services:
+  api_service:
+    build: .
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - statlyapidb-net
+    environment:
+      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
+      SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
+      STATLY_ADMIN_EMAIL: ${STATLY_ADMIN_EMAIL}
+      STATLY_APP_URL: ${STATLY_APP_URL}
+      STATLY_DB_PASSWORD: statly_pass
+      STATLY_DB_URL: jdbc:mysql://db:3306/statly_user_stats?useSSL=false
+      STATLY_DB_USERNAME: user
+      STATLY_MAIL_ADDRESS: ${STATLY_MAIL_ADDRESS}
+      STATLY_MAIL_PASSWORD: ${STATLY_MAIL_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .m2:/root/.m2
+
+  db:
+    image: "mysql:8.0.33"
+    restart: always
+    ports:
+      - "3306:3306"
+    networks:
+      - statlyapidb-net
+    environment:
+      MYSQL_DATABASE: statly_user_stats
+      MYSQL_USER: user
+      MYSQL_PASSWORD: statly_pass
+      MYSQL_ROOT_PASSWORD: statly_root_pass
+    healthcheck:
+      test: "mysql $$MYSQL_DATABASE -u$$MYSQL_USER -p$$MYSQL_PASSWORD -e 'SELECT 1;'"
+      interval: 20s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
+
+networks:
+  statlyapidb-net:

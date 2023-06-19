@@ -39,10 +39,6 @@ public class User {
     @JoinColumn(name = "user_id")
     private List<UserGenre> genres;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private List<UserMainstream> mainstreamList;
-
     public User(long id, String email, LocalDateTime joinDate) {
         this.id = id;
         this.email = email;
@@ -71,10 +67,5 @@ public class User {
     public void addGenre(UserGenre genre) {
         if (genres == null) genres = new ArrayList<>();
         genres.add(genre);
-    }
-
-    public void addMainstream(UserMainstream mainstream) {
-        if (mainstreamList == null) mainstreamList = new ArrayList<>();
-        mainstreamList.add(mainstream);
     }
 }
