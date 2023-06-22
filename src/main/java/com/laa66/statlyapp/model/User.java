@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AllArgsConstructor
@@ -19,5 +21,6 @@ public class User {
     @JsonProperty("display_name")
     private String name;
 
+    private List<Image> images;
 
 }

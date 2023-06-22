@@ -27,11 +27,14 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     public OAuth2User getUserOrCreate(OAuth2User oAuth2User) {
         Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
-        String email;
+
         try {
-            email = (String) oAuth2User.getAttributes().get("email");
+            String username = (String) attributes.get("display_name");
+            String imageUrl = getImageUrl(attributes);
+            String email = (String) oAuth2User.getAttributes().get("email");
+
             Optional<User> user = userService.findUserByEmail(email).or(() -> {
-            userService.saveUser(new User(0, email, LocalDateTime.now()));
+            userService.saveUser(new User(0, username, email, imageUrl, 0, LocalDateTime.now()));
             return userService.findUserByEmail(email);
             });
             attributes.put("userId", user.orElseThrow().getId());
@@ -39,6 +42,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         } catch (NullPointerException | NoSuchElementException e) {
             return oAuth2User;
         }
+    }
+
+    private String getImageUrl(Map<String, Object> attributes) throws NoSuchElementException, NullPointerException {
+        List<?> list = (List<?>) attributes.get("images");
+        Map<?, ?> images = (Map<?, ?>) list.get(0);
+        return (String) images.get("url");
     }
 
 

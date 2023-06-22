@@ -1,10 +1,7 @@
 package com.laa66.statlyapp.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,6 +10,7 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @ToString
@@ -22,7 +20,14 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    private String username;
+
     private String email;
+
+    @Column(name = "image_url")
+    private String image;
+
+    private int points;
 
     @Column(name = "join_date")
     private LocalDateTime joinDate;
@@ -39,19 +44,29 @@ public class User {
     @JoinColumn(name = "user_id")
     private List<UserGenre> genres;
 
-    public User(long id, String email, LocalDateTime joinDate) {
-        this.id = id;
-        this.email = email;
-        this.joinDate = joinDate;
-    }
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_friends",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "friend_id", referencedColumnName = "id")}
+    )
+    private List<User> followed;
 
-    public User(long id, String email, LocalDateTime joinDate, List<UserTrack> tracks, List<UserArtist> artists, List<UserGenre> genres) {
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_friends",
+            joinColumns = {@JoinColumn(name = "friend_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")}
+    )
+    private List<User> followers;
+
+    public User(long id, String username, String email, String image, int points, LocalDateTime joinDate) {
         this.id = id;
+        this.username = username;
         this.email = email;
+        this.image = image;
+        this.points = points;
         this.joinDate = joinDate;
-        this.tracks = tracks;
-        this.artists = artists;
-        this.genres = genres;
     }
 
     public void addTrack(UserTrack track) {
@@ -67,5 +82,10 @@ public class User {
     public void addGenre(UserGenre genre) {
         if (genres == null) genres = new ArrayList<>();
         genres.add(genre);
+    }
+
+    public void addFollowed(User follower) {
+        if (followed == null) followed = new ArrayList<>();
+        followed.add(follower);
     }
 }

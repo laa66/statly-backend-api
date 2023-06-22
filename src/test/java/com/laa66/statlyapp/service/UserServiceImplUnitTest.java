@@ -52,7 +52,7 @@ class UserServiceImplUnitTest {
 
     @Test
     void shouldFindUserByEmail() {
-        User user = new User(1, "user@mail.com", LocalDateTime.of(2023, 4, 30, 20, 20));
+        User user = new User(1, "username", "user@mail.com", "url", 0, LocalDateTime.of(2023, 4, 30, 20, 20));
         when(userRepository.findByEmail("user@mail.com")).thenReturn(Optional.of(user));
         Optional<User> returnUser = userRepository.findByEmail("user@mail.com");
         assertTrue(returnUser.isPresent());
@@ -70,8 +70,8 @@ class UserServiceImplUnitTest {
 
     @Test
     void shouldSaveUser() {
-        User beforeSaveUser = new User(0, "user@mail.com", LocalDateTime.of(2023, 4, 30, 20, 20));
-        User afterSaveUser = new User(1, "user@mail.com", LocalDateTime.of(2023, 4, 30, 20, 20));
+        User beforeSaveUser = new User(0, "username", "user@mail.com", "url", 0, LocalDateTime.of(2023, 4, 30, 20, 20));
+        User afterSaveUser = new User(1, "username", "user@mail.com", "url", 0, LocalDateTime.of(2023, 4, 30, 20, 20));
         when(userRepository.save(beforeSaveUser)).thenReturn(afterSaveUser);
         User returnUser = userService.saveUser(beforeSaveUser);
         assertNotNull(returnUser);
@@ -83,7 +83,7 @@ class UserServiceImplUnitTest {
 
     @Test
     void shouldDeleteUser() {
-        User user = new User(1L, "user@mail.com", LocalDateTime.of(2023, 4, 30, 20, 20));
+        User user = new User(1L, "username", "user@mail.com", "url", 0, LocalDateTime.of(2023, 4, 30, 20, 20));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         userService.deleteUser(user.getId());
         verify(userRepository, times(1)).deleteById(1L);

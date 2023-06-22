@@ -21,6 +21,7 @@ import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -41,29 +42,34 @@ class CustomOAuth2UserServiceUnitTest {
 
     @Test
     void shouldGetUser() {
-        User user = new User(1L, "test@mail.com", LocalDateTime.of(2022, 11, 20, 20, 20));
+        User user = new User(1L, "username", "test@mail.com", "url", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
         OAuth2User oAuth2User = new DefaultOAuth2User(
                 Collections.singletonList(new OAuth2UserAuthority(Map.of("user","user"))),
-                Map.of("display_name", "user", "email", "test@mail.com"),
+                Map.of(
+                        "display_name", "user", "email", "test@mail.com",
+                        "images", List.of(Map.of("url", "imageUrl"))),
                 "display_name"
-        );
+                );
         when(userService.findUserByEmail("test@mail.com")).thenReturn(Optional.of(user));
         OAuth2User result = customOAuth2UserService.getUserOrCreate(oAuth2User);
         assertNotNull(result);
         assertEquals(oAuth2User.getAuthorities(), result.getAuthorities());
         assertEquals(oAuth2User.getAttributes().get("email"), result.getAttributes().get("email"));
         assertEquals(1L, result.getAttributes().get("userId"));
+        assertEquals(oAuth2User.getAttributes().get("display_name"), result.getAttributes().get("display_name"));
     }
 
     @Test
     void shouldCreateUser() {
-        User user = new User(0, "test@mail.com", LocalDateTime.of(2022, 11, 20, 20, 20));
-        User createdUser = new User(1L, "test@mail.com", LocalDateTime.of(2022, 11, 20, 20, 20));
+        User user = new User(0, "username","test@mail.com", "url", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
+        User createdUser = new User(1L, "username", "test@mail.com", "url", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
         OAuth2User oAuth2User = new DefaultOAuth2User(
                 Collections.singletonList(new OAuth2UserAuthority(Map.of("user","user"))),
-                Map.of("display_name", "user", "email", "test@mail.com"),
+                Map.of(
+                        "display_name", "user", "email", "test@mail.com",
+                        "images", List.of(Map.of("url", "imageUrl"))),
                 "display_name"
-        );
+                );
         when(userService.findUserByEmail("test@mail.com")).thenReturn(Optional.empty()).thenReturn(Optional.of(createdUser));
         when(userService.saveUser(any())).thenReturn(createdUser);
         OAuth2User result = customOAuth2UserService.getUserOrCreate(oAuth2User);
@@ -71,6 +77,7 @@ class CustomOAuth2UserServiceUnitTest {
         assertEquals(oAuth2User.getAuthorities(), result.getAuthorities());
         assertEquals(oAuth2User.getAttributes().get("email"), result.getAttributes().get("email"));
         assertEquals(1L, result.getAttributes().get("userId"));
+        assertEquals(oAuth2User.getAttributes().get("display_name"), result.getAttributes().get("display_name"));
     }
 
 }
