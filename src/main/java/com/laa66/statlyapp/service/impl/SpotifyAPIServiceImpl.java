@@ -90,12 +90,6 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
                 }).orElseThrow(() -> new RuntimeException("Tracks cannot be null"));
     }
 
-    private String getTracksIds(Stream<Track> trackStream) {
-        return trackStream
-                .map(Track::getId)
-                .collect(Collectors.joining(","));
-    }
-
     @Override
     public ResponsePlaylists getUserPlaylists() {
         String url = SpotifyAPI.USER_PLAYLISTS.get();
@@ -148,6 +142,12 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     }
 
     // helpers
+    private String getTracksIds(Stream<Track> trackStream) {
+        return trackStream
+                .map(Track::getId)
+                .collect(Collectors.joining(","));
+    }
+
     private PlaylistDTO postEmptyPlaylist(UserDTO user, String range) {
         String url = SpotifyAPI.CREATE_TOP_PLAYLIST.get().replace("user_id", user.getId());
         String body;

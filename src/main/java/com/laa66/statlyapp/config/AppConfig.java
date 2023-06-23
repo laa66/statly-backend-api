@@ -50,6 +50,11 @@ public class AppConfig implements WebMvcConfigurer {
     }
 
     @Bean
+    public SocialService socialService(UserRepository userRepository) {
+        return new SocialServiceImpl(userRepository);
+    }
+
+    @Bean
     public CookieSameSiteSupplier cookieSameSiteSupplier(){
         return CookieSameSiteSupplier.ofNone().whenHasName("XSRF-TOKEN");
     }
