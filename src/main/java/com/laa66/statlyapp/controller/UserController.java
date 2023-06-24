@@ -1,7 +1,10 @@
 package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.DTO.BetaUserDTO;
+import com.laa66.statlyapp.DTO.FollowersDTO;
+import com.laa66.statlyapp.constants.StatlyConstants;
 import com.laa66.statlyapp.service.MailService;
+import com.laa66.statlyapp.service.SocialService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +27,16 @@ public class UserController {
     private final UserService userService;
     private final SpotifyAPIService spotifyApiService;
     private final MailService mailService;
+    private final SocialService socialService;
+
+    @GetMapping("/test")
+    public void test() {
+        FollowersDTO followers = socialService.getFollowers(1L, StatlyConstants.FOLLOWING);
+        System.out.println(followers);
+
+        FollowersDTO followersDTO = socialService.getFollowers(2L, StatlyConstants.FOLLOWERS);
+        System.out.println(followersDTO);
+    }
 
     @GetMapping("/auth")
     public void authenticate(HttpServletRequest request, HttpServletResponse response) {

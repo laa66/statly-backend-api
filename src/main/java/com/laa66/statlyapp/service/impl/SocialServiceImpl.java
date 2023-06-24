@@ -2,6 +2,7 @@ package com.laa66.statlyapp.service.impl;
 
 import com.laa66.statlyapp.DTO.FollowersDTO;
 import com.laa66.statlyapp.DTO.UserProfileDTO;
+import com.laa66.statlyapp.constants.StatlyConstants;
 import com.laa66.statlyapp.entity.User;
 import com.laa66.statlyapp.exception.UserNotFoundException;
 import com.laa66.statlyapp.model.Image;
@@ -27,30 +28,26 @@ public class SocialServiceImpl implements SocialService {
     }
 
     @Override
-    public FollowersDTO getFollowed(long userId) {
+    public FollowersDTO getFollowers(long userId, StatlyConstants type) {
         return userRepository.findById(userId)
                 .map(foundUser -> {
-                    List<com.laa66.statlyapp.model.User> list = foundUser.getFollowed().stream()
-                            .map(followedUser -> new com.laa66.statlyapp.model.User(
-                                    Long.toString(followedUser.getId()),
+                    List<User> followers = type == StatlyConstants.FOLLOWING ? foundUser.getFollowing() : foundUser.getFollowers();
+                    List<com.laa66.statlyapp.model.User> list = followers.stream()
+                            .map(follower -> new com.laa66.statlyapp.model.User(
+                                    Long.toString(follower.getId()),
                                     null,
-                                    followedUser.getUsername(),
-                                    List.of(new Image(followedUser.getImage(), null, null)))
+                                    follower.getUsername(),
+                                    List.of(new Image(follower.getImage(), null, null)))
                             ).toList();
                     return new FollowersDTO(list.size(), list);
                 }).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER);
     }
 
     @Override
-    public FollowersDTO getFollowers(long userId) {
-        return null;
-    }
-
-    @Override
     public User follow(long userId, long followId) {
         User user = userRepository.findById(userId)
                 .map(foundUser -> {
-                    foundUser.addFollowed(
+                    foundUser.addFollower(
                             userRepository.findById(followId).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER)
                             );
                     return foundUser;

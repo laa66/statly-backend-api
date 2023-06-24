@@ -50,7 +50,7 @@ public class User {
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "friend_id", referencedColumnName = "id")}
     )
-    private List<User> followed;
+    private List<User> following;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -84,8 +84,8 @@ public class User {
         genres.add(genre);
     }
 
-    public void addFollowed(User follower) {
-        if (followed == null) followed = new ArrayList<>();
-        followed.add(follower);
+    public void addFollower(User follower) {
+        if (following == null) following = new ArrayList<>();
+        following.add(follower);
     }
 }
