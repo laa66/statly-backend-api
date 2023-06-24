@@ -1,5 +1,6 @@
 package com.laa66.statlyapp.service;
 
+import com.laa66.statlyapp.DTO.FollowersDTO;
 import com.laa66.statlyapp.entity.User;
 import com.laa66.statlyapp.exception.UserNotFoundException;
 import com.laa66.statlyapp.repository.UserRepository;
@@ -51,6 +52,26 @@ public class SocialServiceImplUnitTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(fromUser));
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> socialService.follow(1L, 2L));
+    }
+
+    @Test
+    void shouldGetFollowedValidUserId() {
+        User user = new User(1L, "username1","test1@mail.com", "url1", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
+        User followedUser = new User(2L, "username2","test2@mail.com", "url2", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
+        user.addFollowed(followedUser);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        FollowersDTO followersDTO = socialService.getFollowed(1L);
+        assertEquals(1, followersDTO.getSize());
+        assertEquals("2", followersDTO.getUsers().get(0).getId());
+        assertEquals("username2", followersDTO.getUsers().get(0).getName());
+        assertEquals("url2", followersDTO.getUsers().get(0).getImages().get(0).getUrl());
+    }
+
+    @Test
+    void shouldGetFollowedNotValidUserId() {
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> socialService.getFollowed(1L));
     }
 
 
