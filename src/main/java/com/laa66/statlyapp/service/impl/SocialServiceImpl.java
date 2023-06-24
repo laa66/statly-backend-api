@@ -48,15 +48,24 @@ public class SocialServiceImpl implements SocialService {
         User user = userRepository.findById(userId)
                 .map(foundUser -> {
                     foundUser.addFollower(
-                            userRepository.findById(followId).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER)
-                            );
+                            userRepository.findById(followId)
+                            .orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER)
+                    );
                     return foundUser;
                 }).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER);
         return userRepository.save(user);
     }
 
     @Override
-    public void unfollow(long userId, long unfollowId) {
-
+    public User unfollow(long userId, long unfollowId) {
+        User user = userRepository.findById(userId)
+                .map(foundUser -> {
+                    foundUser.removeFollower(
+                            userRepository.findById(unfollowId)
+                            .orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER)
+                    );
+                    return foundUser;
+                }).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER);
+        return userRepository.save(user);
     }
 }

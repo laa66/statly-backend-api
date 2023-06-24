@@ -13,6 +13,6 @@ public interface SocialService {
 
     User follow(long userId, long followId);
 
-    void unfollow(long userId, long unfollowId);
+    User unfollow(long userId, long unfollowId);
 
 }

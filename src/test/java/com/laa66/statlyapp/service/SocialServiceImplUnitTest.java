@@ -13,11 +13,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 
@@ -32,20 +35,20 @@ public class SocialServiceImplUnitTest {
 
     @Test
     void shouldFollowValidIds() {
-        User fromUser = new User(1L, "username1","test1@mail.com", "url1", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
-        User toUser = new User(2L, "username2","test2@mail.com", "url2", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
-        when(userRepository.findById(1L)).thenReturn(Optional.of(fromUser));
-        when(userRepository.findById(2L)).thenReturn(Optional.of(toUser));
-        when(userRepository.save(fromUser)).thenReturn(fromUser);
-        User returnUser = socialService.follow(1L, 2L);
-        assertEquals(fromUser.getId(), returnUser.getId());
-        assertEquals(1, fromUser.getFollowing().size());
+        User user = new User(1L, "username1","test1@mail.com", "url1", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
+        User userFollowed = new User(2L, "username2","test2@mail.com", "url2", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(userFollowed));
+        when(userRepository.save(user)).thenReturn(user);
+        User returnUser = socialService.follow(1, 2);
+        assertEquals(user.getId(), returnUser.getId());
+        assertEquals(1, returnUser.getFollowing().size());
     }
 
     @Test
     void shouldFollowNotValidUserId() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> socialService.follow(1L, 2L));
+        assertThrows(UserNotFoundException.class, () -> socialService.follow(1, 2));
     }
 
     @Test
@@ -53,7 +56,7 @@ public class SocialServiceImplUnitTest {
         User fromUser = new User(1L, "username1","test1@mail.com", "url1", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
         when(userRepository.findById(1L)).thenReturn(Optional.of(fromUser));
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> socialService.follow(1L, 2L));
+        assertThrows(UserNotFoundException.class, () -> socialService.follow(1, 2));
     }
 
     @Test
@@ -63,7 +66,7 @@ public class SocialServiceImplUnitTest {
         user.addFollower(followedUser);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        FollowersDTO followersDTO = socialService.getFollowers(1L, StatlyConstants.FOLLOWING);
+        FollowersDTO followersDTO = socialService.getFollowers(1, StatlyConstants.FOLLOWING);
         assertEquals(1, followersDTO.getSize());
         assertEquals("2", followersDTO.getUsers().get(0).getId());
         assertEquals("username2", followersDTO.getUsers().get(0).getName());
@@ -73,7 +76,7 @@ public class SocialServiceImplUnitTest {
     @Test
     void shouldGetFollowingNotValidUserId() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> socialService.getFollowers(1L, StatlyConstants.FOLLOWING));
+        assertThrows(UserNotFoundException.class, () -> socialService.getFollowers(1, StatlyConstants.FOLLOWING));
     }
 
     @Test
@@ -83,7 +86,7 @@ public class SocialServiceImplUnitTest {
         user.setFollowers(List.of(userFollower));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        FollowersDTO followersDTO = socialService.getFollowers(1L, StatlyConstants.FOLLOWERS);
+        FollowersDTO followersDTO = socialService.getFollowers(1, StatlyConstants.FOLLOWERS);
         assertEquals(1, followersDTO.getSize());
         assertEquals("2", followersDTO.getUsers().get(0).getId());
         assertEquals("username2", followersDTO.getUsers().get(0).getName());
@@ -93,7 +96,35 @@ public class SocialServiceImplUnitTest {
     @Test
     void shouldGetFollowersNotValidUserId() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> socialService.getFollowers(1L, StatlyConstants.FOLLOWERS));
+        assertThrows(UserNotFoundException.class, () -> socialService.getFollowers(1, StatlyConstants.FOLLOWERS));
+    }
+
+    @Test
+    void shouldUnfollowValidUserId() {
+        User user = new User(1L, "username1","test1@mail.com", "url1", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
+        User followedUser = new User(2L, "username2","test2@mail.com", "url2", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
+        user.addFollower(followedUser);
+        followedUser.setFollowers(List.of(user));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(followedUser));
+        when(userRepository.save(user)).thenReturn(user);
+        User returnUser = socialService.unfollow(1, 2);
+        assertEquals(1L, returnUser.getId());
+        assertEquals(0, returnUser.getFollowing().size());
+    }
+
+    @Test
+    void shouldUnfollowNotValidUserId() {
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> socialService.unfollow(1, 2));
+    }
+
+    @Test
+    void shouldUnfollowNotValidUnfollowId() {
+        User fromUser = new User(1L, "username1","test1@mail.com", "url1", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(fromUser));
+        when(userRepository.findById(2L)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> socialService.unfollow(1, 2));
     }
 
 

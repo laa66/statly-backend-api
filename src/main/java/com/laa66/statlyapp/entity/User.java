@@ -88,4 +88,9 @@ public class User {
         if (following == null) following = new ArrayList<>();
         following.add(follower);
     }
+
+    public void removeFollower(User follower) {
+        if (following == null) return;
+        following.remove(follower);
+    }
 }
