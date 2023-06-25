@@ -58,7 +58,7 @@ public class ApiController {
 
     @GetMapping("/playlist/all")
     public ResponseEntity<ResponsePlaylists> getPlaylists() {
-        ResponsePlaylists playlist = spotifyApiService.getUserPlaylists();
+        ResponsePlaylists playlist = spotifyApiService.getUserPlaylists(null);
         return ResponseEntity.ok(playlist);
     }
 

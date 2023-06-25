@@ -4,6 +4,7 @@ import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.model.PlaylistInfo;
 import com.laa66.statlyapp.model.response.ResponsePlaylists;
 import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
+import org.springframework.lang.Nullable;
 
 public interface SpotifyAPIService {
 
@@ -15,7 +16,7 @@ public interface SpotifyAPIService {
 
     ResponseTracksAnalysis getTracksAnalysis(TracksDTO tracksDTO);
 
-    ResponsePlaylists getUserPlaylists();
+    ResponsePlaylists getUserPlaylists(@Nullable String username);
 
     TracksDTO getPlaylistTracks(PlaylistInfo playlistInfo, String country);
 

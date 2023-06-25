@@ -1,7 +1,7 @@
 package com.laa66.statlyapp.service.impl;
 
 import com.laa66.statlyapp.DTO.FollowersDTO;
-import com.laa66.statlyapp.DTO.UserProfileDTO;
+import com.laa66.statlyapp.DTO.ProfileDTO;
 import com.laa66.statlyapp.constants.StatlyConstants;
 import com.laa66.statlyapp.entity.User;
 import com.laa66.statlyapp.exception.UserNotFoundException;
@@ -23,7 +23,7 @@ public class SocialServiceImpl implements SocialService {
     private final UserRepository userRepository;
 
     @Override
-    public UserProfileDTO getUserProfile(long userId) {
+    public ProfileDTO getUserProfile(long userId) {
         return null;
     }
 
@@ -33,12 +33,8 @@ public class SocialServiceImpl implements SocialService {
                 .map(foundUser -> {
                     List<User> followers = type == StatlyConstants.FOLLOWING ? foundUser.getFollowing() : foundUser.getFollowers();
                     List<com.laa66.statlyapp.model.User> list = followers.stream()
-                            .map(follower -> new com.laa66.statlyapp.model.User(
-                                    Long.toString(follower.getId()),
-                                    null,
-                                    follower.getUsername(),
-                                    List.of(new Image(follower.getImage(), null, null)))
-                            ).toList();
+                            .map(this::toModelUser)
+                            .toList();
                     return new FollowersDTO(list.size(), list);
                 }).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER);
     }
@@ -67,5 +63,14 @@ public class SocialServiceImpl implements SocialService {
                     return foundUser;
                 }).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER);
         return userRepository.save(user);
+    }
+
+    //helpers
+    private com.laa66.statlyapp.model.User toModelUser(User user) {
+        return new com.laa66.statlyapp.model.User(
+                Long.toString(user.getId()),
+                null,
+                user.getUsername(),
+                List.of(new Image(user.getImage(), null, null)));
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
+import org.springframework.lang.Nullable;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -91,8 +92,9 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     }
 
     @Override
-    public ResponsePlaylists getUserPlaylists() {
-        String url = SpotifyAPI.USER_PLAYLISTS.get();
+    public ResponsePlaylists getUserPlaylists(@Nullable String username) {
+        String url = username == null ? SpotifyAPI.CURRENT_USER_PLAYLISTS.get() :
+                SpotifyAPI.USER_PLAYLISTS.get().replace("user_id", username);
         ResponsePlaylists responsePlaylists = new ResponsePlaylists(null, 0, new LinkedList<>());
         ResponsePlaylists body;
         do {

@@ -181,7 +181,7 @@ class ApiControllerUnitTest {
                 null,
                 1,
                 List.of(new PlaylistInfo(new SpotifyURL(), "id", List.of(), "playlist", new User())));
-        when(spotifyAPIService.getUserPlaylists())
+        when(spotifyAPIService.getUserPlaylists(null))
                 .thenReturn(playlists);
         mockMvc.perform(MockMvcRequestBuilders.get("/api/playlist/all")
                 .with(oauth2Login())

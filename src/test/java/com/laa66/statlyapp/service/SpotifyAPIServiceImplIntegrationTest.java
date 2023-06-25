@@ -242,12 +242,12 @@ class SpotifyAPIServiceImplIntegrationTest {
                 new PlaylistInfo(new SpotifyURL(), "id2", List.of(), "playlist2", new User()))
         );
         mockServer.expect(ExpectedCount.once(),
-                requestTo(SpotifyAPI.USER_PLAYLISTS.get()))
+                requestTo(SpotifyAPI.CURRENT_USER_PLAYLISTS.get()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(mapper.writeValueAsString(responsePlaylists)));
-        ResponsePlaylists returnPlaylists = spotifyAPIService.getUserPlaylists();
+        ResponsePlaylists returnPlaylists = spotifyAPIService.getUserPlaylists(null);
         mockServer.verify();
         assertEquals(2, returnPlaylists.getPlaylists().size());
         assertEquals(2, returnPlaylists.getTotal());
@@ -259,10 +259,10 @@ class SpotifyAPIServiceImplIntegrationTest {
     @Test
     void shouldGetUserPlaylistsResponseError() {
         mockServer.expect(ExpectedCount.once(),
-                        requestTo(SpotifyAPI.USER_PLAYLISTS.get()))
+                        requestTo(SpotifyAPI.CURRENT_USER_PLAYLISTS.get()))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withServiceUnavailable());
-        assertThrows(RestClientException.class, () -> spotifyAPIService.getUserPlaylists());
+        assertThrows(RestClientException.class, () -> spotifyAPIService.getUserPlaylists(null));
         mockServer.verify();
     }
 
