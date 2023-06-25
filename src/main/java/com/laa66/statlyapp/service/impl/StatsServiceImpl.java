@@ -51,7 +51,14 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public ArtistsDTO getUserArtists(long userId, String range) {
-        return null;
+        return artistRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, range)
+                .map(item -> {
+                    List<Artist> artists = item.getArtists().entrySet().stream()
+                            .sorted(Map.Entry.comparingByValue())
+                            .map(entry -> new Artist(entry.getKey()))
+                            .toList();
+                    return new ArtistsDTO(Integer.toString(artists.size()), artists, range, item.getDate());
+                }).orElse(new ArtistsDTO("0", null, range, null));
     }
 
     @Override

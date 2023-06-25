@@ -68,6 +68,29 @@ public class StatsServiceImplUnitTest {
     }
 
     @Test
+    void shouldGetUserArtistsValidUserId() {
+        UserArtist userArtist = new UserArtist(1, 1, "long", Map.of(
+                "artist2", 2, "artist1", 1
+        ), LocalDate.of(2023, 1, 1));
+        when(artistRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "long"))
+                .thenReturn(Optional.of(userArtist));
+        ArtistsDTO artistsDTO = statsService.getUserArtists(1, "long");
+        assertEquals("artist1", artistsDTO.getArtists().get(0).getName());
+        assertEquals("artist2", artistsDTO.getArtists().get(1).getName());
+    }
+
+    @Test
+    void shouldGetUserArtistsNotValidUserId() {
+        when(artistRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "long"))
+                .thenReturn(Optional.empty());
+        ArtistsDTO artistsDTO = statsService.getUserArtists(1, "long");
+        assertEquals("0", artistsDTO.getTotal());
+        assertNull(artistsDTO.getArtists());
+        assertEquals("long", artistsDTO.getRange());
+        assertNull(artistsDTO.getDate());
+    }
+
+    @Test
     void shouldSaveUserTracks() {
         Track item = new Track();
         Artist artist = new Artist("artist");
