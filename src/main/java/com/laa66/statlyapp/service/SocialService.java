@@ -7,7 +7,7 @@ import com.laa66.statlyapp.entity.User;
 
 public interface SocialService {
 
-    ProfileDTO getUserProfile(long userId);
+    ProfileDTO getUserProfile(long userId, String spotifyUserId);
 
     FollowersDTO getFollowers(long userId, StatlyConstants type);
 

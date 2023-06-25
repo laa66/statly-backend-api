@@ -7,7 +7,10 @@ import com.laa66.statlyapp.entity.User;
 import com.laa66.statlyapp.exception.UserNotFoundException;
 import com.laa66.statlyapp.model.Image;
 import com.laa66.statlyapp.repository.UserRepository;
+import com.laa66.statlyapp.service.LibraryAnalysisService;
 import com.laa66.statlyapp.service.SocialService;
+import com.laa66.statlyapp.service.SpotifyAPIService;
+import com.laa66.statlyapp.service.StatsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,10 +24,15 @@ public class SocialServiceImpl implements SocialService {
     private final static Supplier<UserNotFoundException> USER_NOT_FOUND_EXCEPTION_SUPPLIER = () -> new UserNotFoundException("User not found");
 
     private final UserRepository userRepository;
+    private final StatsService statsService;
+    private final SpotifyAPIService spotifyAPIService;
+    private final LibraryAnalysisService libraryAnalysisService;
 
     @Override
-    public ProfileDTO getUserProfile(long userId) {
-        return null;
+    public ProfileDTO getUserProfile(long userId, String spotifyUserId) {
+        return userRepository.findById(userId)
+                .map(foundUser -> createProfileDTO(foundUser, userId, spotifyUserId))
+                .orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER);
     }
 
     @Override
@@ -72,5 +80,27 @@ public class SocialServiceImpl implements SocialService {
                 null,
                 user.getUsername(),
                 List.of(new Image(user.getImage(), null, null)));
+    }
+
+    private ProfileDTO createProfileDTO(User user, long userId, String spotifyUserId) {
+        return new ProfileDTO(
+                user.getId(),
+                user.getUsername(),
+                user.getImage(),
+                user.getPoints(),
+                user.getJoinDate(),
+                user.getFollowing().stream()
+                        .map(this::toModelUser)
+                        .toList(),
+                user.getFollowers().stream()
+                        .map(this::toModelUser)
+                        .toList(),
+                statsService.getUserTracks(userId, "long").getTracks(),
+                statsService.getUserArtists(userId, "long").getArtists(),
+                spotifyAPIService.getUserPlaylists(spotifyUserId).getPlaylists(),
+                libraryAnalysisService.getLibraryAnalysis(spotifyAPIService.getTopTracks(userId, "long"))
+                        .getLibraryAnalysis()
+                        .get("mainstream")
+        );
     }
 }

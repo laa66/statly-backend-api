@@ -50,8 +50,11 @@ public class AppConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public SocialService socialService(UserRepository userRepository) {
-        return new SocialServiceImpl(userRepository);
+    public SocialService socialService(UserRepository userRepository,
+                                       StatsService statsService,
+                                       SpotifyAPIService spotifyAPIService,
+                                       LibraryAnalysisService libraryAnalysisService) {
+        return new SocialServiceImpl(userRepository, statsService, spotifyAPIService, libraryAnalysisService);
     }
 
     @Bean

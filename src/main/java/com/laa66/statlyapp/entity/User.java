@@ -50,7 +50,7 @@ public class User {
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "friend_id", referencedColumnName = "id")}
     )
-    private List<User> following;
+    private List<User> following = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -58,7 +58,7 @@ public class User {
             joinColumns = {@JoinColumn(name = "friend_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")}
     )
-    private List<User> followers;
+    private List<User> followers = new ArrayList<>();
 
     public User(long id, String username, String email, String image, int points, LocalDateTime joinDate) {
         this.id = id;
@@ -85,7 +85,6 @@ public class User {
     }
 
     public void addFollower(User follower) {
-        if (following == null) following = new ArrayList<>();
         following.add(follower);
     }
 

@@ -1,9 +1,13 @@
 package com.laa66.statlyapp.service;
 
-import com.laa66.statlyapp.DTO.FollowersDTO;
+import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.constants.StatlyConstants;
 import com.laa66.statlyapp.entity.User;
 import com.laa66.statlyapp.exception.UserNotFoundException;
+import com.laa66.statlyapp.model.Artist;
+import com.laa66.statlyapp.model.PlaylistInfo;
+import com.laa66.statlyapp.model.Track;
+import com.laa66.statlyapp.model.response.ResponsePlaylists;
 import com.laa66.statlyapp.repository.UserRepository;
 import com.laa66.statlyapp.service.impl.SocialServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -13,14 +17,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 
@@ -30,8 +32,50 @@ public class SocialServiceImplUnitTest {
     @Mock
     UserRepository userRepository;
 
+    @Mock
+    StatsService statsService;
+
+    @Mock
+    SpotifyAPIService spotifyAPIService;
+
+    @Mock
+    LibraryAnalysisService libraryAnalysisService;
+
     @InjectMocks
     SocialServiceImpl socialService;
+
+    @Test
+    void shouldGetUserProfileValidUserId() {
+        User user = new User(1L, "username","test@mail.com", "url", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
+        TracksDTO tracksDTO = new TracksDTO(List.of(new Track(List.of(new Artist("artist")), "title"))
+                , "2", "long", null);
+        ArtistsDTO artistsDTO = new ArtistsDTO("1", List.of(new Artist("artist"))
+                , "long", null);
+        ResponsePlaylists responsePlaylists = new ResponsePlaylists(null, 1, List.of(new PlaylistInfo()));
+        LibraryAnalysisDTO libraryAnalysisDTO = new LibraryAnalysisDTO(Map.of("mainstream", 50.0), List.of());
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(statsService.getUserTracks(1, "long")).thenReturn(tracksDTO);
+        when(statsService.getUserArtists(1, "long")).thenReturn(artistsDTO);
+        when(spotifyAPIService.getUserPlaylists("username")).thenReturn(responsePlaylists);
+        when(spotifyAPIService.getTopTracks(1, "long")).thenReturn(tracksDTO);
+        when(libraryAnalysisService.getLibraryAnalysis(tracksDTO)).thenReturn(libraryAnalysisDTO);
+        ProfileDTO profileDTO = socialService.getUserProfile(1, "username");
+        assertEquals(1L, profileDTO.getId());
+        assertEquals("username", profileDTO.getUsername());
+        assertEquals("url", profileDTO.getImageUrl());
+        assertEquals(0, profileDTO.getPoints());
+        assertEquals(user.getJoinDate(), profileDTO.getJoinDate());
+        assertEquals("title", profileDTO.getTopTracks().get(0).getName());
+        assertEquals("artist", profileDTO.getTopArtists().get(0).getName());
+        assertEquals(1, profileDTO.getUserPlaylists().size());
+        assertEquals(50.0, profileDTO.getMainstream());
+    }
+
+    @Test
+    void shouldGetUserProfileNotValidUserId() {
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> socialService.getUserProfile(1L, "username"));
+    }
 
     @Test
     void shouldFollowValidIds() {

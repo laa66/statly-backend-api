@@ -21,5 +21,5 @@ public class ProfileDTO {
     List<Track> topTracks;
     List<Artist> topArtists;
     List<PlaylistInfo> userPlaylists;
-    int mainstream;
+    double mainstream;
 }
