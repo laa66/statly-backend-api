@@ -43,10 +43,34 @@ public class StatsServiceImplUnitTest {
     StatsServiceImpl statsService;
 
     @Test
+    void shouldGetUserTracksValidUserId() {
+        UserTrack userTrack = new UserTrack(1, 1, "long", Map.of(
+                "artist1_title1", 1, "artist2_title2", 2
+        ), LocalDate.of(2023, 1, 1));
+        when(trackRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "long"))
+                .thenReturn(Optional.of(userTrack));
+        TracksDTO tracksDTO = statsService.getUserTracks(1, "long");
+        assertEquals("artist1", tracksDTO.getTracks().get(0).getArtists().get(0).getName());
+        assertEquals("title1", tracksDTO.getTracks().get(0).getName());
+        assertEquals("artist2", tracksDTO.getTracks().get(1).getArtists().get(0).getName());
+        assertEquals("title2", tracksDTO.getTracks().get(1).getName());
+    }
+
+    @Test
+    void shouldGetUserTracksNotValidUserId() {
+        when(trackRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "long"))
+                .thenReturn(Optional.empty());
+        TracksDTO tracksDTO = statsService.getUserTracks(1, "long");
+        assertNull(tracksDTO.getTracks());
+        assertEquals("0", tracksDTO.getTotal());
+        assertEquals("long", tracksDTO.getRange());
+        assertNull(tracksDTO.getDate());
+    }
+
+    @Test
     void shouldSaveUserTracks() {
         Track item = new Track();
-        Artist artist = new Artist();
-        artist.setName("artist");
+        Artist artist = new Artist("artist");
         item.setArtists(Collections.singletonList(artist));
         item.setName("song");
         TracksDTO dto = new TracksDTO(Collections.singletonList(item), "1", "short", null);
@@ -76,10 +100,8 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldCompareTracks() {
-        Artist artist1 = new Artist();
-        Artist artist2 = new Artist();
-        artist1.setName("artist1");
-        artist2.setName("artist2");
+        Artist artist1 = new Artist("artist1");
+        Artist artist2 = new Artist("artist2");
         TracksDTO dto = new TracksDTO(List.of(
                 new Track(new Album(), List.of(artist1), "track1", 50, "uri", new SpotifyURL(), "id", 0),
                 new Track(new Album(), List.of(artist2), "track2", 50, "uri", new SpotifyURL(), "id", 0)
@@ -128,10 +150,8 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldNotCompareTracksWrongId() {
-        Artist artist1 = new Artist();
-        Artist artist2 = new Artist();
-        artist1.setName("artist1");
-        artist2.setName("artist2");
+        Artist artist1 = new Artist("artist1");
+        Artist artist2 = new Artist("artist2");
         TracksDTO dto = new TracksDTO(List.of(
                 new Track(new Album(), List.of(artist1), "track1", 50, "uri", new SpotifyURL(), "id", 0),
                 new Track(new Album(), List.of(artist2), "track2", 50, "uri", new SpotifyURL(), "id", 0)
@@ -152,10 +172,8 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldNotCompareTracksWrongRangeInDto() {
-        Artist artist1 = new Artist();
-        Artist artist2 = new Artist();
-        artist1.setName("artist1");
-        artist2.setName("artist2");
+        Artist artist1 = new Artist("artist1");
+        Artist artist2 = new Artist("artist2");
         TracksDTO dto = new TracksDTO(List.of(
                 new Track(new Album(), List.of(artist1), "track1", 50, "uri", new SpotifyURL(), "id", 0),
                 new Track(new Album(), List.of(artist2), "track2", 50, "uri", new SpotifyURL(), "id", 0)

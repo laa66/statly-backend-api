@@ -8,6 +8,10 @@ import java.util.Map;
 
 public interface StatsService {
 
+    TracksDTO getUserTracks(long userId, String range);
+
+    ArtistsDTO getUserArtists(long userId, String range);
+
     void saveUserTracks(Map<TracksDTO, Long> dtoMap);
 
     void saveUserArtists(Map<ArtistsDTO, Long> dtoMap);

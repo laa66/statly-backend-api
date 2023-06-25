@@ -6,6 +6,7 @@ import com.laa66.statlyapp.DTO.TracksDTO;
 import com.laa66.statlyapp.entity.UserArtist;
 import com.laa66.statlyapp.entity.UserGenre;
 import com.laa66.statlyapp.entity.UserTrack;
+import com.laa66.statlyapp.model.Album;
 import com.laa66.statlyapp.model.Genre;
 import com.laa66.statlyapp.model.Artist;
 import com.laa66.statlyapp.model.Track;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -32,6 +34,25 @@ public class StatsServiceImpl implements StatsService {
     private final TrackRepository trackRepository;
     private final ArtistRepository artistRepository;
     private final GenreRepository genreRepository;
+
+    @Override
+    public TracksDTO getUserTracks(long userId, String range) {
+        return trackRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, range)
+                .map(item -> {
+                    List<Track> tracks = item.getTracks().entrySet().stream()
+                            .sorted(Map.Entry.comparingByValue())
+                            .map(entry -> {
+                                String[] artistTitle = entry.getKey().split("_");
+                                return new Track(List.of(new Artist(artistTitle[0])), artistTitle[1]);
+                            }).toList();
+                    return new TracksDTO(tracks, Integer.toString(tracks.size()), range, item.getDate());
+                }).orElse(new TracksDTO(null, "0", range, null));
+    }
+
+    @Override
+    public ArtistsDTO getUserArtists(long userId, String range) {
+        return null;
+    }
 
     @Override
     public void saveUserTracks(Map<TracksDTO, Long> dtoMap) {

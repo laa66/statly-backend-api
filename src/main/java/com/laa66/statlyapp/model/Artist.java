@@ -26,4 +26,8 @@ public class Artist {
     private SpotifyURL url;
 
     private Integer difference;
+
+    public Artist(String name) {
+        this.name = name;
+    }
 }

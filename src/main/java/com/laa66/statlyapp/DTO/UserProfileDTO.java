@@ -16,7 +16,7 @@ public class UserProfileDTO {
     String imageUrl;
     int points;
     LocalDateTime joinDate;
-    List<User> followed;
+    List<User> following;
     List<User> followers;
     List<Track> topTracks;
     List<Artist> topArtists;

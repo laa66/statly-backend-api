@@ -30,4 +30,9 @@ public class Track {
     private String id;
 
     private Integer difference;
+
+    public Track(List<Artist> artists, String name) {
+        this.artists = artists;
+        this.name = name;
+    }
 }

@@ -1,11 +1,7 @@
 package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.DTO.BetaUserDTO;
-import com.laa66.statlyapp.DTO.FollowersDTO;
-import com.laa66.statlyapp.constants.StatlyConstants;
-import com.laa66.statlyapp.entity.User;
 import com.laa66.statlyapp.service.MailService;
-import com.laa66.statlyapp.service.SocialService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
