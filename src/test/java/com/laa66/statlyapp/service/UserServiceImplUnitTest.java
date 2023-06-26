@@ -59,13 +59,25 @@ class UserServiceImplUnitTest {
         assertEquals(user.getId(), returnUser.get().getId());
         assertEquals(user.getEmail(), returnUser.get().getEmail());
         assertEquals(user.getJoinDate(), returnUser.get().getJoinDate());
+
+        when(userRepository.findByEmail("wrong@mail.com")).thenReturn(Optional.empty());
+        Optional<User> returnEmptyUser = userRepository.findByEmail("wrong@mail.com");
+        assertTrue(returnEmptyUser.isEmpty());
     }
 
     @Test
-    void shouldNotFindUserByEmail() {
-        when(userRepository.findByEmail("user@mail.com")).thenReturn(Optional.empty());
-        Optional<User> returnUser = userRepository.findByEmail("user@mail.com");
-        assertTrue(returnUser.isEmpty());
+    void shouldFindUserByUsername() {
+        User user = new User(1, "username", "user@mail.com", "url", 0, LocalDateTime.of(2023, 4, 30, 20, 20));
+        when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
+        Optional<User> returnUser = userRepository.findByUsername("username");
+        assertTrue(returnUser.isPresent());
+        assertEquals(user.getId(), returnUser.get().getId());
+        assertEquals(user.getEmail(), returnUser.get().getEmail());
+        assertEquals(user.getJoinDate(), returnUser.get().getJoinDate());
+
+        when(userRepository.findByUsername("empty")).thenReturn(Optional.empty());
+        Optional<User> returnEmptyUser = userRepository.findByUsername("empty");
+        assertTrue(returnEmptyUser.isEmpty());
     }
 
     @Test
