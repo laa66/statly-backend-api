@@ -17,17 +17,26 @@ class UserRepositoryIntegrationTest extends MySQLBaseContainerTest {
     UserRepository userRepository;
 
     @Test
-    void shouldFindUserByEmail() {
+    void shouldFindByEmail() {
         Optional<User> optionalUser = userRepository.findByEmail("user@mail.com");
         assertTrue(optionalUser.isPresent());
         assertEquals(1, optionalUser.get().getId());
         assertEquals("user@mail.com", optionalUser.get().getEmail());
         assertEquals(LocalDateTime.of(2023, 4, 20, 14, 56,32), optionalUser.get().getJoinDate());
+
+        Optional<User> emptyUser = userRepository.findByEmail("wrong@mail.com");
+        assertTrue(emptyUser.isEmpty());
     }
 
     @Test
-    void shouldNotFindUserByEmail() {
-        Optional<User> optionalUser = userRepository.findByEmail("wrong@mail.com");
-        assertTrue(optionalUser.isEmpty());
+    void shouldFindByUsername() {
+        Optional<User> optionalUser = userRepository.findByUsername("username");
+        assertTrue(optionalUser.isPresent());
+        assertEquals(1, optionalUser.get().getId());
+        assertEquals("user@mail.com", optionalUser.get().getEmail());
+        assertEquals(LocalDateTime.of(2023, 4, 20, 14, 56,32), optionalUser.get().getJoinDate());
+
+        Optional<User> emptyUser = userRepository.findByUsername("wrongUsername");
+        assertTrue(emptyUser.isEmpty());
     }
 }
