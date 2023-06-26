@@ -1,5 +1,6 @@
 package com.laa66.statlyapp.entity;
 
+import com.laa66.statlyapp.model.Image;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -89,7 +90,14 @@ public class User {
     }
 
     public void removeFollower(User follower) {
-        if (following == null) return;
         following.remove(follower);
+    }
+
+    public com.laa66.statlyapp.model.User toModelUser() {
+        return new com.laa66.statlyapp.model.User(
+                Long.toString(this.getId()),
+                null,
+                this.getUsername(),
+                List.of(new Image(this.getImage(), null, null)));
     }
 }

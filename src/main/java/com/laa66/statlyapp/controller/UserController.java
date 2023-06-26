@@ -1,6 +1,7 @@
 package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.DTO.BetaUserDTO;
+import com.laa66.statlyapp.model.User;
 import com.laa66.statlyapp.service.MailService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.UserService;
@@ -34,9 +35,15 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> delete(@AuthenticationPrincipal OAuth2User principal) {
+    public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal OAuth2User principal) {
         userService.deleteUser((long) principal.getAttributes().get("userId"));
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/get")
+    public ResponseEntity<User> getUser(@RequestParam("username") String username) {
+        User user = userService.findUserByUsername(username);
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping("/beta/all")

@@ -1,9 +1,6 @@
 package com.laa66.statlyapp.aspect;
 
-import com.laa66.statlyapp.exception.ClientAuthorizationException;
-import com.laa66.statlyapp.exception.SpotifyAPIEmptyResponseException;
-import com.laa66.statlyapp.exception.SpotifyAPIException;
-import com.laa66.statlyapp.exception.UserAuthenticationException;
+import com.laa66.statlyapp.exception.*;
 import com.laa66.statlyapp.DTO.ExceptionDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,6 +14,12 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Slf4j
 @RestControllerAdvice
 public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler({UserNotFoundException.class})
+    public ResponseEntity<ExceptionDTO> handleUserNotFoundException(UserNotFoundException e) {
+        ExceptionDTO exceptionDTO = new ExceptionDTO(HttpStatus.NOT_FOUND.value(), e.getMessage(), System.currentTimeMillis());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionDTO);
+    }
 
     @ExceptionHandler({UserAuthenticationException.class})
     public ResponseEntity<ExceptionDTO> handleAuthenticationException(UserAuthenticationException e) {

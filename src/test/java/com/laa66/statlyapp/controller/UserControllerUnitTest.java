@@ -3,6 +3,7 @@ package com.laa66.statlyapp.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.config.TestSecurityConfig;
+import com.laa66.statlyapp.exception.UserNotFoundException;
 import com.laa66.statlyapp.model.*;
 import com.laa66.statlyapp.repository.*;
 import com.laa66.statlyapp.service.MailService;
@@ -94,6 +95,32 @@ class UserControllerUnitTest {
                                 .attributes(map -> map.put("userId", 1L)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void shouldGetUser() throws Exception {
+        User user = new User("1", "uri", "name", List.of(new Image("url", null, null)));
+        when(userService.findUserByUsername("name")).thenReturn(user);
+        mockMvc.perform(get("/user/get?username=name")
+                .with(oauth2Login())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.id", is("1")),
+                        jsonPath("$.uri", is("uri")),
+                        jsonPath("$.display_name", is("name")),
+                        jsonPath("$.images[0].url", is("url"))
+                );
+    }
+
+    @Test
+    void shouldGetUserWrongUsername() throws Exception {
+        when(userService.findUserByUsername("wrong"))
+                .thenThrow(UserNotFoundException.class);
+        mockMvc.perform(get("/user/get?username=wrong")
+                .with(oauth2Login())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @Test

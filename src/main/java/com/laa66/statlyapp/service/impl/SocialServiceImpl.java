@@ -41,7 +41,7 @@ public class SocialServiceImpl implements SocialService {
                 .map(foundUser -> {
                     List<User> followers = type == StatlyConstants.FOLLOWING ? foundUser.getFollowing() : foundUser.getFollowers();
                     List<com.laa66.statlyapp.model.User> list = followers.stream()
-                            .map(this::toModelUser)
+                            .map(User::toModelUser)
                             .toList();
                     return new FollowersDTO(list.size(), list);
                 }).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER);
@@ -74,14 +74,6 @@ public class SocialServiceImpl implements SocialService {
     }
 
     //helpers
-    private com.laa66.statlyapp.model.User toModelUser(User user) {
-        return new com.laa66.statlyapp.model.User(
-                Long.toString(user.getId()),
-                null,
-                user.getUsername(),
-                List.of(new Image(user.getImage(), null, null)));
-    }
-
     private ProfileDTO createProfileDTO(User user, long userId, String spotifyUserId) {
         return new ProfileDTO(
                 user.getId(),
@@ -90,10 +82,10 @@ public class SocialServiceImpl implements SocialService {
                 user.getPoints(),
                 user.getJoinDate(),
                 user.getFollowing().stream()
-                        .map(this::toModelUser)
+                        .map(User::toModelUser)
                         .toList(),
                 user.getFollowers().stream()
-                        .map(this::toModelUser)
+                        .map(User::toModelUser)
                         .toList(),
                 statsService.getUserTracks(userId, "long").getTracks(),
                 statsService.getUserArtists(userId, "long").getArtists(),

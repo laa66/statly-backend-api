@@ -54,14 +54,14 @@ class UserServiceImplUnitTest {
     void shouldFindUserByEmail() {
         User user = new User(1, "username", "user@mail.com", "url", 0, LocalDateTime.of(2023, 4, 30, 20, 20));
         when(userRepository.findByEmail("user@mail.com")).thenReturn(Optional.of(user));
-        Optional<User> returnUser = userRepository.findByEmail("user@mail.com");
+        Optional<User> returnUser = userService.findUserByEmail("user@mail.com");
         assertTrue(returnUser.isPresent());
         assertEquals(user.getId(), returnUser.get().getId());
         assertEquals(user.getEmail(), returnUser.get().getEmail());
         assertEquals(user.getJoinDate(), returnUser.get().getJoinDate());
 
         when(userRepository.findByEmail("wrong@mail.com")).thenReturn(Optional.empty());
-        Optional<User> returnEmptyUser = userRepository.findByEmail("wrong@mail.com");
+        Optional<User> returnEmptyUser = userService.findUserByEmail("wrong@mail.com");
         assertTrue(returnEmptyUser.isEmpty());
     }
 
@@ -69,15 +69,12 @@ class UserServiceImplUnitTest {
     void shouldFindUserByUsername() {
         User user = new User(1, "username", "user@mail.com", "url", 0, LocalDateTime.of(2023, 4, 30, 20, 20));
         when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
-        Optional<User> returnUser = userRepository.findByUsername("username");
-        assertTrue(returnUser.isPresent());
-        assertEquals(user.getId(), returnUser.get().getId());
-        assertEquals(user.getEmail(), returnUser.get().getEmail());
-        assertEquals(user.getJoinDate(), returnUser.get().getJoinDate());
+        com.laa66.statlyapp.model.User returnUser = userService.findUserByUsername("username");
+        assertEquals(Long.toString(user.getId()), returnUser.getId());
+        assertEquals(user.getImage(), returnUser.getImages().get(0).getUrl());
 
         when(userRepository.findByUsername("empty")).thenReturn(Optional.empty());
-        Optional<User> returnEmptyUser = userRepository.findByUsername("empty");
-        assertTrue(returnEmptyUser.isEmpty());
+        assertThrows(UserNotFoundException.class, () -> userService.findUserByUsername("empty"));
     }
 
     @Test
@@ -99,12 +96,9 @@ class UserServiceImplUnitTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         userService.deleteUser(user.getId());
         verify(userRepository, times(1)).deleteById(1L);
-    }
 
-    @Test
-    void shouldNotDeleteUserThrowException() {
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> userService.deleteUser(1L));
+        when(userRepository.findById(2L)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> userService.deleteUser(2L));
     }
 
     @Test

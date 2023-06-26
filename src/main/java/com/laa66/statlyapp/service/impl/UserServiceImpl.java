@@ -40,8 +40,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> findUserByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public com.laa66.statlyapp.model.User findUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .map(User::toModelUser)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     @Override
@@ -51,7 +53,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(long id) {
-        userRepository.findById(id).ifPresentOrElse(item -> userRepository.deleteById(item.getId()), () -> {
+        userRepository.findById(id).ifPresentOrElse(item -> userRepository.deleteById(item.getId()),
+                        () -> {
                     throw new UserNotFoundException("User not found");
                 });
     }
