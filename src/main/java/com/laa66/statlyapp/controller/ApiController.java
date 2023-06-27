@@ -21,21 +21,21 @@ public class ApiController {
     private final LibraryAnalysisService libraryAnalysisService;
 
     @GetMapping("/top/tracks")
-    public ResponseEntity<TracksDTO> tracks(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
+    public ResponseEntity<TracksDTO> tracks(@RequestParam String range, @AuthenticationPrincipal OAuth2User principal) {
         long userId = (long) principal.getAttributes().get("userId");
         TracksDTO tracksDTO = spotifyApiService.getTopTracks(userId, range);
         return ResponseEntity.ok(tracksDTO);
     }
 
     @GetMapping("/top/artists")
-    public ResponseEntity<ArtistsDTO> artists(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
+    public ResponseEntity<ArtistsDTO> artists(@RequestParam String range, @AuthenticationPrincipal OAuth2User principal) {
         long userId = (long) principal.getAttributes().get("userId");
         ArtistsDTO artistsDTO = spotifyApiService.getTopArtists(userId, range);
         return ResponseEntity.ok(artistsDTO);
     }
 
     @GetMapping("/top/genres")
-    public ResponseEntity<GenresDTO> genres(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
+    public ResponseEntity<GenresDTO> genres(@RequestParam String range, @AuthenticationPrincipal OAuth2User principal) {
         long userId = (long) principal.getAttributes().get("userId");
         ArtistsDTO artistsDTO = spotifyApiService.getTopArtists(userId, range);
         GenresDTO genresDTO = libraryAnalysisService.getTopGenres(userId, range, artistsDTO);
@@ -50,7 +50,7 @@ public class ApiController {
     }
 
     @PostMapping("/playlist/create")
-    public ResponseEntity<PlaylistDTO> createPlaylist(@RequestParam("range") String range, @AuthenticationPrincipal OAuth2User principal) {
+    public ResponseEntity<PlaylistDTO> createPlaylist(@RequestParam String range, @AuthenticationPrincipal OAuth2User principal) {
         long userId = (long) principal.getAttributes().get("userId");
         PlaylistDTO playlistDTO = spotifyApiService.postTopTracksPlaylist(userId, range);
         return ResponseEntity.status(HttpStatus.CREATED).body(playlistDTO);

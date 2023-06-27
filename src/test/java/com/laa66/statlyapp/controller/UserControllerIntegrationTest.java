@@ -21,6 +21,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -123,4 +124,29 @@ class UserControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isFound());
     }
+
+    @Test
+    void shouldFollowValidFollowId() throws Exception {
+        mockMvc.perform(put("/user/follow?followId=2")
+                        .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+        verify(socialService, times(1)).follow(1, 2);
+
+        mockMvc.perform(put("/user/follow?followId=2")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isFound());
+    }
+
+    @Test
+    void shouldFollowNotValidFollowId() throws Exception {
+        when(socialService.follow(1, 3)).thenThrow(new UserNotFoundException("User not found"));
+        mockMvc.perform(put("/user/follow?followId=3")
+                        .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
 }

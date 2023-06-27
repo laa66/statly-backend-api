@@ -41,7 +41,7 @@ public class UserController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<User> getUser(@RequestParam("username") String username) {
+    public ResponseEntity<User> getUser(@RequestParam String username) {
         User user = userService.findUserByUsername(username);
         return ResponseEntity.ok(user);
     }
@@ -51,6 +51,13 @@ public class UserController {
         long userId = (long) principal.getAttributes().get("userId");
         FollowersDTO followersDTO = socialService.getFollowers(userId, StatlyConstants.FOLLOWING);
         return ResponseEntity.ok(followersDTO);
+    }
+
+    @PutMapping("/follow")
+    public ResponseEntity<Void> follow(@AuthenticationPrincipal OAuth2User principal, @RequestParam long followId) {
+        long userId = (long) principal.getAttributes().get("userId");
+        socialService.follow(userId, followId);
+        return ResponseEntity.noContent().build();
     }
 
 

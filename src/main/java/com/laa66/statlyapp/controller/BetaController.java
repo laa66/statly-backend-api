@@ -24,7 +24,7 @@ public class BetaController {
     }
 
     @GetMapping("/join")
-    public ResponseEntity<Void> join(@RequestParam("name") String fullName, @RequestParam("email") String email) {
+    public ResponseEntity<Void> join(@RequestParam("name") String fullName, @RequestParam String email) {
         userService.saveBetaUser(new BetaUserDTO(fullName, email, null));
         mailService.sendJoinBetaNotification();
         return ResponseEntity.noContent().build();
