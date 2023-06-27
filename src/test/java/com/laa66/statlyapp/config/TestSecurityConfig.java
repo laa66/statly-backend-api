@@ -65,9 +65,9 @@ public class TestSecurityConfig {
         CsrfTokenRequestHandler requestHandler = delegate::handle;
         httpSecurity.csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/user/beta/all", "/user/beta/delete").access((authentication, object) ->
+                .requestMatchers(HttpMethod.GET, "/beta/join").permitAll()
+                .requestMatchers("/beta/all", "/beta/delete", "/beta/notification").access((authentication, object) ->
                         new AuthorizationDecision(((OAuth2User) authentication.get().getPrincipal()).getAttributes().get("email").equals("admin@mail.com")))
-                .requestMatchers(HttpMethod.POST, "/user/beta/join").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

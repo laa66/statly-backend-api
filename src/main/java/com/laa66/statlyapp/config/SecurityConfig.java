@@ -75,8 +75,8 @@ public class SecurityConfig {
                         .csrfTokenRepository(tokenRepository)
                         .csrfTokenRequestHandler(requestHandler))
                 .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.GET, "/user/beta/join").permitAll()
-                .requestMatchers("/user/beta/all", "/user/beta/delete", "user/beta/notification").access((authentication, object) ->
+                .requestMatchers(HttpMethod.GET, "/beta/join").permitAll()
+                .requestMatchers("/beta/all", "/beta/delete", "/beta/notification").access((authentication, object) ->
                         new AuthorizationDecision(((OAuth2User) authentication.get().getPrincipal()).getAttributes().get("email").equals(ADMIN_EMAIL)))
                 .anyRequest()
                 .authenticated()

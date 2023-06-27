@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class AppConfig implements WebMvcConfigurer {
+public class AppConfig {
 
     @Bean
     public MailService mailService(JavaMailSender javaMailSender, @Value("${statly.api.admin-email}") String email) {
@@ -55,10 +55,5 @@ public class AppConfig implements WebMvcConfigurer {
                                        SpotifyAPIService spotifyAPIService,
                                        LibraryAnalysisService libraryAnalysisService) {
         return new SocialServiceImpl(userRepository, statsService, spotifyAPIService, libraryAnalysisService);
-    }
-
-    @Bean
-    public CookieSameSiteSupplier cookieSameSiteSupplier(){
-        return CookieSameSiteSupplier.ofNone().whenHasName("XSRF-TOKEN");
     }
 }

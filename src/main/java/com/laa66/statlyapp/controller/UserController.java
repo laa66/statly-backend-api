@@ -15,8 +15,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
@@ -24,8 +22,6 @@ public class UserController {
 
     private final UserService userService;
     private final SpotifyAPIService spotifyApiService;
-    private final MailService mailService;
-
 
     @GetMapping("/auth")
     public void authenticate(HttpServletRequest request, HttpServletResponse response) {
@@ -44,31 +40,6 @@ public class UserController {
     public ResponseEntity<User> getUser(@RequestParam("username") String username) {
         User user = userService.findUserByUsername(username);
         return ResponseEntity.ok(user);
-    }
-
-    @GetMapping("/beta/all")
-    public ResponseEntity<List<BetaUserDTO>> findAllBetaUsers() {
-        List<BetaUserDTO> dto = userService.findAllBetaUsers();
-        return ResponseEntity.ok(dto);
-    }
-
-    @GetMapping("/beta/join")
-    public ResponseEntity<Void> join(@RequestParam("name") String fullName, @RequestParam("email") String email) {
-        userService.saveBetaUser(new BetaUserDTO(fullName, email, null));
-        mailService.sendJoinBetaNotification();
-        return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/beta/notification")
-    public ResponseEntity<Void> sendNotification(@RequestBody BetaUserDTO betaUserDTO) {
-        mailService.sendAccessGrantedNotification(betaUserDTO);
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/beta/delete")
-    public ResponseEntity<Void> deleteAllBetaUsers() {
-        userService.deleteAllBetaUsers();
-        return ResponseEntity.noContent().build();
     }
 
 }
