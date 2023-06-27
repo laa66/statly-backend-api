@@ -2,8 +2,10 @@ package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.config.TestSecurityConfig;
+import com.laa66.statlyapp.constants.StatlyConstants;
 import com.laa66.statlyapp.exception.UserNotFoundException;
 import com.laa66.statlyapp.model.*;
+import com.laa66.statlyapp.service.SocialService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -35,6 +37,9 @@ class UserControllerIntegrationTest {
     @MockBean
     UserService userService;
 
+    @MockBean
+    SocialService socialService;
+
     @Autowired
     MockMvc mockMvc;
 
@@ -48,10 +53,7 @@ class UserControllerIntegrationTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/user/auth").with(oauth2Login()))
                 .andExpect(status().isTemporaryRedirect())
                 .andExpect(header().string("location", "url/callback?name=testuser&url=imageurl"));
-    }
 
-    @Test
-    void shouldNotAuth() throws Exception {
         mockMvc.perform(get("/user/auth")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isFound());
@@ -64,10 +66,14 @@ class UserControllerIntegrationTest {
                                 .attributes(map -> map.put("userId", 1L)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/user/delete")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isFound());
     }
 
     @Test
-    void shouldGetUser() throws Exception {
+    void shouldGetUserValidUsername() throws Exception {
         User user = new User("1", "uri", "name", List.of(new Image("url", null, null)));
         when(userService.findUserByUsername("name")).thenReturn(user);
         mockMvc.perform(get("/user/get?username=name")
@@ -80,15 +86,41 @@ class UserControllerIntegrationTest {
                         jsonPath("$.display_name", is("name")),
                         jsonPath("$.images[0].url", is("url"))
                 );
+        mockMvc.perform(get("/user/get?username=name")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isFound());
     }
 
     @Test
-    void shouldGetUserWrongUsername() throws Exception {
+    void shouldGetUserNotValidUsername() throws Exception {
         when(userService.findUserByUsername("wrong"))
                 .thenThrow(UserNotFoundException.class);
         mockMvc.perform(get("/user/get?username=wrong")
                 .with(oauth2Login())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldGetUserFollowing() throws Exception {
+        FollowersDTO followersDTO = new FollowersDTO(1, List.of(new User(
+                "id", "uri", "name", List.of(new Image("url", null, null))
+        )));
+        when(socialService.getFollowers(1, StatlyConstants.FOLLOWING))
+                .thenReturn(followersDTO);
+        mockMvc.perform(get("/user/following")
+                .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.size", is(1)),
+                        jsonPath("$.users[0].id", is("id")),
+                        jsonPath("$.users[0].display_name", is("name")),
+                        jsonPath("$.users[0].images[0].url", is("url"))
+                );
+
+        mockMvc.perform(get("/user/following")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isFound());
     }
 }

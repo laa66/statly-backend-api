@@ -5,7 +5,6 @@ import com.laa66.statlyapp.DTO.ProfileDTO;
 import com.laa66.statlyapp.constants.StatlyConstants;
 import com.laa66.statlyapp.entity.User;
 import com.laa66.statlyapp.exception.UserNotFoundException;
-import com.laa66.statlyapp.model.Image;
 import com.laa66.statlyapp.repository.UserRepository;
 import com.laa66.statlyapp.service.LibraryAnalysisService;
 import com.laa66.statlyapp.service.SocialService;

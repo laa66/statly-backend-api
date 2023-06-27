@@ -51,15 +51,13 @@ class ApiControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total", is("1")))
                 .andExpect(jsonPath("$.items").exists());
-    }
 
-    @Test
-    void shouldGetTopTracksNotAuthenticated() throws Exception {
         mockMvc.perform(get("/api/top/tracks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("range", "short"))
                 .andExpect(status().isFound());
     }
+
 
     @Test
     void shouldGetTopArtistsAuthenticated() throws Exception {
@@ -72,15 +70,13 @@ class ApiControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total", is("1")))
                 .andExpect(jsonPath("$.items").exists());
-    }
 
-    @Test
-    void shouldGetTopArtistsNotAuthenticated() throws Exception {
         mockMvc.perform(get("/api/top/artists")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("range", "short"))
                 .andExpect(status().isFound());
     }
+
 
     @Test
     void shouldGetTopGenresAuthenticated() throws Exception {
@@ -95,13 +91,10 @@ class ApiControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.genres[0].genre", is("rock")))
                 .andExpect(jsonPath("$.genres[0].score", is(2)));
-    }
 
-    @Test
-    void shouldGetTopGenresNotAuthenticated() throws Exception {
         mockMvc.perform(get("/api/top/genres")
-                .contentType(MediaType.APPLICATION_JSON)
-                .param("range", "short"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("range", "short"))
                 .andExpect(status().isFound());
     }
 
@@ -115,12 +108,9 @@ class ApiControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total", is("1")))
                 .andExpect(jsonPath("$.items").exists());
-    }
 
-    @Test
-    void shouldGetRecentlyPlayedNotAuthenticated() throws Exception {
         mockMvc.perform(get("/api/recently")
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isFound());
     }
 
@@ -129,7 +119,7 @@ class ApiControllerIntegrationTest {
         PlaylistDTO playlistDTO = new PlaylistDTO("1", new SpotifyURL());
         when(spotifyAPIService.postTopTracksPlaylist(1, "short"))
                 .thenReturn(playlistDTO);
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/playlist/create")
+        mockMvc.perform(post("/api/playlist/create")
                         .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
                         .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -137,13 +127,10 @@ class ApiControllerIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", is("1")))
                 .andExpect(jsonPath("$.external_urls").exists());
-    }
 
-    @Test
-    void shouldCreatePlaylistNotAuthenticated() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/playlist/create").with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .param("range", "short"))
+        mockMvc.perform(post("/api/playlist/create").with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("range", "short"))
                 .andExpect(status().isFound());
     }
 
@@ -155,7 +142,7 @@ class ApiControllerIntegrationTest {
                 List.of(new PlaylistInfo(new SpotifyURL(), "id", List.of(), "playlist", new User())));
         when(spotifyAPIService.getUserPlaylists(null))
                 .thenReturn(playlists);
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/playlist/all")
+        mockMvc.perform(get("/api/playlist/all")
                 .with(oauth2Login())
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
@@ -163,13 +150,10 @@ class ApiControllerIntegrationTest {
                 .andExpect(jsonPath("$.next").doesNotExist())
                 .andExpect(jsonPath("$.total", is(1)))
                 .andExpect(jsonPath("$.items").exists());
-    }
 
-    @Test
-    void shouldGetAllPlaylistsNotAuthenticated() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/playlist/all")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/playlist/all")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isFound());
     }
 
@@ -184,7 +168,7 @@ class ApiControllerIntegrationTest {
                 .thenReturn(tracksDTO);
         when(libraryAnalysisService.getLibraryAnalysis(tracksDTO))
                 .thenReturn(libraryAnalysisDTO);
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/analysis/library")
+        mockMvc.perform(get("/api/analysis/library")
                 .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
@@ -194,13 +178,10 @@ class ApiControllerIntegrationTest {
                         jsonPath("$.libraryAnalysis", hasEntry("valence", 0.55)),
                         jsonPath("$.images").exists()
                 );
-    }
 
-    @Test
-    void shouldGetLibraryAnalysisNotAuthenticated() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/analysis/library")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/analysis/library")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isFound());
     }
 
@@ -216,7 +197,7 @@ class ApiControllerIntegrationTest {
                 .thenReturn(tracksDTO);
         when(libraryAnalysisService.getLibraryAnalysis(tracksDTO))
                 .thenReturn(libraryAnalysisDTO);
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/analysis/playlist")
+        mockMvc.perform(post("/api/analysis/playlist")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(playlistInfo))
                 .with(csrf())
@@ -228,14 +209,11 @@ class ApiControllerIntegrationTest {
                         jsonPath("$.images").exists()
                 );
 
-    }
-
-    @Test
-    void shouldGetPlaylistAnalysisNotAuthenticated() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/analysis/playlist")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(csrf())
-                .content(mapper.writeValueAsString(new PlaylistInfo())))
+        mockMvc.perform(post("/api/analysis/playlist")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(mapper.writeValueAsString(new PlaylistInfo())))
                 .andExpect(status().isFound());
+
     }
 }
