@@ -149,4 +149,28 @@ class UserControllerIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    void shouldUnfollowValidFollowId() throws Exception {
+        mockMvc.perform(put("/user/unfollow?followId=2")
+                        .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+        verify(socialService, times(1)).unfollow(1, 2);
+
+        mockMvc.perform(put("/user/unfollow?followId=2")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isFound());
+    }
+
+    @Test
+    void shouldUnfollowNotValidFollowId() throws Exception {
+        when(socialService.unfollow(1, 3)).thenThrow(new UserNotFoundException("User not found"));
+        mockMvc.perform(put("/user/unfollow?followId=3")
+                        .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
 }

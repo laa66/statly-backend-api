@@ -1,10 +1,8 @@
 package com.laa66.statlyapp.controller;
 
-import com.laa66.statlyapp.DTO.BetaUserDTO;
 import com.laa66.statlyapp.DTO.FollowersDTO;
 import com.laa66.statlyapp.constants.StatlyConstants;
 import com.laa66.statlyapp.model.User;
-import com.laa66.statlyapp.service.MailService;
 import com.laa66.statlyapp.service.SocialService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.UserService;
@@ -57,6 +55,13 @@ public class UserController {
     public ResponseEntity<Void> follow(@AuthenticationPrincipal OAuth2User principal, @RequestParam long followId) {
         long userId = (long) principal.getAttributes().get("userId");
         socialService.follow(userId, followId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/unfollow")
+    public ResponseEntity<Void> unfollow(@AuthenticationPrincipal OAuth2User principal, @RequestParam long followId) {
+        long userId = (long) principal.getAttributes().get("userId");
+        socialService.unfollow(userId, followId);
         return ResponseEntity.noContent().build();
     }
 
