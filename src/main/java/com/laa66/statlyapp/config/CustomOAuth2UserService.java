@@ -1,6 +1,7 @@
 package com.laa66.statlyapp.config;
 
 import com.laa66.statlyapp.entity.User;
+import com.laa66.statlyapp.entity.UserStats;
 import com.laa66.statlyapp.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -30,11 +31,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         try {
             String username = (String) attributes.get("display_name");
-            String imageUrl = getImageUrl(attributes);
             String email = (String) oAuth2User.getAttributes().get("email");
+            String spotifyUserId = (String) oAuth2User.getAttributes().get("id");
+            String imageUrl = getImageUrl(attributes);
 
             Optional<User> user = userService.findUserByEmail(email).or(() -> {
-            userService.saveUser(new User(0, username, email, imageUrl, 0, LocalDateTime.now()));
+            userService.saveUser(new User(0, spotifyUserId, username, email, imageUrl, LocalDateTime.now(), new UserStats()));
             return userService.findUserByEmail(email);
             });
             attributes.put("userId", user.orElseThrow().getId());

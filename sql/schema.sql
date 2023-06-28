@@ -1,11 +1,30 @@
+CREATE TABLE IF NOT EXISTS user_stats (
+	id BIGINT AUTO_INCREMENT,
+    energy DOUBLE NOT NULL,
+    tempo DOUBLE NOT NULL,
+    mainstream DOUBLE NOT NULL,
+    boringness DOUBLE NOT NULL,
+    points BIGINT NOT NULL,
+    PRIMARY KEY (id)
+);
+
 CREATE TABLE IF NOT EXISTS users (
 	id BIGINT AUTO_INCREMENT,
+    external_id VARCHAR(50) NOT NULL,
     username VARCHAR(50) NOT NULL,
     email VARCHAR(50) NOT NULL,
     image_url VARCHAR(100) NOT NULL,
-    points BIGINT NOT NULL,
     join_date DATETIME NOT NULL,
-    PRIMARY KEY (id)
+    user_stats_id BIGINT,
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_stats_id) REFERENCES user_stats(id)
+);
+
+CREATE TABLE IF NOT EXISTS user_friends (
+	user_id BIGINT NOT NULL,
+    friend_id BIGINT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (friend_id) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS beta_users (
@@ -47,11 +66,4 @@ CREATE TABLE IF NOT EXISTS user_genres (
     PRIMARY KEY (id),
     UNIQUE KEY (user_id, time_range, date),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS user_friends (
-	user_id BIGINT NOT NULL,
-    friend_id BIGINT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (friend_id) REFERENCES users(id)
 );

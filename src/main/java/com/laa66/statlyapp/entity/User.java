@@ -21,6 +21,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "external_id")
+    private String externalId;
+
     private String username;
 
     private String email;
@@ -28,22 +31,12 @@ public class User {
     @Column(name = "image_url")
     private String image;
 
-    private int points;
-
     @Column(name = "join_date")
     private LocalDateTime joinDate;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private List<UserTrack> tracks;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private List<UserArtist> artists;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private List<UserGenre> genres;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_stats_id", referencedColumnName = "id")
+    private UserStats userStats;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -61,28 +54,14 @@ public class User {
     )
     private List<User> followers = new ArrayList<>();
 
-    public User(long id, String username, String email, String image, int points, LocalDateTime joinDate) {
+    public User(long id, String externalId, String username, String email, String image, LocalDateTime joinDate, UserStats userStats) {
         this.id = id;
+        this.externalId = externalId;
         this.username = username;
         this.email = email;
         this.image = image;
-        this.points = points;
         this.joinDate = joinDate;
-    }
-
-    public void addTrack(UserTrack track) {
-        if (tracks == null) tracks = new ArrayList<>();
-        tracks.add(track);
-    }
-
-    public void addArtist(UserArtist artist) {
-        if (artists == null) artists = new ArrayList<>();
-        artists.add(artist);
-    }
-
-    public void addGenre(UserGenre genre) {
-        if (genres == null) genres = new ArrayList<>();
-        genres.add(genre);
+        this.userStats = userStats;
     }
 
     public void addFollower(User follower) {

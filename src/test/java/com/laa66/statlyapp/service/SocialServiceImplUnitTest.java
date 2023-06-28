@@ -3,11 +3,10 @@ package com.laa66.statlyapp.service;
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.constants.StatlyConstants;
 import com.laa66.statlyapp.entity.User;
+import com.laa66.statlyapp.entity.UserStats;
 import com.laa66.statlyapp.exception.UserNotFoundException;
 import com.laa66.statlyapp.model.Artist;
-import com.laa66.statlyapp.model.PlaylistInfo;
 import com.laa66.statlyapp.model.Track;
-import com.laa66.statlyapp.model.response.ResponsePlaylists;
 import com.laa66.statlyapp.repository.UserRepository;
 import com.laa66.statlyapp.service.impl.SocialServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,52 +33,47 @@ public class SocialServiceImplUnitTest {
     @Mock
     StatsService statsService;
 
-    @Mock
-    SpotifyAPIService spotifyAPIService;
-
-    @Mock
-    LibraryAnalysisService libraryAnalysisService;
-
     @InjectMocks
     SocialServiceImpl socialService;
 
     @Test
     void shouldGetUserProfileValidUserId() {
-        User user = new User(1L, "username","test@mail.com", "url", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
+        User user = new User(
+                1L,
+                "id",
+                "username",
+                "test@mail.com",
+                "url",
+                LocalDateTime.of(2022, 11, 20, 20, 20),
+                new UserStats(1, 40.0, 30.0, 50.0, 300.0, 500));
         TracksDTO tracksDTO = new TracksDTO(List.of(new Track(List.of(new Artist("artist")), "title"))
                 , "2", "long", null);
         ArtistsDTO artistsDTO = new ArtistsDTO("1", List.of(new Artist("artist"))
                 , "long", null);
-        ResponsePlaylists responsePlaylists = new ResponsePlaylists(null, 1, List.of(new PlaylistInfo()));
-        LibraryAnalysisDTO libraryAnalysisDTO = new LibraryAnalysisDTO(Map.of("mainstream", 50.0), List.of());
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(statsService.getUserTracks(1, "long")).thenReturn(tracksDTO);
         when(statsService.getUserArtists(1, "long")).thenReturn(artistsDTO);
-        when(spotifyAPIService.getUserPlaylists("username")).thenReturn(responsePlaylists);
-        when(spotifyAPIService.getTopTracks(1, "long")).thenReturn(tracksDTO);
-        when(libraryAnalysisService.getLibraryAnalysis(tracksDTO)).thenReturn(libraryAnalysisDTO);
-        ProfileDTO profileDTO = socialService.getUserProfile(1, "username");
+        ProfileDTO profileDTO = socialService.getUserProfile(1);
         assertEquals(1L, profileDTO.getId());
         assertEquals("username", profileDTO.getUsername());
         assertEquals("url", profileDTO.getImageUrl());
-        assertEquals(0, profileDTO.getPoints());
+        assertEquals(500, profileDTO.getPoints());
         assertEquals(user.getJoinDate(), profileDTO.getJoinDate());
         assertEquals("title", profileDTO.getTopTracks().get(0).getName());
         assertEquals("artist", profileDTO.getTopArtists().get(0).getName());
-        assertEquals(1, profileDTO.getUserPlaylists().size());
-        assertEquals(50.0, profileDTO.getMainstream());
+        assertEquals(50.0, profileDTO.getStatsMap().get("mainstream"));
     }
 
     @Test
     void shouldGetUserProfileNotValidUserId() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> socialService.getUserProfile(1L, "username"));
+        assertThrows(UserNotFoundException.class, () -> socialService.getUserProfile(1L));
     }
 
     @Test
     void shouldFollowValidIds() {
-        User user = new User(1L, "username1","test1@mail.com", "url1", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
-        User userFollowed = new User(2L, "username2","test2@mail.com", "url2", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
+        User user = new User(1L,"id","username1","test1@mail.com", "url1", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats());
+        User userFollowed = new User(2L,"id","username2","test2@mail.com", "url2", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats());
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userRepository.findById(2L)).thenReturn(Optional.of(userFollowed));
         when(userRepository.save(user)).thenReturn(user);
@@ -97,7 +90,7 @@ public class SocialServiceImplUnitTest {
 
     @Test
     void shouldFollowNotValidFollowId() {
-        User fromUser = new User(1L, "username1","test1@mail.com", "url1", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
+        User fromUser = new User(1L, "id","username1","test1@mail.com", "url1", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats());
         when(userRepository.findById(1L)).thenReturn(Optional.of(fromUser));
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> socialService.follow(1, 2));
@@ -105,8 +98,8 @@ public class SocialServiceImplUnitTest {
 
     @Test
     void shouldGetFollowingValidUserId() {
-        User user = new User(1L, "username1","test1@mail.com", "url1", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
-        User followedUser = new User(2L, "username2","test2@mail.com", "url2", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
+        User user = new User(1L, "id", "username1","test1@mail.com", "url1", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats());
+        User followedUser = new User(2L, "id","username2","test2@mail.com", "url2", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats());
         user.addFollower(followedUser);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
@@ -125,8 +118,8 @@ public class SocialServiceImplUnitTest {
 
     @Test
     void shouldGetFollowersValidUserId() {
-        User user = new User(1L, "username1","test1@mail.com", "url1", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
-        User userFollower = new User(2L, "username2","test2@mail.com", "url2", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
+        User user = new User(1L,"id", "username1","test1@mail.com", "url1", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats());
+        User userFollower = new User(2L,"id", "username2","test2@mail.com", "url2", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats());
         user.setFollowers(List.of(userFollower));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
@@ -145,8 +138,8 @@ public class SocialServiceImplUnitTest {
 
     @Test
     void shouldUnfollowValidUserId() {
-        User user = new User(1L, "username1","test1@mail.com", "url1", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
-        User followedUser = new User(2L, "username2","test2@mail.com", "url2", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
+        User user = new User(1L, "id", "username1","test1@mail.com", "url1", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats());
+        User followedUser = new User(2L,"id", "username2","test2@mail.com", "url2", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats());
         user.addFollower(followedUser);
         followedUser.setFollowers(List.of(user));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
@@ -165,7 +158,7 @@ public class SocialServiceImplUnitTest {
 
     @Test
     void shouldUnfollowNotValidUnfollowId() {
-        User fromUser = new User(1L, "username1","test1@mail.com", "url1", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
+        User fromUser = new User(1L, "id", "username1","test1@mail.com", "url1", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats());
         when(userRepository.findById(1L)).thenReturn(Optional.of(fromUser));
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> socialService.unfollow(1, 2));

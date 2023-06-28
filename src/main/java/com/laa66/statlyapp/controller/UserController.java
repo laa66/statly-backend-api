@@ -1,6 +1,7 @@
 package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.DTO.FollowersDTO;
+import com.laa66.statlyapp.DTO.ProfileDTO;
 import com.laa66.statlyapp.constants.StatlyConstants;
 import com.laa66.statlyapp.model.User;
 import com.laa66.statlyapp.service.SocialService;
@@ -45,7 +46,7 @@ public class UserController {
     }
 
     @GetMapping("/following")
-    public ResponseEntity<FollowersDTO> getUserFollowing(@AuthenticationPrincipal OAuth2User principal) {
+    public ResponseEntity<FollowersDTO> getCurrentUserFollowing(@AuthenticationPrincipal OAuth2User principal) {
         long userId = (long) principal.getAttributes().get("userId");
         FollowersDTO followersDTO = socialService.getFollowers(userId, StatlyConstants.FOLLOWING);
         return ResponseEntity.ok(followersDTO);
@@ -65,6 +66,10 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-
+    @GetMapping("/profile")
+    public ResponseEntity<ProfileDTO> getProfile(@RequestParam("user_id") long userId) {
+        ProfileDTO userProfile = socialService.getUserProfile(userId);
+        return ResponseEntity.ok(userProfile);
+    }
 
 }

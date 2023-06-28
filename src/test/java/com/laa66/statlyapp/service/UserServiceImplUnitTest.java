@@ -52,7 +52,7 @@ class UserServiceImplUnitTest {
 
     @Test
     void shouldFindUserByEmail() {
-        User user = new User(1, "username", "user@mail.com", "url", 0, LocalDateTime.of(2023, 4, 30, 20, 20));
+        User user = new User(1, "id", "username", "user@mail.com", "url",LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
         when(userRepository.findByEmail("user@mail.com")).thenReturn(Optional.of(user));
         Optional<User> returnUser = userService.findUserByEmail("user@mail.com");
         assertTrue(returnUser.isPresent());
@@ -67,7 +67,7 @@ class UserServiceImplUnitTest {
 
     @Test
     void shouldFindUserByUsername() {
-        User user = new User(1, "username", "user@mail.com", "url", 0, LocalDateTime.of(2023, 4, 30, 20, 20));
+        User user = new User(1, "id", "username", "user@mail.com", "url",LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
         when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
         com.laa66.statlyapp.model.User returnUser = userService.findUserByUsername("username");
         assertEquals(Long.toString(user.getId()), returnUser.getId());
@@ -79,8 +79,8 @@ class UserServiceImplUnitTest {
 
     @Test
     void shouldSaveUser() {
-        User beforeSaveUser = new User(0, "username", "user@mail.com", "url", 0, LocalDateTime.of(2023, 4, 30, 20, 20));
-        User afterSaveUser = new User(1, "username", "user@mail.com", "url", 0, LocalDateTime.of(2023, 4, 30, 20, 20));
+        User beforeSaveUser = new User(0, "id", "username", "user@mail.com", "url", LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
+        User afterSaveUser = new User(1, "id", "username", "user@mail.com", "url",LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
         when(userRepository.save(beforeSaveUser)).thenReturn(afterSaveUser);
         User returnUser = userService.saveUser(beforeSaveUser);
         assertNotNull(returnUser);
@@ -92,7 +92,7 @@ class UserServiceImplUnitTest {
 
     @Test
     void shouldDeleteUser() {
-        User user = new User(1L, "username", "user@mail.com", "url", 0, LocalDateTime.of(2023, 4, 30, 20, 20));
+        User user = new User(1L, "id", "username", "user@mail.com", "url",LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         userService.deleteUser(user.getId());
         verify(userRepository, times(1)).deleteById(1L);

@@ -2,6 +2,7 @@ package com.laa66.statlyapp.service;
 
 import com.laa66.statlyapp.config.CustomOAuth2UserService;
 import com.laa66.statlyapp.entity.User;
+import com.laa66.statlyapp.entity.UserStats;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,12 +43,12 @@ class CustomOAuth2UserServiceUnitTest {
 
     @Test
     void shouldGetUser() {
-        User user = new User(1L, "username", "test@mail.com", "url", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
+        User user = new User(1L, "id","username", "test@mail.com", "url", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats());
         OAuth2User oAuth2User = new DefaultOAuth2User(
                 Collections.singletonList(new OAuth2UserAuthority(Map.of("user","user"))),
                 Map.of(
                         "display_name", "user", "email", "test@mail.com",
-                        "images", List.of(Map.of("url", "imageUrl"))),
+                        "images", List.of(Map.of("url", "imageUrl")), "id", "id"),
                 "display_name"
                 );
         when(userService.findUserByEmail("test@mail.com")).thenReturn(Optional.of(user));
@@ -61,13 +62,13 @@ class CustomOAuth2UserServiceUnitTest {
 
     @Test
     void shouldCreateUser() {
-        User user = new User(0, "username","test@mail.com", "url", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
-        User createdUser = new User(1L, "username", "test@mail.com", "url", 0, LocalDateTime.of(2022, 11, 20, 20, 20));
+        User user = new User(0, "id", "username","test@mail.com", "url", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats());
+        User createdUser = new User(1L, "id", "username", "test@mail.com", "url", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats());
         OAuth2User oAuth2User = new DefaultOAuth2User(
                 Collections.singletonList(new OAuth2UserAuthority(Map.of("user","user"))),
                 Map.of(
                         "display_name", "user", "email", "test@mail.com",
-                        "images", List.of(Map.of("url", "imageUrl"))),
+                        "images", List.of(Map.of("url", "imageUrl")), "id", "id"),
                 "display_name"
                 );
         when(userService.findUserByEmail("test@mail.com")).thenReturn(Optional.empty()).thenReturn(Optional.of(createdUser));

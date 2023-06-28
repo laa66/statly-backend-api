@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.parameters.P;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -169,6 +170,43 @@ class UserControllerIntegrationTest {
         mockMvc.perform(put("/user/unfollow?followId=3")
                         .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
                         .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldGetProfileValidUserId() throws Exception {
+        ProfileDTO profileDTO = new ProfileDTO(
+                1,
+                "username",
+                "url",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                500
+        );
+        when(socialService.getUserProfile(1)).thenReturn(profileDTO);
+        mockMvc.perform(get("/user/profile?user_id=1")
+                .with(oauth2Login())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpectAll(status().isOk(),
+                        jsonPath("$.username", is("username")),
+                        jsonPath("$.imageUrl", is("url")),
+                        jsonPath("$.points", is(500)));
+
+        mockMvc.perform(get("/user/profile?user_id=1")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isFound());
+    }
+
+    @Test
+    void shouldGetProfileNotValidId() throws Exception {
+        when(socialService.getUserProfile(2)).thenThrow(new UserNotFoundException("User not found"));
+        mockMvc.perform(get("/user/profile?user_id=2")
+                        .with(oauth2Login())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }

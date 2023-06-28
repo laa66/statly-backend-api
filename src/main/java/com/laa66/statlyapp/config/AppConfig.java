@@ -50,10 +50,7 @@ public class AppConfig {
     }
 
     @Bean
-    public SocialService socialService(UserRepository userRepository,
-                                       StatsService statsService,
-                                       SpotifyAPIService spotifyAPIService,
-                                       LibraryAnalysisService libraryAnalysisService) {
-        return new SocialServiceImpl(userRepository, statsService, spotifyAPIService, libraryAnalysisService);
+    public SocialService socialService(UserRepository userRepository, StatsService statsService) {
+        return new SocialServiceImpl(userRepository, statsService);
     }
 }
