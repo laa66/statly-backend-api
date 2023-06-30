@@ -47,6 +47,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<com.laa66.statlyapp.model.User> findAllMatchingUsers(String username) {
+        return userRepository.findAllMatchingUsers(username).stream()
+                .map(User::toModelUser)
+                .toList();
+    }
+
+    @Override
     public User saveUser(User user) {
         return userRepository.save(user);
     }

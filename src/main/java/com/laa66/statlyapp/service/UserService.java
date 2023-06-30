@@ -14,6 +14,8 @@ public interface UserService {
 
     com.laa66.statlyapp.model.User findUserByUsername(String username);
 
+    List<com.laa66.statlyapp.model.User> findAllMatchingUsers(String username);
+
     User saveUser(User user);
 
     void deleteUser(long id);

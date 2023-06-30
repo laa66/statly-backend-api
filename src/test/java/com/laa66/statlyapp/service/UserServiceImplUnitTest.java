@@ -78,6 +78,21 @@ class UserServiceImplUnitTest {
     }
 
     @Test
+    void shouldFindAllMatchingUsers() {
+        User user = new User(1, "id", "username", "user@mail.com", "url",LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
+        when(userRepository.findAllMatchingUsers("name")).thenReturn(List.of(user));
+        List<com.laa66.statlyapp.model.User> users = userService.findAllMatchingUsers("name");
+        assertEquals(1, users.size());
+        assertEquals("username", users.get(0).getName());
+        assertEquals("url", users.get(0).getImages().get(0).getUrl());
+
+        when(userRepository.findAllMatchingUsers("none")).thenReturn(List.of());
+        List<com.laa66.statlyapp.model.User> emptyUsers = userService.findAllMatchingUsers("none");
+        assertTrue(emptyUsers.isEmpty());
+
+    }
+
+    @Test
     void shouldSaveUser() {
         User beforeSaveUser = new User(0, "id", "username", "user@mail.com", "url", LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
         User afterSaveUser = new User(1, "id", "username", "user@mail.com", "url",LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
