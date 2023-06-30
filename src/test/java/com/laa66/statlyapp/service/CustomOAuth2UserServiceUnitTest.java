@@ -48,7 +48,7 @@ class CustomOAuth2UserServiceUnitTest {
                 Collections.singletonList(new OAuth2UserAuthority(Map.of("user","user"))),
                 Map.of(
                         "display_name", "user", "email", "test@mail.com",
-                        "images", List.of(Map.of("url", "imageUrl")), "id", "id"),
+                        "images", List.of(), "id", "id"),
                 "display_name"
                 );
         when(userService.findUserByEmail("test@mail.com")).thenReturn(Optional.of(user));

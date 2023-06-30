@@ -7,6 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,5 +46,15 @@ class UserRepositoryIntegrationTest extends MySQLBaseContainerTest {
 
         Optional<User> emptyUser = userRepository.findByUsername("wrongUsername");
         assertTrue(emptyUser.isEmpty());
+    }
+
+    @Test
+    void shouldFindAllMatchingUsers() {
+        List<User> users = (List<User>) userRepository.findAllMatchingUsers("name");
+        assertEquals(1, users.size());
+        assertEquals("username", users.get(0).getUsername());
+
+        List<User> emptyUsers = (List<User>) userRepository.findAllMatchingUsers("none");
+        assertTrue(emptyUsers.isEmpty());
     }
 }

@@ -48,7 +48,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     private String getImageUrl(Map<String, Object> attributes) throws NoSuchElementException, NullPointerException {
         List<?> list = (List<?>) attributes.get("images");
-        if (list.size() == 0) return "none";
+        if (list.size() == 0) return "./account.png";
         Map<?, ?> images = (Map<?, ?>) list.get(0);
         return (String) images.get("url");
     }

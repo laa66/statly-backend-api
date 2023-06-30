@@ -32,8 +32,8 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
                 tracks -> {
                     ResponseTracksAnalysis tracksAnalysis = spotifyAPIService.getTracksAnalysis(tracks);
                     Map<String, Double> mapAnalysis = getMapAnalysis(tracksAnalysis);
-                    addToMap(mapAnalysis, "mainstream", getMainstreamScore(tracks));
                     addToMap(mapAnalysis, "boringness", getBoringness(mapAnalysis));
+                    addToMap(mapAnalysis, "mainstream", getMainstreamScore(tracks));
                     List<Image> images = tracks.getTracks().stream()
                             .map(track -> Optional
                                     .ofNullable(track.getAlbum().getImages().get(0))
@@ -87,13 +87,14 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
     }
 
     private double getBoringness(Map<String, Double> mapAnalysis) {
-        return new BigDecimal(Double.toString(
+        return !mapAnalysis.isEmpty() ?
+                new BigDecimal(Double.toString(
                 mapAnalysis.get("tempo")
                 + (mapAnalysis.get("valence"))
                 + (mapAnalysis.get("energy"))
                 + (mapAnalysis.get("danceability"))))
                 .setScale(0, RoundingMode.HALF_UP)
-                .doubleValue();
+                .doubleValue() : 0.0;
     }
 
     private Map<String, Double> getMapAnalysis(ResponseTracksAnalysis tracksAnalysis) {
