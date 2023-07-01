@@ -104,6 +104,33 @@ class UserControllerIntegrationTest {
     }
 
     @Test
+    void shouldSearchUser() throws Exception {
+        User user = new User("1", "uri", "username", List.of());
+        when(userService.findAllMatchingUsers("name")).thenReturn(List.of(user));
+        mockMvc.perform(get("/user/search?username=name")
+                .with(oauth2Login())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$[0].id", is("1")),
+                        jsonPath("$[0].display_name", is("username"))
+                );
+
+        when(userService.findAllMatchingUsers("none")).thenReturn(List.of());
+        mockMvc.perform(get("/user/search?username=none")
+                .with(oauth2Login())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$").isEmpty()
+                );
+
+        mockMvc.perform(get("/user/search?username=name")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isFound());
+    }
+
+    @Test
     void shouldGetUserFollowing() throws Exception {
         FollowersDTO followersDTO = new FollowersDTO(1, List.of(new User(
                 "id", "uri", "name", List.of(new Image("url", null, null))

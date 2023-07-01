@@ -17,6 +17,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
@@ -43,6 +45,12 @@ public class UserController {
     public ResponseEntity<User> getUser(@RequestParam String username) {
         User user = userService.findUserByUsername(username);
         return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<User>> searchUser(@RequestParam String username) {
+        List<User> users = userService.findAllMatchingUsers(username);
+        return ResponseEntity.ok(users);
     }
 
     @GetMapping("/following")
