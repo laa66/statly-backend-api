@@ -7,6 +7,7 @@ import com.laa66.statlyapp.DTO.TracksDTO;
 import com.laa66.statlyapp.model.*;
 import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
 import com.laa66.statlyapp.service.impl.LibraryAnalysisServiceImpl;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,10 +17,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class LibraryAnalysisServiceImplUnitTest {
@@ -71,8 +73,9 @@ class LibraryAnalysisServiceImplUnitTest {
         ));
         when(spotifyAPIService.getTracksAnalysis(tracksDTO))
                 .thenReturn(tracksAnalysis);
-        LibraryAnalysisDTO analysisDTO = libraryAnalysisService.getLibraryAnalysis(tracksDTO);
+        LibraryAnalysisDTO analysisDTO = libraryAnalysisService.getLibraryAnalysis(tracksDTO, 1L);
 
+        verify(statsService, times(1)).saveUserStats(isA(Long.class), anyMap());
         assertEquals(50.0, analysisDTO.getLibraryAnalysis().get("acousticness"));
         assertEquals(30.0, analysisDTO.getLibraryAnalysis().get("danceability"));
         assertEquals(19.0, analysisDTO.getLibraryAnalysis().get("energy"));
@@ -89,7 +92,7 @@ class LibraryAnalysisServiceImplUnitTest {
 
     @Test
     void shouldGetLibraryAnalysisNullParameter() {
-        assertThrows(RuntimeException.class, () -> libraryAnalysisService.getLibraryAnalysis(null));
+        assertThrows(RuntimeException.class, () -> libraryAnalysisService.getLibraryAnalysis(null, null));
     }
 
 }

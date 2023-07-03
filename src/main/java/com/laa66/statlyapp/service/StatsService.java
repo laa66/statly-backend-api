@@ -18,6 +18,8 @@ public interface StatsService {
 
     void saveUserGenres(Map<GenresDTO, Long> dtoMap);
 
+    void saveUserStats(long userId, Map<String, Double> statsMap);
+
     TracksDTO compareTracks(long userId, TracksDTO dto);
 
     ArtistsDTO compareArtists(long userId, ArtistsDTO dto);

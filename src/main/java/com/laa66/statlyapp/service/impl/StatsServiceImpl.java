@@ -3,9 +3,8 @@ package com.laa66.statlyapp.service.impl;
 import com.laa66.statlyapp.DTO.ArtistsDTO;
 import com.laa66.statlyapp.DTO.GenresDTO;
 import com.laa66.statlyapp.DTO.TracksDTO;
-import com.laa66.statlyapp.entity.UserArtist;
-import com.laa66.statlyapp.entity.UserGenre;
-import com.laa66.statlyapp.entity.UserTrack;
+import com.laa66.statlyapp.entity.*;
+import com.laa66.statlyapp.exception.UserNotFoundException;
 import com.laa66.statlyapp.model.Album;
 import com.laa66.statlyapp.model.Genre;
 import com.laa66.statlyapp.model.Artist;
@@ -13,6 +12,7 @@ import com.laa66.statlyapp.model.Track;
 import com.laa66.statlyapp.repository.ArtistRepository;
 import com.laa66.statlyapp.repository.GenreRepository;
 import com.laa66.statlyapp.repository.TrackRepository;
+import com.laa66.statlyapp.repository.UserRepository;
 import com.laa66.statlyapp.service.StatsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +34,7 @@ public class StatsServiceImpl implements StatsService {
     private final TrackRepository trackRepository;
     private final ArtistRepository artistRepository;
     private final GenreRepository genreRepository;
+    private final UserRepository userRepository;
 
     @Override
     public TracksDTO getUserTracks(long userId, String range) {
@@ -103,6 +104,23 @@ public class StatsServiceImpl implements StatsService {
             return new UserGenre(0, entry.getValue(), entry.getKey().getRange(), genres, LocalDate.now());
         }).toList();
         genreRepository.saveAll(userGenreList);
+    }
+
+    @Override
+    public void saveUserStats(long userId, Map<String, Double> statsMap) {
+        User user = userRepository.findById(userId)
+                .map(foundUser -> {
+                    foundUser.setUserStats(new UserStats(
+                            foundUser.getUserStats().getId(),
+                            statsMap.get("energy"),
+                            statsMap.get("tempo"),
+                            statsMap.get("mainstream"),
+                            statsMap.get("boringness"),
+                            foundUser.getUserStats().getPoints()
+                    ));
+                    return foundUser;
+                }).orElseThrow(() -> new UserNotFoundException("User not found"));
+        userRepository.save(user);
     }
 
     @Override

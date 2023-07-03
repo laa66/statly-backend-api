@@ -12,6 +12,7 @@ import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
 import com.laa66.statlyapp.repository.ArtistRepository;
 import com.laa66.statlyapp.repository.GenreRepository;
 import com.laa66.statlyapp.repository.TrackRepository;
+import com.laa66.statlyapp.repository.UserRepository;
 import com.laa66.statlyapp.service.impl.SpotifyAPIServiceImpl;
 import com.laa66.statlyapp.service.impl.StatsServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,6 +60,9 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @MockBean
     GenreRepository genreRepository;
+
+    @MockBean
+    UserRepository userRepository;
 
     @Autowired
     @InjectMocks

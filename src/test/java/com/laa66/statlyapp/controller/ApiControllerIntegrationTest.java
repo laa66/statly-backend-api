@@ -166,7 +166,7 @@ class ApiControllerIntegrationTest {
         );
         when(spotifyAPIService.getTopTracks(1L, "long"))
                 .thenReturn(tracksDTO);
-        when(libraryAnalysisService.getLibraryAnalysis(tracksDTO))
+        when(libraryAnalysisService.getLibraryAnalysis(tracksDTO, 1L))
                 .thenReturn(libraryAnalysisDTO);
         mockMvc.perform(get("/api/analysis/library")
                 .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
@@ -195,7 +195,7 @@ class ApiControllerIntegrationTest {
         );
         when(spotifyAPIService.getPlaylistTracks(playlistInfo, "ES"))
                 .thenReturn(tracksDTO);
-        when(libraryAnalysisService.getLibraryAnalysis(tracksDTO))
+        when(libraryAnalysisService.getLibraryAnalysis(tracksDTO, null))
                 .thenReturn(libraryAnalysisDTO);
         mockMvc.perform(post("/api/analysis/playlist")
                 .contentType(MediaType.APPLICATION_JSON)

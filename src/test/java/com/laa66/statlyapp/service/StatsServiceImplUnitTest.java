@@ -3,9 +3,9 @@ package com.laa66.statlyapp.service;
 import com.laa66.statlyapp.DTO.ArtistsDTO;
 import com.laa66.statlyapp.DTO.GenresDTO;
 import com.laa66.statlyapp.DTO.TracksDTO;
-import com.laa66.statlyapp.entity.UserArtist;
-import com.laa66.statlyapp.entity.UserGenre;
-import com.laa66.statlyapp.entity.UserTrack;
+import com.laa66.statlyapp.entity.*;
+import com.laa66.statlyapp.entity.User;
+import com.laa66.statlyapp.exception.UserNotFoundException;
 import com.laa66.statlyapp.model.*;
 import com.laa66.statlyapp.repository.*;
 import com.laa66.statlyapp.service.impl.StatsServiceImpl;
@@ -16,10 +16,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,6 +27,9 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class StatsServiceImplUnitTest {
+
+    @Mock
+    UserRepository userRepository;
 
     @Mock
     TrackRepository trackRepository;
@@ -119,6 +120,24 @@ public class StatsServiceImplUnitTest {
         Map<GenresDTO, Long> dtoMap = Collections.singletonMap(dto, 1L);
         statsService.saveUserGenres(dtoMap);
         verify(genreRepository, times(1)).saveAll(anyList());
+    }
+
+    @Test
+    void shouldSaveUserStats() {
+        User user = new User(1L, "id", "username", "email", "image", LocalDateTime.now()
+        , new UserStats(1L, 0.0, 0.0, 0.0, 0.0, 0));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        Map<String, Double> statsMap = Map.of(
+                "energy", 50.0,
+                "tempo", 127.0,
+                "mainstream", 61.0,
+                "boringness", 300.0
+        );
+        statsService.saveUserStats(1L, statsMap);
+        verify(userRepository, times(1)).save(any(User.class));
+
+        when(userRepository.findById(2L)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> statsService.saveUserStats(2L, statsMap));
     }
 
     @Test

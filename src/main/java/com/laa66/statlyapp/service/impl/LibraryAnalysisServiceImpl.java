@@ -27,7 +27,7 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
     private final SpotifyAPIService spotifyAPIService;
 
     @Override
-    public LibraryAnalysisDTO getLibraryAnalysis(TracksDTO tracksDTO) {
+    public LibraryAnalysisDTO getLibraryAnalysis(TracksDTO tracksDTO, Long userId) {
         return Optional.ofNullable(tracksDTO).map(
                 tracks -> {
                     ResponseTracksAnalysis tracksAnalysis = spotifyAPIService.getTracksAnalysis(tracks);
@@ -40,6 +40,7 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
                                     .orElseThrow(() -> new RuntimeException("Image cannot be null")))
                             .limit(22)
                             .toList();
+                    if (userId != null) statsService.saveUserStats(userId, mapAnalysis);
                     return new LibraryAnalysisDTO(mapAnalysis, images);
                 }
         ).orElseThrow(() -> new RuntimeException("Tracks cannot be null"));

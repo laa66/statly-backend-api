@@ -49,7 +49,7 @@ public class UserController {
 
     @GetMapping("/search")
     public ResponseEntity<List<User>> searchUser(@RequestParam String username) {
-        List<User> users = userService.findAllMatchingUsers(username);
+        List<User> users = username.isBlank() ? List.of() : userService.findAllMatchingUsers(username);
         return ResponseEntity.ok(users);
     }
 

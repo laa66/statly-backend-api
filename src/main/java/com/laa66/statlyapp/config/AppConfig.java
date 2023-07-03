@@ -38,8 +38,12 @@ public class AppConfig {
     @Bean
     public StatsService statsService(TrackRepository trackRepository,
                                      ArtistRepository artistRepository,
-                                     GenreRepository genreRepository) {
-        return new StatsServiceImpl(trackRepository, artistRepository, genreRepository);
+                                     GenreRepository genreRepository,
+                                     UserRepository userRepository) {
+        return new StatsServiceImpl(trackRepository,
+                artistRepository,
+                genreRepository,
+                userRepository);
     }
 
     @Bean

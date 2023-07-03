@@ -7,7 +7,7 @@ import com.laa66.statlyapp.DTO.TracksDTO;
 
 public interface LibraryAnalysisService {
 
-    LibraryAnalysisDTO getLibraryAnalysis(TracksDTO tracksDTO);
+    LibraryAnalysisDTO getLibraryAnalysis(TracksDTO tracksDTO, Long userId);
 
     GenresDTO getTopGenres(long userId, String range, ArtistsDTO artistsDTO);
 
