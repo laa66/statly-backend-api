@@ -215,11 +215,32 @@ public class StatsServiceImpl implements StatsService {
                                             .map(allMatchArtists -> allMatchArtists.stream()
                                                     .flatMap(matchUserArtist -> matchUserArtist.getArtists().keySet().stream())
                                                     .collect(Collectors.toCollection(HashSet::new))
-                                            )
-                                            .orElse(HashSet.newHashSet(0)));
+                                            ).orElse(HashSet.newHashSet(0)));
                                     return collectedTracks.size();
                                 }
                         ))).orElse(0);
+        return Pair.of(matching, comparingSize.get());
+    }
+
+    @Override
+    public Pair<Integer, Integer> matchGenres(long userId, long matchUserId) {
+        AtomicInteger comparingSize = new AtomicInteger();
+        int matching = Optional.of(genreRepository.findAllByUserId(userId))
+                .map(allGenres -> allGenres.stream()
+                        .flatMap(userGenre -> userGenre.getGenres().keySet().stream())
+                        .collect(Collectors.collectingAndThen(
+                                Collectors.toCollection(HashSet::new),
+                                collectedGenres -> {
+                                    comparingSize.set(collectedGenres.size());
+                                    collectedGenres.retainAll(Optional.of(genreRepository.findAllByUserId(matchUserId))
+                                            .map(matchAllGenres -> matchAllGenres.stream()
+                                                    .flatMap(matchUserGenre -> matchUserGenre.getGenres().keySet().stream())
+                                                    .collect(Collectors.toCollection(HashSet::new))
+                                            ).orElse(HashSet.newHashSet(0)));
+                                    return collectedGenres.size();
+                                }
+                        )))
+                .orElse(0);
         return Pair.of(matching, comparingSize.get());
     }
 }

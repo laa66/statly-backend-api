@@ -491,5 +491,64 @@ public class StatsServiceImplUnitTest {
         assertEquals(4, pair.getSecond());
     }
 
+    @Test
+    void shouldMatchGenres() {
+        Collection<UserGenre> genres = List.of(
+                new UserGenre(1, 1, "long", Map.of(
+                        "item1", 3, "item2", 4, "item3", 5
+                ), null),
+                new UserGenre(1, 1, "short", Map.of(
+                        "item4", 3, "item2", 4, "item5", 5
+                ), null)
+        );
+        Collection<UserGenre> matchGenres = List.of(
+                new UserGenre(1, 1, "long", Map.of(
+                        "item1", 3, "item5", 4, "item3", 5
+                ), null),
+                new UserGenre(1, 1, "short", Map.of(
+                        "item4", 3, "item1", 4, "item3", 5
+                ), null)
+        );
+        when(genreRepository.findAllByUserId(1)).thenReturn(genres);
+        when(genreRepository.findAllByUserId(2)).thenReturn(matchGenres);
+        Pair<Integer, Integer> pair = statsService.matchGenres(1, 2);
+        assertEquals(4, pair.getFirst());
+        assertEquals(5, pair.getSecond());
+    }
+
+    @Test
+    void shouldMatchGenresWrongUserId() {
+        Collection<UserGenre> matchGenres = List.of(
+                new UserGenre(1, 1, "long", Map.of(
+                        "item1", 3, "item5", 4, "item3", 5
+                ), null),
+                new UserGenre(1, 1, "short", Map.of(
+                        "item4", 3, "item1", 4, "item3", 5
+                ), null)
+        );
+        when(genreRepository.findAllByUserId(1)).thenReturn(Collections.emptyList());
+        when(genreRepository.findAllByUserId(2)).thenReturn(matchGenres);
+        Pair<Integer, Integer> pair = statsService.matchGenres(1, 2);
+        assertEquals(0, pair.getFirst());
+        assertEquals(0, pair.getSecond());
+    }
+
+    @Test
+    void shouldMatchGenresWrongMatchUserId() {
+        Collection<UserGenre> genres = List.of(
+                new UserGenre(1, 1, "long", Map.of(
+                        "item1", 3, "item2", 4, "item3", 5
+                ), null),
+                new UserGenre(1, 1, "short", Map.of(
+                        "item4", 3, "item2", 4, "item5", 5
+                ), null)
+        );
+        when(genreRepository.findAllByUserId(1)).thenReturn(genres);
+        when(genreRepository.findAllByUserId(2)).thenReturn(Collections.emptyList());
+        Pair<Integer, Integer> pair = statsService.matchGenres(1, 2);
+        assertEquals(0, pair.getFirst());
+        assertEquals(5, pair.getSecond());
+    }
+
 
 }
