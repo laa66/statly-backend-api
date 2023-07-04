@@ -3,6 +3,7 @@ package com.laa66.statlyapp.service;
 import com.laa66.statlyapp.DTO.ArtistsDTO;
 import com.laa66.statlyapp.DTO.GenresDTO;
 import com.laa66.statlyapp.DTO.TracksDTO;
+import org.springframework.data.util.Pair;
 
 import java.util.Map;
 
@@ -25,5 +26,7 @@ public interface StatsService {
     ArtistsDTO compareArtists(long userId, ArtistsDTO dto);
 
     GenresDTO compareGenres(long userId, GenresDTO dto);
+
+    Pair<Integer, Integer> matchTracks(long userId, long matchUserId);
 
 }

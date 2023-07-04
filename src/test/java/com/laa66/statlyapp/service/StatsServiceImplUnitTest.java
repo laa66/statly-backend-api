@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.util.Pair;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -368,5 +369,65 @@ public class StatsServiceImplUnitTest {
         assertEquals(dto.getGenres().get(1).getDifference(), returnDto.getGenres().get(1).getDifference());
         assertEquals(dto.getGenres().get(2).getDifference(), returnDto.getGenres().get(2).getDifference());
         assertNull(returnDto.getDate());
+    }
+
+    @Test
+    void shouldMatchTracks() {
+        Collection<UserTrack> tracks = List.of(
+                new UserTrack(1, 1, "long", Map.of(
+                        "item1", 1, "item2", 2, "item3", 3
+                ), null),
+                new UserTrack(2, 1, "short", Map.of(
+                        "item3", 1, "item4", 2, "item5", 3
+                ), null)
+        );
+        Collection<UserTrack> matchTracks = List.of(
+                new UserTrack(3, 2, "long", Map.of(
+                        "item1", 1, "item3", 3
+                ), null),
+                new UserTrack(4, 2, "short", Map.of(
+                        "item3", 1, "item1", 3
+                ), null)
+        );
+        when(trackRepository.findAllByUserId(1)).thenReturn(tracks);
+        when(trackRepository.findAllByUserId(2)).thenReturn(matchTracks);
+
+        Pair<Integer, Integer> pair = statsService.matchTracks(1, 2);
+        assertEquals(2, pair.getFirst());
+        assertEquals(5, pair.getSecond());
+    }
+
+    @Test
+    void shouldMatchTracksWrongUserId() {
+        Collection<UserTrack> matchTracks = List.of(
+                new UserTrack(3, 2, "long", Map.of(
+                        "item1", 1, "item3", 3
+                ), null),
+                new UserTrack(4, 2, "short", Map.of(
+                        "item3", 1, "item1", 3
+                ), null)
+        );
+        when(trackRepository.findAllByUserId(1)).thenReturn(Collections.emptyList());
+        when(trackRepository.findAllByUserId(2)).thenReturn(matchTracks);
+        Pair<Integer, Integer> pair = statsService.matchTracks(1, 2);
+        assertEquals(0, pair.getFirst());
+        assertEquals(0, pair.getSecond());
+    }
+
+    @Test
+    void shouldMatchTracksWrongMatchUserId() {
+        Collection<UserTrack> tracks = List.of(
+                new UserTrack(1, 1, "long", Map.of(
+                        "item1", 1, "item2", 2, "item3", 3
+                ), null),
+                new UserTrack(2, 1, "short", Map.of(
+                        "item3", 1, "item4", 2, "item5", 3
+                ), null)
+        );
+        when(trackRepository.findAllByUserId(1)).thenReturn(tracks);
+        when(trackRepository.findAllByUserId(2)).thenReturn(Collections.emptyList());
+        Pair<Integer, Integer> pair = statsService.matchTracks(1, 2);
+        assertEquals(0, pair.getFirst());
+        assertEquals(5, pair.getSecond());
     }
 }

@@ -5,7 +5,6 @@ import com.laa66.statlyapp.DTO.GenresDTO;
 import com.laa66.statlyapp.DTO.TracksDTO;
 import com.laa66.statlyapp.entity.*;
 import com.laa66.statlyapp.exception.UserNotFoundException;
-import com.laa66.statlyapp.model.Album;
 import com.laa66.statlyapp.model.Genre;
 import com.laa66.statlyapp.model.Artist;
 import com.laa66.statlyapp.model.Track;
@@ -16,12 +15,11 @@ import com.laa66.statlyapp.repository.UserRepository;
 import com.laa66.statlyapp.service.StatsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -180,5 +178,26 @@ public class StatsServiceImpl implements StatsService {
                     });
                     return dto;
                 }).orElse(dto);
+    }
+
+    @Override
+    public Pair<Integer, Integer> matchTracks(long userId, long matchUserId) {
+        AtomicInteger comparingSize = new AtomicInteger();
+        int matching = Optional.of(trackRepository.findAllByUserId(userId))
+                .map(allTracks -> allTracks.stream()
+                        .flatMap(userTrack -> userTrack.getTracks().keySet().stream())
+                        .collect(Collectors.collectingAndThen(
+                                Collectors.toCollection(HashSet::new),
+                                collectedTracks -> {
+                                    comparingSize.set(collectedTracks.size());
+                                    collectedTracks.retainAll(Optional.of(trackRepository.findAllByUserId(matchUserId))
+                                            .map(allMatchTracks -> allMatchTracks.stream()
+                                                    .flatMap(matchUserTrack -> matchUserTrack.getTracks().keySet().stream())
+                                                    .collect(Collectors.toCollection(HashSet::new))
+                                            ).orElse(HashSet.newHashSet(0)));
+                                    return collectedTracks.size();
+                                }
+                        ))).orElse(0);
+        return Pair.of(matching, comparingSize.get());
     }
 }
