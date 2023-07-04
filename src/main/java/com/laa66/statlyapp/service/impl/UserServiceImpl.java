@@ -40,8 +40,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public com.laa66.statlyapp.model.User findUserByUsername(String username) {
-        return userRepository.findByUsername(username)
+    public com.laa66.statlyapp.model.User findUserById(long userId) {
+        return userRepository.findById(userId)
                 .map(User::toModelUser)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
     }

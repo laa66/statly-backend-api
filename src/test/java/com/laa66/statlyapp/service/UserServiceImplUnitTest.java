@@ -66,18 +66,6 @@ class UserServiceImplUnitTest {
     }
 
     @Test
-    void shouldFindUserByUsername() {
-        User user = new User(1, "id", "username", "user@mail.com", "url",LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
-        when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
-        com.laa66.statlyapp.model.User returnUser = userService.findUserByUsername("username");
-        assertEquals(Long.toString(user.getId()), returnUser.getId());
-        assertEquals(user.getImage(), returnUser.getImages().get(0).getUrl());
-
-        when(userRepository.findByUsername("empty")).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> userService.findUserByUsername("empty"));
-    }
-
-    @Test
     void shouldFindAllMatchingUsers() {
         User user = new User(1, "id", "username", "user@mail.com", "url",LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
         when(userRepository.findAllMatchingUsers("name")).thenReturn(List.of(user));

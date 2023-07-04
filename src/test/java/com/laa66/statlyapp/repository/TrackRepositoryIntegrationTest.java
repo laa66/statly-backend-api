@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -43,6 +45,22 @@ class TrackRepositoryIntegrationTest extends MySQLBaseContainerTest {
     void shouldNotFindFirstByUserIdAndRangeOrderByDateDescWrongRange() {
         Optional<UserTrack> track = trackRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "long");
         assertTrue(track.isEmpty());
+    }
+
+    @Test
+    void shouldFindAllByUserId() {
+        List<UserTrack> tracks = (List<UserTrack>) trackRepository.findAllByUserId(1);
+        assertEquals(2, tracks.size());
+        assertEquals(3, tracks.get(0).getTracks().size());
+        assertEquals(3, tracks.get(0).getTracks().size());
+        assertEquals(1, tracks.get(0).getTracks().get("artist_track1"));
+        assertEquals(3, tracks.get(0).getTracks().get("artist_track3"));
+    }
+
+    @Test
+    void shouldFindAllByUserIdWrongId() {
+        Collection<UserTrack> tracks = trackRepository.findAllByUserId(3);
+        assertTrue(tracks.isEmpty());
     }
 
 }

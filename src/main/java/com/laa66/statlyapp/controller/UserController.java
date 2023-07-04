@@ -35,16 +35,24 @@ public class UserController {
         response.setHeader(HttpHeaders.LOCATION, redirectUrl);
     }
 
-    @DeleteMapping("/delete")
+    @GetMapping("/me")
+    public ResponseEntity<User> getCurrentUser(@AuthenticationPrincipal OAuth2User principal) {
+        long userId = (long) principal.getAttributes().get("userId");
+        User user = userService.findUserById(userId);
+        return ResponseEntity.ok(user);
+    }
+
+    @DeleteMapping("/me/delete")
     public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal OAuth2User principal) {
         userService.deleteUser((long) principal.getAttributes().get("userId"));
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/get")
-    public ResponseEntity<User> getUser(@RequestParam String username) {
-        User user = userService.findUserByUsername(username);
-        return ResponseEntity.ok(user);
+    @GetMapping("/me/following")
+    public ResponseEntity<FollowersDTO> getCurrentUserFollowing(@AuthenticationPrincipal OAuth2User principal) {
+        long userId = (long) principal.getAttributes().get("userId");
+        FollowersDTO followersDTO = socialService.getFollowers(userId, StatlyConstants.FOLLOWING);
+        return ResponseEntity.ok(followersDTO);
     }
 
     @GetMapping("/search")
@@ -53,22 +61,15 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/following")
-    public ResponseEntity<FollowersDTO> getCurrentUserFollowing(@AuthenticationPrincipal OAuth2User principal) {
-        long userId = (long) principal.getAttributes().get("userId");
-        FollowersDTO followersDTO = socialService.getFollowers(userId, StatlyConstants.FOLLOWING);
-        return ResponseEntity.ok(followersDTO);
-    }
-
     @PutMapping("/follow")
-    public ResponseEntity<Void> follow(@AuthenticationPrincipal OAuth2User principal, @RequestParam long followId) {
+    public ResponseEntity<Void> follow(@AuthenticationPrincipal OAuth2User principal, @RequestParam("user_id") long followId) {
         long userId = (long) principal.getAttributes().get("userId");
         socialService.follow(userId, followId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/unfollow")
-    public ResponseEntity<Void> unfollow(@AuthenticationPrincipal OAuth2User principal, @RequestParam long followId) {
+    public ResponseEntity<Void> unfollow(@AuthenticationPrincipal OAuth2User principal, @RequestParam("user_id") long followId) {
         long userId = (long) principal.getAttributes().get("userId");
         socialService.unfollow(userId, followId);
         return ResponseEntity.noContent().build();

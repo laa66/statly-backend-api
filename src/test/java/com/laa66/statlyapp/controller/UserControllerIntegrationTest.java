@@ -64,43 +64,14 @@ class UserControllerIntegrationTest {
     @Test
     void shouldDelete() throws Exception {
         doNothing().when(userService).deleteUser(1L);
-        mockMvc.perform(delete("/user/delete").with(oauth2Login()
+        mockMvc.perform(delete("/user/me/delete").with(oauth2Login()
                                 .attributes(map -> map.put("userId", 1L)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/user/delete")
+        mockMvc.perform(get("/user/me/delete")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isFound());
-    }
-
-    @Test
-    void shouldGetUserValidUsername() throws Exception {
-        User user = new User("1", "uri", "name", List.of(new Image("url", null, null)));
-        when(userService.findUserByUsername("name")).thenReturn(user);
-        mockMvc.perform(get("/user/get?username=name")
-                .with(oauth2Login())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpectAll(
-                        status().isOk(),
-                        jsonPath("$.id", is("1")),
-                        jsonPath("$.uri", is("uri")),
-                        jsonPath("$.display_name", is("name")),
-                        jsonPath("$.images[0].url", is("url"))
-                );
-        mockMvc.perform(get("/user/get?username=name")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isFound());
-    }
-
-    @Test
-    void shouldGetUserNotValidUsername() throws Exception {
-        when(userService.findUserByUsername("wrong"))
-                .thenThrow(UserNotFoundException.class);
-        mockMvc.perform(get("/user/get?username=wrong")
-                .with(oauth2Login())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -131,13 +102,33 @@ class UserControllerIntegrationTest {
     }
 
     @Test
+    void shouldGetCurrentUser() throws Exception {
+        User user = new User("1", "uri", "name", List.of());
+        when(userService.findUserById(1L)).thenReturn(user);
+        mockMvc.perform(get("/user/me")
+                        .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.id", is("1")),
+                        jsonPath("$.display_name", is("name"))
+                );
+
+        when(userService.findUserById(2L)).thenThrow(UserNotFoundException.class);
+        mockMvc.perform(get("/user/me")
+                .with(oauth2Login().attributes(map -> map.put("userId", 2L)))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void shouldGetUserFollowing() throws Exception {
         FollowersDTO followersDTO = new FollowersDTO(1, List.of(new User(
                 "id", "uri", "name", List.of(new Image("url", null, null))
         )));
         when(socialService.getFollowers(1, StatlyConstants.FOLLOWING))
                 .thenReturn(followersDTO);
-        mockMvc.perform(get("/user/following")
+        mockMvc.perform(get("/user/me/following")
                 .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpectAll(
@@ -148,21 +139,21 @@ class UserControllerIntegrationTest {
                         jsonPath("$.users[0].images[0].url", is("url"))
                 );
 
-        mockMvc.perform(get("/user/following")
+        mockMvc.perform(get("/user/me/following")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isFound());
     }
 
     @Test
     void shouldFollowValidFollowId() throws Exception {
-        mockMvc.perform(put("/user/follow?followId=2")
+        mockMvc.perform(put("/user/follow?user_id=2")
                         .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
         verify(socialService, times(1)).follow(1, 2);
 
-        mockMvc.perform(put("/user/follow?followId=2")
+        mockMvc.perform(put("/user/follow?user_id=2")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isFound());
     }
@@ -170,7 +161,7 @@ class UserControllerIntegrationTest {
     @Test
     void shouldFollowNotValidFollowId() throws Exception {
         when(socialService.follow(1, 3)).thenThrow(new UserNotFoundException("User not found"));
-        mockMvc.perform(put("/user/follow?followId=3")
+        mockMvc.perform(put("/user/follow?user_id=3")
                         .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
@@ -179,14 +170,14 @@ class UserControllerIntegrationTest {
 
     @Test
     void shouldUnfollowValidFollowId() throws Exception {
-        mockMvc.perform(put("/user/unfollow?followId=2")
+        mockMvc.perform(put("/user/unfollow?user_id=2")
                         .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
         verify(socialService, times(1)).unfollow(1, 2);
 
-        mockMvc.perform(put("/user/unfollow?followId=2")
+        mockMvc.perform(put("/user/unfollow?user_id=2")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isFound());
     }
@@ -194,7 +185,7 @@ class UserControllerIntegrationTest {
     @Test
     void shouldUnfollowNotValidFollowId() throws Exception {
         when(socialService.unfollow(1, 3)).thenThrow(new UserNotFoundException("User not found"));
-        mockMvc.perform(put("/user/unfollow?followId=3")
+        mockMvc.perform(put("/user/unfollow?user_id=3")
                         .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))

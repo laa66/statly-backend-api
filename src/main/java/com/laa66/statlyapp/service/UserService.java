@@ -12,7 +12,7 @@ public interface UserService {
 
     Optional<User> findUserByEmail(String email);
 
-    com.laa66.statlyapp.model.User findUserByUsername(String username);
+    com.laa66.statlyapp.model.User findUserById(long userId);
 
     List<com.laa66.statlyapp.model.User> findAllMatchingUsers(String username);
 
