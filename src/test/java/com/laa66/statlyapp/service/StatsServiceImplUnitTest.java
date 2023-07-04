@@ -430,4 +430,66 @@ public class StatsServiceImplUnitTest {
         assertEquals(0, pair.getFirst());
         assertEquals(5, pair.getSecond());
     }
+
+    @Test
+    void shouldMatchArtists() {
+        Collection<UserArtist> artists = List.of(
+                new UserArtist(1, 1, "long", Map.of(
+                        "item1", 1, "item2", 2, "item3", 3
+                ), null),
+                new UserArtist(2, 1, "short", Map.of(
+                        "item1", 1, "item3", 2, "item4", 3
+                ), null)
+        );
+        Collection<UserArtist> matchArtists = List.of(
+                new UserArtist(3, 2, "short", Map.of(
+                        "item1", 1, "item2", 2, "item3", 3
+                ), null),
+                new UserArtist(4, 2, "short", Map.of(
+                        "item1", 1, "item2", 2, "item3", 3
+                ), null)
+        );
+        when(artistRepository.findAllByUserId(1)).thenReturn(artists);
+        when(artistRepository.findAllByUserId(2)).thenReturn(matchArtists);
+
+        Pair<Integer, Integer> pair = statsService.matchArtists(1, 2);
+        assertEquals(3, pair.getFirst());
+        assertEquals(4, pair.getSecond());
+    }
+
+    @Test
+    void shouldMatchArtistsWrongUserId() {
+        Collection<UserArtist> matchArtists = List.of(
+                new UserArtist(3, 2, "short", Map.of(
+                        "item1", 1, "item2", 2, "item3", 3
+                ), null),
+                new UserArtist(4, 2, "short", Map.of(
+                        "item1", 1, "item2", 2, "item3", 3
+                ), null)
+        );
+        when(artistRepository.findAllByUserId(1)).thenReturn(Collections.emptyList());
+        when(artistRepository.findAllByUserId(2)).thenReturn(matchArtists);
+        Pair<Integer, Integer> pair = statsService.matchArtists(1, 2);
+        assertEquals(0, pair.getFirst());
+        assertEquals(0, pair.getSecond());
+    }
+
+    @Test
+    void shouldMatchArtistsWrongMatchUserId() {
+        Collection<UserArtist> artists = List.of(
+                new UserArtist(1, 1, "long", Map.of(
+                        "item1", 1, "item2", 2, "item3", 3
+                ), null),
+                new UserArtist(2, 1, "short", Map.of(
+                        "item1", 1, "item3", 2, "item4", 3
+                ), null)
+        );
+        when(artistRepository.findAllByUserId(1)).thenReturn(artists);
+        when(artistRepository.findAllByUserId(2)).thenReturn(Collections.emptyList());
+        Pair<Integer, Integer> pair = statsService.matchArtists(1,2);
+        assertEquals(0, pair.getFirst());
+        assertEquals(4, pair.getSecond());
+    }
+
+
 }

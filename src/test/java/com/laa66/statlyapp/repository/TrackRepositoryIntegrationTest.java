@@ -52,7 +52,7 @@ class TrackRepositoryIntegrationTest extends MySQLBaseContainerTest {
         List<UserTrack> tracks = (List<UserTrack>) trackRepository.findAllByUserId(1);
         assertEquals(2, tracks.size());
         assertEquals(3, tracks.get(0).getTracks().size());
-        assertEquals(3, tracks.get(0).getTracks().size());
+        assertEquals(3, tracks.get(1).getTracks().size());
         assertEquals(1, tracks.get(0).getTracks().get("artist_track1"));
         assertEquals(3, tracks.get(0).getTracks().get("artist_track3"));
     }

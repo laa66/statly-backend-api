@@ -29,4 +29,6 @@ public interface StatsService {
 
     Pair<Integer, Integer> matchTracks(long userId, long matchUserId);
 
+    Pair<Integer, Integer> matchArtists(long userId, long matchUserId);
+
 }

@@ -200,4 +200,26 @@ public class StatsServiceImpl implements StatsService {
                         ))).orElse(0);
         return Pair.of(matching, comparingSize.get());
     }
+
+    @Override
+    public Pair<Integer, Integer> matchArtists(long userId, long matchUserId) {
+        AtomicInteger comparingSize = new AtomicInteger();
+        int matching = Optional.of(artistRepository.findAllByUserId(userId))
+                .map(allArtists -> allArtists.stream()
+                        .flatMap(userArtist -> userArtist.getArtists().keySet().stream())
+                        .collect(Collectors.collectingAndThen(
+                                Collectors.toCollection(HashSet::new),
+                                collectedTracks -> {
+                                    comparingSize.set(collectedTracks.size());
+                                    collectedTracks.retainAll(Optional.of(artistRepository.findAllByUserId(matchUserId))
+                                            .map(allMatchArtists -> allMatchArtists.stream()
+                                                    .flatMap(matchUserArtist -> matchUserArtist.getArtists().keySet().stream())
+                                                    .collect(Collectors.toCollection(HashSet::new))
+                                            )
+                                            .orElse(HashSet.newHashSet(0)));
+                                    return collectedTracks.size();
+                                }
+                        ))).orElse(0);
+        return Pair.of(matching, comparingSize.get());
+    }
 }
