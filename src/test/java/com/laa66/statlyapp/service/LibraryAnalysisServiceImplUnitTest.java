@@ -13,9 +13,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.util.Pair;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
@@ -93,6 +95,35 @@ class LibraryAnalysisServiceImplUnitTest {
     @Test
     void shouldGetLibraryAnalysisNullParameter() {
         assertThrows(RuntimeException.class, () -> libraryAnalysisService.getLibraryAnalysis(null, null));
+    }
+
+    @Test
+    void shouldGetUsersMatching() {
+        when(statsService.matchTracks(1,2)).thenReturn(Pair.of(40, 120));
+        when(statsService.matchArtists(1,2)).thenReturn(Pair.of(34, 70));
+        when(statsService.matchGenres(1,2)).thenReturn(Pair.of(4, 15));
+
+        Map<String, Double> usersMatching = libraryAnalysisService.getUsersMatching(1, 2);
+        assertEquals(33., usersMatching.get("track"));
+        assertEquals(49., usersMatching.get("artist"));
+        assertEquals(27., usersMatching.get("genre"));
+        assertEquals(38., usersMatching.get("overall"));
+    }
+
+    @Test
+    void shouldGetUsersMatchingNotValidUsersIds() {
+        when(statsService.matchTracks(1,2)).thenReturn(Pair.of(0, 0));
+        when(statsService.matchArtists(1,2)).thenReturn(Pair.of(0, 0));
+        when(statsService.matchGenres(1,2)).thenReturn(Pair.of(0, 0));
+        Map<String, Double> firstNotValid = libraryAnalysisService.getUsersMatching(1,2);
+        assertEquals(0.0, firstNotValid.get("overall"));
+
+        when(statsService.matchTracks(3,4)).thenReturn(Pair.of(0, 30));
+        when(statsService.matchArtists(3,4)).thenReturn(Pair.of(0, 50));
+        when(statsService.matchGenres(3,4)).thenReturn(Pair.of(0, 7));
+        Map<String, Double> secondNotValid = libraryAnalysisService.getUsersMatching(3,4);
+        assertEquals(0.0, secondNotValid.get("overall"));
+
     }
 
 }

@@ -12,7 +12,9 @@ import com.laa66.statlyapp.service.LibraryAnalysisService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.StatsService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.util.Pair;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -21,6 +23,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
+@Slf4j
 public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
 
     private final StatsService statsService;
@@ -75,27 +78,35 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
                 .orElseThrow(() -> new RuntimeException("Artists cannot be null"));
     }
 
+    @Override
+    public Map<String, Double> getUsersMatching(long userId, long matchUserId) {
+        Pair<Integer, Integer> track = statsService.matchTracks(userId, matchUserId);
+        Pair<Integer, Integer> artist = statsService.matchArtists(userId, matchUserId);
+        Pair<Integer, Integer> genre = statsService.matchGenres(userId, matchUserId);
+        return Map.of(
+                "track", roundHalfUp(((double) track.getFirst() / track.getSecond()) * 100),
+                "artist", roundHalfUp(((double) artist.getFirst() / artist.getSecond()) * 100),
+                "genre", roundHalfUp(((double) genre.getFirst() / genre.getSecond()) * 100),
+                "overall", roundHalfUp(((track.getFirst() + artist.getFirst() + (double) genre.getFirst()) /
+                        (track.getSecond() + artist.getSecond() + genre.getSecond())) * 100)
+        );
+    }
+
     //helpers
     private double getMainstreamScore(TracksDTO tracksDTO) {
-        return new BigDecimal(Double.toString(
-                tracksDTO.getTracks()
+        return roundHalfUp(tracksDTO.getTracks()
                         .stream()
                         .mapToInt(Track::getPopularity)
                         .average()
-                        .orElse(0)))
-                .setScale(0, RoundingMode.HALF_UP)
-                .doubleValue();
+                        .orElse(0));
     }
 
     private double getBoringness(Map<String, Double> mapAnalysis) {
-        return !mapAnalysis.isEmpty() ?
-                new BigDecimal(Double.toString(
+        return !mapAnalysis.isEmpty() ? roundHalfUp(
                 mapAnalysis.get("tempo")
-                + (mapAnalysis.get("valence"))
-                + (mapAnalysis.get("energy"))
-                + (mapAnalysis.get("danceability"))))
-                .setScale(0, RoundingMode.HALF_UP)
-                .doubleValue() : 0.0;
+                        + (mapAnalysis.get("valence"))
+                        + (mapAnalysis.get("energy"))
+                        + (mapAnalysis.get("danceability"))) : 0.;
     }
 
     private Map<String, Double> getMapAnalysis(ResponseTracksAnalysis tracksAnalysis) {
@@ -119,12 +130,20 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
         return analyzedTracks.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        value -> new BigDecimal(Double
-                                .toString((value.getValue() / trackCount)))
-                                .setScale(0, RoundingMode.HALF_UP)
-                                .doubleValue(),
+                        value -> roundHalfUp((value.getValue() / trackCount)),
                         (first, conflict) -> first,
                         LinkedHashMap::new));
+    }
+
+    private double roundHalfUp(double num) {
+        try {
+            return new BigDecimal(Double.toString(num))
+                    .setScale(0, RoundingMode.HALF_UP)
+                    .doubleValue();
+        } catch (NumberFormatException e) {
+            log.error(e.getMessage());
+            return 0.;
+        }
     }
 
     private void addToMap(Map<String, Double> map, String key, double value) {
