@@ -54,15 +54,14 @@ class UserServiceImplUnitTest {
     void shouldFindUserByEmail() {
         User user = new User(1, "id", "username", "user@mail.com", "url",LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
         when(userRepository.findByEmail("user@mail.com")).thenReturn(Optional.of(user));
-        Optional<User> returnUser = userService.findUserByEmail("user@mail.com");
-        assertTrue(returnUser.isPresent());
-        assertEquals(user.getId(), returnUser.get().getId());
-        assertEquals(user.getEmail(), returnUser.get().getEmail());
-        assertEquals(user.getJoinDate(), returnUser.get().getJoinDate());
+        com.laa66.statlyapp.model.User returnUser = userService.findUserByEmail("user@mail.com");
+        assertEquals("1", returnUser.getId());
+        assertEquals(user.getUsername(), returnUser.getName());
+        assertEquals(user.getImage(), returnUser.getImages().get(0).getUrl());
 
         when(userRepository.findByEmail("wrong@mail.com")).thenReturn(Optional.empty());
-        Optional<User> returnEmptyUser = userService.findUserByEmail("wrong@mail.com");
-        assertTrue(returnEmptyUser.isEmpty());
+        com.laa66.statlyapp.model.User returnEmptyUser = userService.findUserByEmail("wrong@mail.com");
+        assertNull(returnEmptyUser);
     }
 
     @Test
@@ -85,12 +84,11 @@ class UserServiceImplUnitTest {
         User beforeSaveUser = new User(0, "id", "username", "user@mail.com", "url", LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
         User afterSaveUser = new User(1, "id", "username", "user@mail.com", "url",LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
         when(userRepository.save(beforeSaveUser)).thenReturn(afterSaveUser);
-        User returnUser = userService.saveUser(beforeSaveUser);
-        assertNotNull(returnUser);
-        assertNotEquals(beforeSaveUser.getId(), returnUser.getId());
-        assertEquals(afterSaveUser.getId(), returnUser.getId());
-        assertEquals(beforeSaveUser.getEmail(), returnUser.getEmail());
-        assertEquals(beforeSaveUser.getJoinDate(), returnUser.getJoinDate());
+        com.laa66.statlyapp.model.User returnUser = userService.saveUser(beforeSaveUser);
+        assertNotEquals("0", returnUser.getId());
+        assertEquals("1", returnUser.getId());
+        assertEquals(beforeSaveUser.getUsername(), returnUser.getName());
+        assertEquals(beforeSaveUser.getImage(), returnUser.getImages().get(0).getUrl());
     }
 
     @Test

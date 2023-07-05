@@ -92,9 +92,9 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     }
 
     @Override
-    public ResponsePlaylists getUserPlaylists(@Nullable String username) {
-        String url = username == null ? SpotifyAPI.CURRENT_USER_PLAYLISTS.get() :
-                SpotifyAPI.USER_PLAYLISTS.get().replace("user_id", username);
+    public ResponsePlaylists getUserPlaylists(@Nullable String externalId) {
+        String url = externalId == null ? SpotifyAPI.CURRENT_USER_PLAYLISTS.get() :
+                SpotifyAPI.USER_PLAYLISTS.get().replace("user_id", externalId);
         ResponsePlaylists responsePlaylists = new ResponsePlaylists(null, 0, new LinkedList<>());
         ResponsePlaylists body;
         do {

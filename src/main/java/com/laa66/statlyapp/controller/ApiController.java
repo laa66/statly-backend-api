@@ -5,6 +5,7 @@ import com.laa66.statlyapp.model.PlaylistInfo;
 import com.laa66.statlyapp.model.response.ResponsePlaylists;
 import com.laa66.statlyapp.service.LibraryAnalysisService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
+import com.laa66.statlyapp.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,8 +60,8 @@ public class ApiController {
     }
 
     @GetMapping("/playlist/all")
-    public ResponseEntity<ResponsePlaylists> getPlaylists() {
-        ResponsePlaylists playlist = spotifyApiService.getUserPlaylists(null);
+    public ResponseEntity<ResponsePlaylists> getPlaylists(@RequestParam(value = "external_id", required = false) String externalUserId) {
+        ResponsePlaylists playlist = spotifyApiService.getUserPlaylists(externalUserId);
         return ResponseEntity.ok(playlist);
     }
 

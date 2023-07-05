@@ -107,7 +107,7 @@ class LibraryAnalysisServiceImplUnitTest {
         assertEquals(33., usersMatching.get("track"));
         assertEquals(49., usersMatching.get("artist"));
         assertEquals(27., usersMatching.get("genre"));
-        assertEquals(38., usersMatching.get("overall"));
+        assertEquals(37., usersMatching.get("overall"));
     }
 
     @Test

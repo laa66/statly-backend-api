@@ -5,6 +5,7 @@ import com.laa66.statlyapp.DTO.ProfileDTO;
 import com.laa66.statlyapp.constants.StatlyConstants;
 import com.laa66.statlyapp.entity.User;
 import com.laa66.statlyapp.exception.UserNotFoundException;
+import com.laa66.statlyapp.mapper.EntityMapper;
 import com.laa66.statlyapp.repository.UserRepository;
 import com.laa66.statlyapp.service.SocialService;
 import com.laa66.statlyapp.service.StatsService;
@@ -37,7 +38,7 @@ public class SocialServiceImpl implements SocialService {
                 .map(foundUser -> {
                     List<User> followers = type == StatlyConstants.FOLLOWING ? foundUser.getFollowing() : foundUser.getFollowers();
                     List<com.laa66.statlyapp.model.User> list = followers.stream()
-                            .map(User::toModelUser)
+                            .map(EntityMapper::toUserDTO)
                             .toList();
                     return new FollowersDTO(list.size(), list);
                 }).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER);
@@ -77,10 +78,10 @@ public class SocialServiceImpl implements SocialService {
                 user.getImage(),
                 user.getJoinDate(),
                 user.getFollowing().stream()
-                        .map(User::toModelUser)
+                        .map(EntityMapper::toUserDTO)
                         .toList(),
                 user.getFollowers().stream()
-                        .map(User::toModelUser)
+                        .map(EntityMapper::toUserDTO)
                         .toList(),
                 statsService.getUserTracks(userId, "long").getTracks(),
                 statsService.getUserArtists(userId, "long").getArtists(),

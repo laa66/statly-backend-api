@@ -1,9 +1,12 @@
 package com.laa66.statlyapp.service.impl;
 
 import com.laa66.statlyapp.DTO.*;
-import com.laa66.statlyapp.entity.*;
+
+import com.laa66.statlyapp.entity.BetaUser;
 import com.laa66.statlyapp.exception.UserNotFoundException;
+import com.laa66.statlyapp.mapper.EntityMapper;
 import com.laa66.statlyapp.model.Image;
+import com.laa66.statlyapp.model.User;
 import com.laa66.statlyapp.repository.*;
 import com.laa66.statlyapp.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -35,27 +38,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(EntityMapper::toUserDTO)
+                .orElse(null);
     }
 
     @Override
-    public com.laa66.statlyapp.model.User findUserById(long userId) {
+    public User findUserById(long userId) {
         return userRepository.findById(userId)
-                .map(User::toModelUser)
+                .map(EntityMapper::toUserDTO)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     @Override
-    public List<com.laa66.statlyapp.model.User> findAllMatchingUsers(String username) {
+    public List<User> findAllMatchingUsers(String username) {
         return userRepository.findAllMatchingUsers(username).stream()
-                .map(User::toModelUser)
+                .map(EntityMapper::toUserDTO)
                 .toList();
     }
 
     @Override
-    public User saveUser(User user) {
-        return userRepository.save(user);
+    public User saveUser(com.laa66.statlyapp.entity.User user) {
+        com.laa66.statlyapp.entity.User savedUser = userRepository.save(user);
+        return EntityMapper.toUserDTO(savedUser);
     }
 
     @Override

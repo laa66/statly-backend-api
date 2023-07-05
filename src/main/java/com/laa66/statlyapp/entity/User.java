@@ -71,12 +71,4 @@ public class User {
     public void removeFollower(User follower) {
         following.remove(follower);
     }
-
-    public com.laa66.statlyapp.model.User toModelUser() {
-        return new com.laa66.statlyapp.model.User(
-                Long.toString(this.getId()),
-                null,
-                this.getUsername(),
-                List.of(new Image(this.getImage(), null, null)));
-    }
 }

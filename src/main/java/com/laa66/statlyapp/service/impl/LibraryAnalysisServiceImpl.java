@@ -83,13 +83,12 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
         Pair<Integer, Integer> track = statsService.matchTracks(userId, matchUserId);
         Pair<Integer, Integer> artist = statsService.matchArtists(userId, matchUserId);
         Pair<Integer, Integer> genre = statsService.matchGenres(userId, matchUserId);
-        return Map.of(
+        Map<String, Double> matchMap = new HashMap<>(Map.of(
                 "track", roundHalfUp(((double) track.getFirst() / track.getSecond()) * 100),
                 "artist", roundHalfUp(((double) artist.getFirst() / artist.getSecond()) * 100),
-                "genre", roundHalfUp(((double) genre.getFirst() / genre.getSecond()) * 100),
-                "overall", roundHalfUp(((track.getFirst() + artist.getFirst() + (double) genre.getFirst()) /
-                        (track.getSecond() + artist.getSecond() + genre.getSecond())) * 100)
-        );
+                "genre", roundHalfUp(((double) genre.getFirst() / genre.getSecond()) * 100)));
+        matchMap.put("overall", roundHalfUp(matchMap.get("track") * .35 + matchMap.get("artist") * .35 + matchMap.get("genre") * .30));
+        return matchMap;
     }
 
     //helpers
@@ -141,7 +140,6 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
                     .setScale(0, RoundingMode.HALF_UP)
                     .doubleValue();
         } catch (NumberFormatException e) {
-            log.error(e.getMessage());
             return 0.;
         }
     }

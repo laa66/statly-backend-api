@@ -110,10 +110,10 @@ public class StatsServiceImpl implements StatsService {
                 .map(foundUser -> {
                     foundUser.setUserStats(new UserStats(
                             foundUser.getUserStats().getId(),
-                            statsMap.get("energy"),
-                            statsMap.get("tempo"),
-                            statsMap.get("mainstream"),
-                            statsMap.get("boringness"),
+                            statsMap.getOrDefault("energy", 0.),
+                            statsMap.getOrDefault("tempo", 0.),
+                            statsMap.getOrDefault("mainstream", 0.),
+                            statsMap.getOrDefault("boringness", 0.),
                             foundUser.getUserStats().getPoints()
                     ));
                     return foundUser;
@@ -183,14 +183,14 @@ public class StatsServiceImpl implements StatsService {
     @Override
     public Pair<Integer, Integer> matchTracks(long userId, long matchUserId) {
         AtomicInteger comparingSize = new AtomicInteger();
-        int matching = Optional.of(trackRepository.findAllByUserId(userId))
+        int matching = Optional.ofNullable(trackRepository.findAllByUserId(userId))
                 .map(allTracks -> allTracks.stream()
                         .flatMap(userTrack -> userTrack.getTracks().keySet().stream())
                         .collect(Collectors.collectingAndThen(
                                 Collectors.toCollection(HashSet::new),
                                 collectedTracks -> {
                                     comparingSize.set(collectedTracks.size());
-                                    collectedTracks.retainAll(Optional.of(trackRepository.findAllByUserId(matchUserId))
+                                    collectedTracks.retainAll(Optional.ofNullable(trackRepository.findAllByUserId(matchUserId))
                                             .map(allMatchTracks -> allMatchTracks.stream()
                                                     .flatMap(matchUserTrack -> matchUserTrack.getTracks().keySet().stream())
                                                     .collect(Collectors.toCollection(HashSet::new))
@@ -204,14 +204,14 @@ public class StatsServiceImpl implements StatsService {
     @Override
     public Pair<Integer, Integer> matchArtists(long userId, long matchUserId) {
         AtomicInteger comparingSize = new AtomicInteger();
-        int matching = Optional.of(artistRepository.findAllByUserId(userId))
+        int matching = Optional.ofNullable(artistRepository.findAllByUserId(userId))
                 .map(allArtists -> allArtists.stream()
                         .flatMap(userArtist -> userArtist.getArtists().keySet().stream())
                         .collect(Collectors.collectingAndThen(
                                 Collectors.toCollection(HashSet::new),
                                 collectedTracks -> {
                                     comparingSize.set(collectedTracks.size());
-                                    collectedTracks.retainAll(Optional.of(artistRepository.findAllByUserId(matchUserId))
+                                    collectedTracks.retainAll(Optional.ofNullable(artistRepository.findAllByUserId(matchUserId))
                                             .map(allMatchArtists -> allMatchArtists.stream()
                                                     .flatMap(matchUserArtist -> matchUserArtist.getArtists().keySet().stream())
                                                     .collect(Collectors.toCollection(HashSet::new))
@@ -225,14 +225,14 @@ public class StatsServiceImpl implements StatsService {
     @Override
     public Pair<Integer, Integer> matchGenres(long userId, long matchUserId) {
         AtomicInteger comparingSize = new AtomicInteger();
-        int matching = Optional.of(genreRepository.findAllByUserId(userId))
+        int matching = Optional.ofNullable(genreRepository.findAllByUserId(userId))
                 .map(allGenres -> allGenres.stream()
                         .flatMap(userGenre -> userGenre.getGenres().keySet().stream())
                         .collect(Collectors.collectingAndThen(
                                 Collectors.toCollection(HashSet::new),
                                 collectedGenres -> {
                                     comparingSize.set(collectedGenres.size());
-                                    collectedGenres.retainAll(Optional.of(genreRepository.findAllByUserId(matchUserId))
+                                    collectedGenres.retainAll(Optional.ofNullable(genreRepository.findAllByUserId(matchUserId))
                                             .map(matchAllGenres -> matchAllGenres.stream()
                                                     .flatMap(matchUserGenre -> matchUserGenre.getGenres().keySet().stream())
                                                     .collect(Collectors.toCollection(HashSet::new))
