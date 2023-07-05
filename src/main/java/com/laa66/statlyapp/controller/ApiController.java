@@ -12,6 +12,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -76,5 +78,12 @@ public class ApiController {
         TracksDTO tracksDTO = spotifyApiService.getPlaylistTracks(playlistInfo, country);
         LibraryAnalysisDTO libraryAnalysisDTO = libraryAnalysisService.getLibraryAnalysis(tracksDTO, null);
         return ResponseEntity.ok(libraryAnalysisDTO);
+    }
+
+    @GetMapping("/analysis/match")
+    public ResponseEntity<Map<String, Double>> matchUsers(@AuthenticationPrincipal OAuth2User principal, @RequestParam("user_id") long matchUserId) {
+        long userId = (long) principal.getAttributes().get("userId");
+        Map<String, Double> usersMatching = libraryAnalysisService.getUsersMatching(userId, matchUserId);
+        return ResponseEntity.ok(usersMatching);
     }
 }

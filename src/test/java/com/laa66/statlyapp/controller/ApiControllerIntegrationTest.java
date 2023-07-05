@@ -41,7 +41,7 @@ class ApiControllerIntegrationTest {
     ObjectMapper mapper = new ObjectMapper();
 
     @Test
-    void shouldGetTopTracksAuthenticated() throws Exception {
+    void shouldGetTopTracks() throws Exception {
         TracksDTO tracksDTO = new TracksDTO(List.of(new Track()), "1", "short", null);
         when(spotifyAPIService.getTopTracks(1, "short")).thenReturn(tracksDTO);
         mockMvc.perform(get("/api/top/tracks").with(oauth2Login()
@@ -60,7 +60,7 @@ class ApiControllerIntegrationTest {
 
 
     @Test
-    void shouldGetTopArtistsAuthenticated() throws Exception {
+    void shouldGetTopArtists() throws Exception {
         ArtistsDTO artistsDTO = new ArtistsDTO("1", List.of(new Artist()), "short", null);
         when(spotifyAPIService.getTopArtists(1, "short")).thenReturn(artistsDTO);
         mockMvc.perform(get("/api/top/artists").with(oauth2Login()
@@ -79,7 +79,7 @@ class ApiControllerIntegrationTest {
 
 
     @Test
-    void shouldGetTopGenresAuthenticated() throws Exception {
+    void shouldGetTopGenres() throws Exception {
         GenresDTO genresDTO = new GenresDTO(List.of(new Genre("rock", 2)), "short", null);
         ArtistsDTO artistsDTO = new ArtistsDTO("1", List.of(new Artist()), "short", null);
         when(spotifyAPIService.getTopArtists(1, "short")).thenReturn(artistsDTO);
@@ -99,7 +99,7 @@ class ApiControllerIntegrationTest {
     }
 
     @Test
-    void shouldGetRecentlyPlayedAuthenticated() throws Exception {
+    void shouldGetRecentlyPlayed() throws Exception {
         RecentlyPlayedDTO recentlyDTO = new RecentlyPlayedDTO("1", List.of(new PlaybackEvent()));
         when(spotifyAPIService.getRecentlyPlayed())
                 .thenReturn(recentlyDTO);
@@ -115,7 +115,7 @@ class ApiControllerIntegrationTest {
     }
 
     @Test
-    void shouldCreatePlaylistAuthenticated() throws Exception {
+    void shouldCreatePlaylist() throws Exception {
         PlaylistDTO playlistDTO = new PlaylistDTO("1", new SpotifyURL());
         when(spotifyAPIService.postTopTracksPlaylist(1, "short"))
                 .thenReturn(playlistDTO);
@@ -135,7 +135,7 @@ class ApiControllerIntegrationTest {
     }
 
     @Test
-    void shouldGetAllPlaylistsAuthenticated() throws Exception {
+    void shouldGetAllPlaylists() throws Exception {
         ResponsePlaylists playlists = new ResponsePlaylists(
                 null,
                 1,
@@ -158,7 +158,7 @@ class ApiControllerIntegrationTest {
     }
 
     @Test
-    void shouldGetLibraryAnalysisAuthenticated() throws Exception {
+    void shouldGetLibraryAnalysis() throws Exception {
         TracksDTO tracksDTO = new TracksDTO(List.of(new Track()), "1", "long", null);
         LibraryAnalysisDTO libraryAnalysisDTO = new LibraryAnalysisDTO(
                 Map.of("acousticness", 0.34, "valence", 0.55),
@@ -186,7 +186,7 @@ class ApiControllerIntegrationTest {
     }
 
     @Test
-    void shouldGetPlaylistAnalysisAuthenticated() throws Exception {
+    void shouldGetPlaylistAnalysis() throws Exception {
         PlaylistInfo playlistInfo = new PlaylistInfo();
         TracksDTO tracksDTO = new TracksDTO(List.of(new Track()), "1", "long", null);
         LibraryAnalysisDTO libraryAnalysisDTO = new LibraryAnalysisDTO(
@@ -214,6 +214,38 @@ class ApiControllerIntegrationTest {
                         .with(csrf())
                         .content(mapper.writeValueAsString(new PlaylistInfo())))
                 .andExpect(status().isFound());
+
+    }
+
+    @Test
+    void shouldMatchUsers() throws Exception {
+        Map<String, Double> usersMatch = Map.of("track", 22., "artist", 30., "genre", 31., "overall", 40.);
+        when(libraryAnalysisService.getUsersMatching(1,2)).thenReturn(usersMatch);
+        mockMvc.perform(get("/api/analysis/match?user_id=2")
+                .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$", hasEntry("track", 22.)),
+                        jsonPath("$", hasEntry("artist", 30.)),
+                        jsonPath("$", hasEntry("genre", 31.)),
+                        jsonPath("$", hasEntry("overall", 40.))
+                );
+
+        when(libraryAnalysisService.getUsersMatching(1,3))
+                .thenReturn(Map.of(
+                "track", 0., "artist", 0., "genre", 0., "overall", 0.
+        ));
+        mockMvc.perform(get("/api/analysis/match?user_id=3")
+                        .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$", hasEntry("track", 0.)),
+                        jsonPath("$", hasEntry("artist", 0.)),
+                        jsonPath("$", hasEntry("genre", 0.)),
+                        jsonPath("$", hasEntry("overall", 0.))
+                );
 
     }
 }
