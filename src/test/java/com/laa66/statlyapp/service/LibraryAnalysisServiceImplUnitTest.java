@@ -1,17 +1,14 @@
 package com.laa66.statlyapp.service;
 
-import com.laa66.statlyapp.DTO.LibraryAnalysisDTO;
-import com.laa66.statlyapp.DTO.ArtistsDTO;
-import com.laa66.statlyapp.DTO.GenresDTO;
-import com.laa66.statlyapp.DTO.TracksDTO;
+import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.model.*;
 import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
 import com.laa66.statlyapp.service.impl.LibraryAnalysisServiceImpl;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
 
@@ -19,7 +16,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -29,11 +25,15 @@ import static org.mockito.Mockito.*;
 class LibraryAnalysisServiceImplUnitTest {
 
     @Mock
+    SocialService socialService;
+
+    @Mock
     StatsService statsService;
 
     @Mock
     SpotifyAPIService spotifyAPIService;
 
+    @Spy
     @InjectMocks
     LibraryAnalysisServiceImpl libraryAnalysisService;
 
@@ -75,26 +75,26 @@ class LibraryAnalysisServiceImplUnitTest {
         ));
         when(spotifyAPIService.getTracksAnalysis(tracksDTO))
                 .thenReturn(tracksAnalysis);
-        LibraryAnalysisDTO analysisDTO = libraryAnalysisService.getLibraryAnalysis(tracksDTO, 1L);
+        AnalysisDTO analysisDTO = libraryAnalysisService.getTracksAnalysis(tracksDTO, 1L);
 
         verify(statsService, times(1)).saveUserStats(isA(Long.class), anyMap());
-        assertEquals(50.0, analysisDTO.getLibraryAnalysis().get("acousticness"));
-        assertEquals(30.0, analysisDTO.getLibraryAnalysis().get("danceability"));
-        assertEquals(19.0, analysisDTO.getLibraryAnalysis().get("energy"));
-        assertEquals(22.0, analysisDTO.getLibraryAnalysis().get("instrumentalness"));
-        assertEquals(55.0, analysisDTO.getLibraryAnalysis().get("liveness"));
-        assertEquals(-17, analysisDTO.getLibraryAnalysis().get("loudness"));
-        assertEquals(33.0, analysisDTO.getLibraryAnalysis().get("speechiness"));
-        assertEquals(123.0, analysisDTO.getLibraryAnalysis().get("tempo"));
-        assertEquals(66.0, analysisDTO.getLibraryAnalysis().get("valence"));
-        assertEquals(55.0, analysisDTO.getLibraryAnalysis().get("mainstream"));
-        assertEquals(238.0, analysisDTO.getLibraryAnalysis().get("boringness"));
+        assertEquals(50.0, analysisDTO.getAnalysis().get("acousticness"));
+        assertEquals(30.0, analysisDTO.getAnalysis().get("danceability"));
+        assertEquals(19.0, analysisDTO.getAnalysis().get("energy"));
+        assertEquals(22.0, analysisDTO.getAnalysis().get("instrumentalness"));
+        assertEquals(55.0, analysisDTO.getAnalysis().get("liveness"));
+        assertEquals(-17, analysisDTO.getAnalysis().get("loudness"));
+        assertEquals(33.0, analysisDTO.getAnalysis().get("speechiness"));
+        assertEquals(123.0, analysisDTO.getAnalysis().get("tempo"));
+        assertEquals(66.0, analysisDTO.getAnalysis().get("valence"));
+        assertEquals(55.0, analysisDTO.getAnalysis().get("mainstream"));
+        assertEquals(238.0, analysisDTO.getAnalysis().get("boringness"));
         assertEquals(2, analysisDTO.getImages().size());
     }
 
     @Test
     void shouldGetLibraryAnalysisNullParameter() {
-        assertThrows(RuntimeException.class, () -> libraryAnalysisService.getLibraryAnalysis(null, null));
+        assertThrows(RuntimeException.class, () -> libraryAnalysisService.getTracksAnalysis(null, null));
     }
 
     @Test
@@ -124,6 +124,71 @@ class LibraryAnalysisServiceImplUnitTest {
         Map<String, Double> secondNotValid = libraryAnalysisService.getUsersMatching(3,4);
         assertEquals(0.0, secondNotValid.get("overall"));
 
+    }
+
+    @Test
+    void shouldMakePlaylistBattle() {
+        TracksDTO tracks1 = new TracksDTO();
+        TracksDTO tracks2 = new TracksDTO();
+        AnalysisDTO analysis1 = new AnalysisDTO(Map.of("tempo", 120.,
+                "valence", .35,
+                "energy", .60,
+                "danceability", .45,
+                "mainstream", 45.,
+                "boringness", 260.),
+                List.of()// 315
+        );
+        AnalysisDTO analysis2 = new AnalysisDTO(
+                Map.of("tempo", 110.,
+                        "valence", .30,
+                        "energy", .55,
+                        "danceability", .15,
+                        "mainstream", 65.,
+                        "boringness", 210.),
+                List.of()// 245
+        );
+        doReturn(analysis1).when(libraryAnalysisService)
+                .getTracksAnalysis(tracks1, null);
+        doReturn(analysis2).when(libraryAnalysisService)
+                .getTracksAnalysis(tracks2, null);
+        PlaylistBattleDTO playlistBattleDTO = libraryAnalysisService.makePlaylistBattle(1L, 2L,
+                tracks1, tracks2);
+        assertEquals(1L, playlistBattleDTO.getWinner().getId());
+        assertEquals(2L, playlistBattleDTO.getLoser().getId());
+        assertEquals(70., playlistBattleDTO.getResult());
+        assertEquals(315., playlistBattleDTO.getWinner().getScore());
+        assertEquals(245., playlistBattleDTO.getLoser().getScore());
+    }
+
+    @Test
+    void shouldMakePlaylistBattleNoContest() {
+        TracksDTO tracks1 = new TracksDTO();
+        TracksDTO tracks2 = new TracksDTO();
+        AnalysisDTO analysis1 = new AnalysisDTO(Map.of("tempo", 120.,
+                "valence", .35,
+                "energy", .60,
+                "danceability", .45,
+                "mainstream", 45.,
+                "boringness", 260.),
+                List.of()// 315
+        );
+        AnalysisDTO analysis2 = new AnalysisDTO(Map.of("tempo", 120.,
+                "valence", .35,
+                "energy", .60,
+                "danceability", .45,
+                "mainstream", 45.,
+                "boringness", 260.),
+                List.of()// 315
+        );
+        doReturn(analysis1).when(libraryAnalysisService)
+                .getTracksAnalysis(tracks1, null);
+        doReturn(analysis2).when(libraryAnalysisService)
+                .getTracksAnalysis(tracks2, null);
+        PlaylistBattleDTO playlistBattleDTO = libraryAnalysisService.makePlaylistBattle(1L, 2L,
+                tracks1, tracks2);
+        assertEquals(0., playlistBattleDTO.getResult());
+        assertEquals(315., playlistBattleDTO.getWinner().getScore());
+        assertEquals(315., playlistBattleDTO.getLoser().getScore());
     }
 
 }

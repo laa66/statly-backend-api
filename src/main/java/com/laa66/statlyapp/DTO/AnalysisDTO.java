@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 @Value
-public class LibraryAnalysisDTO {
-    Map<String, Double> libraryAnalysis;
+public class AnalysisDTO {
+    Map<String, Double> analysis;
     List<Image> images;
 }
 

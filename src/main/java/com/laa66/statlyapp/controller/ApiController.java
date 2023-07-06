@@ -5,7 +5,6 @@ import com.laa66.statlyapp.model.PlaylistInfo;
 import com.laa66.statlyapp.model.response.ResponsePlaylists;
 import com.laa66.statlyapp.service.LibraryAnalysisService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
-import com.laa66.statlyapp.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +48,6 @@ public class ApiController {
     public ResponseEntity<RecentlyPlayedDTO> recently() {
         RecentlyPlayedDTO recentlyPlayedDTO = spotifyApiService.getRecentlyPlayed();
         return ResponseEntity.ok(recentlyPlayedDTO);
-
     }
 
     @PostMapping("/playlist/create")
@@ -66,19 +64,19 @@ public class ApiController {
     }
 
     @GetMapping("/analysis/library")
-    public ResponseEntity<LibraryAnalysisDTO> libraryAnalysis(@AuthenticationPrincipal OAuth2User principal) {
+    public ResponseEntity<AnalysisDTO> libraryAnalysis(@AuthenticationPrincipal OAuth2User principal) {
         long userId = (long) principal.getAttributes().get("userId");
         TracksDTO tracksDTO = spotifyApiService.getTopTracks(userId, "long");
-        LibraryAnalysisDTO libraryAnalysisDTO = libraryAnalysisService.getLibraryAnalysis(tracksDTO, userId);
-        return ResponseEntity.ok(libraryAnalysisDTO);
+        AnalysisDTO analysisDTO = libraryAnalysisService.getTracksAnalysis(tracksDTO, userId);
+        return ResponseEntity.ok(analysisDTO);
     }
 
     @PostMapping("/analysis/playlist")
-    public ResponseEntity<LibraryAnalysisDTO> playlistAnalysis(@AuthenticationPrincipal OAuth2User principal, @RequestBody PlaylistInfo playlistInfo) {
+    public ResponseEntity<AnalysisDTO> playlistAnalysis(@AuthenticationPrincipal OAuth2User principal, @RequestBody PlaylistInfo playlistInfo) {
         String country = (String) principal.getAttributes().get("country");
         TracksDTO tracksDTO = spotifyApiService.getPlaylistTracks(playlistInfo, country);
-        LibraryAnalysisDTO libraryAnalysisDTO = libraryAnalysisService.getLibraryAnalysis(tracksDTO, null);
-        return ResponseEntity.ok(libraryAnalysisDTO);
+        AnalysisDTO analysisDTO = libraryAnalysisService.getTracksAnalysis(tracksDTO, null);
+        return ResponseEntity.ok(analysisDTO);
     }
 
     @GetMapping("/analysis/match")

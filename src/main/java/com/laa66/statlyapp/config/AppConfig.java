@@ -31,8 +31,8 @@ public class AppConfig {
     }
 
     @Bean
-    public LibraryAnalysisService libraryAnalysisService(StatsService statsService, SpotifyAPIService spotifyAPIService) {
-        return new LibraryAnalysisServiceImpl(statsService, spotifyAPIService);
+    public LibraryAnalysisService libraryAnalysisService(StatsService statsService, SpotifyAPIService spotifyAPIService, SocialService socialService) {
+        return new LibraryAnalysisServiceImpl(statsService, spotifyAPIService, socialService);
     }
 
     @Bean

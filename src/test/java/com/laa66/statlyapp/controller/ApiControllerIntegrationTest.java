@@ -14,7 +14,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.*;
 
@@ -160,22 +159,22 @@ class ApiControllerIntegrationTest {
     @Test
     void shouldGetLibraryAnalysis() throws Exception {
         TracksDTO tracksDTO = new TracksDTO(List.of(new Track()), "1", "long", null);
-        LibraryAnalysisDTO libraryAnalysisDTO = new LibraryAnalysisDTO(
+        AnalysisDTO analysisDTO = new AnalysisDTO(
                 Map.of("acousticness", 0.34, "valence", 0.55),
                 List.of(new Image())
         );
         when(spotifyAPIService.getTopTracks(1L, "long"))
                 .thenReturn(tracksDTO);
-        when(libraryAnalysisService.getLibraryAnalysis(tracksDTO, 1L))
-                .thenReturn(libraryAnalysisDTO);
+        when(libraryAnalysisService.getTracksAnalysis(tracksDTO, 1L))
+                .thenReturn(analysisDTO);
         mockMvc.perform(get("/api/analysis/library")
                 .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpectAll(
                         status().isOk(),
-                        jsonPath("$.libraryAnalysis", hasEntry("acousticness", 0.34)),
-                        jsonPath("$.libraryAnalysis", hasEntry("valence", 0.55)),
+                        jsonPath("$.analysis", hasEntry("acousticness", 0.34)),
+                        jsonPath("$.analysis", hasEntry("valence", 0.55)),
                         jsonPath("$.images").exists()
                 );
 
@@ -189,14 +188,14 @@ class ApiControllerIntegrationTest {
     void shouldGetPlaylistAnalysis() throws Exception {
         PlaylistInfo playlistInfo = new PlaylistInfo();
         TracksDTO tracksDTO = new TracksDTO(List.of(new Track()), "1", "long", null);
-        LibraryAnalysisDTO libraryAnalysisDTO = new LibraryAnalysisDTO(
+        AnalysisDTO analysisDTO = new AnalysisDTO(
                 Map.of("acousticness", 0.34, "valence", 0.55),
                 List.of(new Image())
         );
         when(spotifyAPIService.getPlaylistTracks(playlistInfo, "ES"))
                 .thenReturn(tracksDTO);
-        when(libraryAnalysisService.getLibraryAnalysis(tracksDTO, null))
-                .thenReturn(libraryAnalysisDTO);
+        when(libraryAnalysisService.getTracksAnalysis(tracksDTO, null))
+                .thenReturn(analysisDTO);
         mockMvc.perform(post("/api/analysis/playlist")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(playlistInfo))
@@ -204,8 +203,8 @@ class ApiControllerIntegrationTest {
                 .with(oauth2Login().attributes(map -> map.put("country", "ES"))))
                 .andExpectAll(
                         status().isOk(),
-                        jsonPath("$.libraryAnalysis", hasEntry("acousticness", 0.34)),
-                        jsonPath("$.libraryAnalysis", hasEntry("valence", 0.55)),
+                        jsonPath("$.analysis", hasEntry("acousticness", 0.34)),
+                        jsonPath("$.analysis", hasEntry("valence", 0.55)),
                         jsonPath("$.images").exists()
                 );
 

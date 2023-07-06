@@ -1,20 +1,17 @@
 package com.laa66.statlyapp.service.impl;
 
-import com.laa66.statlyapp.DTO.LibraryAnalysisDTO;
-import com.laa66.statlyapp.DTO.ArtistsDTO;
-import com.laa66.statlyapp.DTO.GenresDTO;
-import com.laa66.statlyapp.DTO.TracksDTO;
-import com.laa66.statlyapp.model.Genre;
-import com.laa66.statlyapp.model.Image;
-import com.laa66.statlyapp.model.Track;
+import com.laa66.statlyapp.DTO.*;
+import com.laa66.statlyapp.model.*;
 import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
 import com.laa66.statlyapp.service.LibraryAnalysisService;
+import com.laa66.statlyapp.service.SocialService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.StatsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.util.Pair;
+import org.springframework.lang.Nullable;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -28,9 +25,16 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
 
     private final StatsService statsService;
     private final SpotifyAPIService spotifyAPIService;
+    private final SocialService socialService;
 
+    /**
+     *
+     * @param tracksDTO DTO that contains tracks to analysis
+     * @param userId null if analysis result should not be saved
+     * @return audio analysis result based on passed object
+     */
     @Override
-    public LibraryAnalysisDTO getLibraryAnalysis(TracksDTO tracksDTO, Long userId) {
+    public AnalysisDTO getTracksAnalysis(TracksDTO tracksDTO, @Nullable Long userId) {
         return Optional.ofNullable(tracksDTO).map(
                 tracks -> {
                     ResponseTracksAnalysis tracksAnalysis = spotifyAPIService.getTracksAnalysis(tracks);
@@ -44,7 +48,7 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
                             .limit(22)
                             .toList();
                     if (userId != null) statsService.saveUserStats(userId, mapAnalysis);
-                    return new LibraryAnalysisDTO(mapAnalysis, images);
+                    return new AnalysisDTO(mapAnalysis, images);
                 }
         ).orElseThrow(() -> new RuntimeException("Tracks cannot be null"));
     }
@@ -91,7 +95,25 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
         return matchMap;
     }
 
-    //helpers
+    @Override
+    public PlaylistBattleDTO makePlaylistBattle(long userId, long battleUserId,
+                                            TracksDTO playlist, TracksDTO battlePlaylist) {
+        AnalysisDTO playlistAnalysis = getTracksAnalysis(playlist, null);
+        AnalysisDTO battlePlaylistAnalysis = getTracksAnalysis(battlePlaylist, null);
+        Battler user = new Battler(userId, playlistAnalysis);
+        Battler battleUser = new Battler(battleUserId, battlePlaylistAnalysis);
+        return Optional.ofNullable(user.battle(battleUser))
+                .map(winnerLoser -> new PlaylistBattleDTO(
+                        socialService.getUserProfile(winnerLoser.getFirst().getId()),
+                        socialService.getUserProfile(winnerLoser.getSecond().getId()),
+                        winnerLoser.getFirst(),
+                        winnerLoser.getSecond(),
+                        user.getDifference(battleUser)
+                )).orElse(new PlaylistBattleDTO(
+                        null, null,
+                        user, battleUser,0));
+    }
+
     private double getMainstreamScore(TracksDTO tracksDTO) {
         return roundHalfUp(tracksDTO.getTracks()
                         .stream()
