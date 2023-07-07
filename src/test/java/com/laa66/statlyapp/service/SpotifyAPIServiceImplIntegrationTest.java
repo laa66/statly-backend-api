@@ -272,9 +272,7 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @Test
     void shouldGetPlaylistTracksResponseOk() throws JsonProcessingException {
-        PlaylistInfo playlistInfo = new PlaylistInfo();
-        playlistInfo.setId("id");
-        playlistInfo.setName("playlist");
+        PlaylistInfo playlistInfo = new PlaylistInfo(null, "id", null, "playlist", null);
         Playlist playlist = new Playlist("random", null, List.of(
                 new PlaylistTrack(), new PlaylistTrack(), new PlaylistTrack()
         ));
@@ -292,9 +290,7 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @Test
     void shouldGetPlaylistTracksResponseError() {
-        PlaylistInfo playlistInfo = new PlaylistInfo();
-        playlistInfo.setId("id");
-        playlistInfo.setName("playlist");
+        PlaylistInfo playlistInfo = new PlaylistInfo(null, "id", null, "playlist", null);
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.PLAYLIST_TRACKS.get()
                                 .replace("playlist_id", "id")

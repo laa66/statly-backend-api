@@ -12,6 +12,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AllArgsConstructor
 @NoArgsConstructor
+// TODO: 07.07.2023 merge this with UserDTO
 public class User {
 
     private String id;

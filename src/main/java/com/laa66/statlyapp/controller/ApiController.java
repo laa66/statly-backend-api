@@ -5,11 +5,13 @@ import com.laa66.statlyapp.model.PlaylistInfo;
 import com.laa66.statlyapp.model.response.ResponsePlaylists;
 import com.laa66.statlyapp.service.LibraryAnalysisService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -72,7 +74,7 @@ public class ApiController {
     }
 
     @PostMapping("/analysis/playlist")
-    public ResponseEntity<AnalysisDTO> playlistAnalysis(@AuthenticationPrincipal OAuth2User principal, @RequestBody PlaylistInfo playlistInfo) {
+    public ResponseEntity<AnalysisDTO> playlistAnalysis(@AuthenticationPrincipal OAuth2User principal, @Valid @RequestBody PlaylistInfo playlistInfo) {
         String country = (String) principal.getAttributes().get("country");
         TracksDTO tracksDTO = spotifyApiService.getPlaylistTracks(playlistInfo, country);
         AnalysisDTO analysisDTO = libraryAnalysisService.getTracksAnalysis(tracksDTO, null);
@@ -84,5 +86,18 @@ public class ApiController {
         long userId = (long) principal.getAttributes().get("userId");
         Map<String, Double> usersMatching = libraryAnalysisService.getUsersMatching(userId, matchUserId);
         return ResponseEntity.ok(usersMatching);
+    }
+
+    @PostMapping("/analysis/battle")
+    public ResponseEntity<BattleResultDTO> createPlaylistBattle(@AuthenticationPrincipal OAuth2User principal,
+                                                              @RequestParam("user_id") long battleUserId,
+                                                              @Valid @RequestBody BattleDTO battleDTO) {
+        System.out.println(battleDTO);
+        long userId = (long) principal.getAttributes().get("userId");
+        String country = (String) principal.getAttributes().get("country");
+        TracksDTO tracks = spotifyApiService.getPlaylistTracks(battleDTO.getPlaylist(), country);
+        TracksDTO tracksBattle = spotifyApiService.getPlaylistTracks(battleDTO.getPlaylistBattle(), country);
+        BattleResultDTO battleResultDTO = libraryAnalysisService.makePlaylistBattle(userId, battleUserId, tracks, tracksBattle);
+        return ResponseEntity.ok(battleResultDTO);
     }
 }

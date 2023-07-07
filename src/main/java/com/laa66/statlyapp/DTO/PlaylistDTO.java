@@ -9,6 +9,7 @@ import lombok.*;
 @Value
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
 @AllArgsConstructor
+// TODO: 07.07.2023 merge this with ResponsePlaylists
 public class PlaylistDTO {
 
     String id;

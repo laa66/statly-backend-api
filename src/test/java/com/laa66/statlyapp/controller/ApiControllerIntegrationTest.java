@@ -186,7 +186,7 @@ class ApiControllerIntegrationTest {
 
     @Test
     void shouldGetPlaylistAnalysis() throws Exception {
-        PlaylistInfo playlistInfo = new PlaylistInfo();
+        PlaylistInfo playlistInfo = new PlaylistInfo(new SpotifyURL(), "id", List.of(), "name", null);
         TracksDTO tracksDTO = new TracksDTO(List.of(new Track()), "1", "long", null);
         AnalysisDTO analysisDTO = new AnalysisDTO(
                 Map.of("acousticness", 0.34, "valence", 0.55),
@@ -210,8 +210,18 @@ class ApiControllerIntegrationTest {
 
         mockMvc.perform(post("/api/analysis/playlist")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(null))
                         .with(csrf())
-                        .content(mapper.writeValueAsString(new PlaylistInfo())))
+                        .with(oauth2Login().attributes(map -> map.put("country", "ES"))))
+                .andExpect(status().isBadRequest());
+
+
+        mockMvc.perform(post("/api/analysis/playlist")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(mapper.writeValueAsString(new PlaylistInfo(
+                                new SpotifyURL(), "id", List.of(), "name", null
+                        ))))
                 .andExpect(status().isFound());
 
     }
@@ -245,6 +255,47 @@ class ApiControllerIntegrationTest {
                         jsonPath("$", hasEntry("genre", 0.)),
                         jsonPath("$", hasEntry("overall", 0.))
                 );
+    }
+
+    @Test
+    void shouldCreatePlaylistBattle() throws Exception {
+        BattleResultDTO battleResultDTO = new BattleResultDTO(
+                null,
+                null,
+                new Battler(1L, new AnalysisDTO(Map.of(), List.of())),
+                new Battler(2L, new AnalysisDTO(Map.of(), List.of())),
+                50.
+        );
+        when(libraryAnalysisService.makePlaylistBattle(anyLong(), anyLong(), any(), any()))
+                .thenReturn(battleResultDTO);
+        mockMvc.perform(post("/api/analysis/battle?user_id=2")
+                .with(csrf())
+                .with(oauth2Login().attributes(map -> {
+                    map.put("userId", 1L);
+                    map.put("country", "ES");
+                })).contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(
+                                new BattleDTO(
+                                        new PlaylistInfo(null, "id1", List.of(), "name1", null),
+                                        new PlaylistInfo(null, "id2", List.of(), "name2", null)
+                                )
+                        )))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.result", is(50.)),
+                        jsonPath("$.winner.id", is(1)),
+                        jsonPath("$.loser.id", is(2)));
+
+
+        mockMvc.perform(post("/api/analysis/battle?user_id=2")
+                        .with(csrf())
+                        .with(oauth2Login().attributes(map -> {
+                            map.put("userId", 1L);
+                            map.put("country", "ES");
+                        })).contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(
+                                null
+                        ))).andExpect(status().isBadRequest());
 
     }
 }

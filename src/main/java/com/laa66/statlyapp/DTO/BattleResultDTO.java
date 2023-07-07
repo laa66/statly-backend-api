@@ -4,7 +4,7 @@ import com.laa66.statlyapp.model.Battler;
 import lombok.Value;
 
 @Value
-public class PlaylistBattleDTO {
+public class BattleResultDTO {
     ProfileDTO winnerProfile;
     ProfileDTO loserProfile;
     Battler winner;

@@ -11,8 +11,8 @@ public interface LibraryAnalysisService {
 
     Map<String, Double> getUsersMatching(long userId, long matchUserId);
 
-    PlaylistBattleDTO makePlaylistBattle(long userId,
-            long battleUserId,
-            TracksDTO playlist,
-            TracksDTO playlistToBattle);
+    BattleResultDTO makePlaylistBattle(long userId,
+                                       long battleUserId,
+                                       TracksDTO playlist,
+                                       TracksDTO playlistToBattle);
 }

@@ -96,20 +96,20 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
     }
 
     @Override
-    public PlaylistBattleDTO makePlaylistBattle(long userId, long battleUserId,
-                                            TracksDTO playlist, TracksDTO battlePlaylist) {
+    public BattleResultDTO makePlaylistBattle(long userId, long battleUserId,
+                                              TracksDTO playlist, TracksDTO battlePlaylist) {
         AnalysisDTO playlistAnalysis = getTracksAnalysis(playlist, null);
         AnalysisDTO battlePlaylistAnalysis = getTracksAnalysis(battlePlaylist, null);
         Battler user = new Battler(userId, playlistAnalysis);
         Battler battleUser = new Battler(battleUserId, battlePlaylistAnalysis);
         return Optional.ofNullable(user.battle(battleUser))
-                .map(winnerLoser -> new PlaylistBattleDTO(
+                .map(winnerLoser -> new BattleResultDTO(
                         socialService.getUserProfile(winnerLoser.getFirst().getId()),
                         socialService.getUserProfile(winnerLoser.getSecond().getId()),
                         winnerLoser.getFirst(),
                         winnerLoser.getSecond(),
                         user.getDifference(battleUser)
-                )).orElse(new PlaylistBattleDTO(
+                )).orElse(new BattleResultDTO(
                         null, null,
                         user, battleUser,0));
     }

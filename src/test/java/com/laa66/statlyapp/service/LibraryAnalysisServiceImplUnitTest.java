@@ -151,13 +151,13 @@ class LibraryAnalysisServiceImplUnitTest {
                 .getTracksAnalysis(tracks1, null);
         doReturn(analysis2).when(libraryAnalysisService)
                 .getTracksAnalysis(tracks2, null);
-        PlaylistBattleDTO playlistBattleDTO = libraryAnalysisService.makePlaylistBattle(1L, 2L,
+        BattleResultDTO battleResultDTO = libraryAnalysisService.makePlaylistBattle(1L, 2L,
                 tracks1, tracks2);
-        assertEquals(1L, playlistBattleDTO.getWinner().getId());
-        assertEquals(2L, playlistBattleDTO.getLoser().getId());
-        assertEquals(70., playlistBattleDTO.getResult());
-        assertEquals(315., playlistBattleDTO.getWinner().getScore());
-        assertEquals(245., playlistBattleDTO.getLoser().getScore());
+        assertEquals(1L, battleResultDTO.getWinner().getId());
+        assertEquals(2L, battleResultDTO.getLoser().getId());
+        assertEquals(70., battleResultDTO.getResult());
+        assertEquals(315., battleResultDTO.getWinner().getScore());
+        assertEquals(245., battleResultDTO.getLoser().getScore());
     }
 
     @Test
@@ -184,11 +184,11 @@ class LibraryAnalysisServiceImplUnitTest {
                 .getTracksAnalysis(tracks1, null);
         doReturn(analysis2).when(libraryAnalysisService)
                 .getTracksAnalysis(tracks2, null);
-        PlaylistBattleDTO playlistBattleDTO = libraryAnalysisService.makePlaylistBattle(1L, 2L,
+        BattleResultDTO battleResultDTO = libraryAnalysisService.makePlaylistBattle(1L, 2L,
                 tracks1, tracks2);
-        assertEquals(0., playlistBattleDTO.getResult());
-        assertEquals(315., playlistBattleDTO.getWinner().getScore());
-        assertEquals(315., playlistBattleDTO.getLoser().getScore());
+        assertEquals(0., battleResultDTO.getResult());
+        assertEquals(315., battleResultDTO.getWinner().getScore());
+        assertEquals(315., battleResultDTO.getLoser().getScore());
     }
 
 }

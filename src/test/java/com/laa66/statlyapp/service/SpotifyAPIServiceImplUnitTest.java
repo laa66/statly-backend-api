@@ -266,9 +266,7 @@ class SpotifyAPIServiceImplUnitTest {
 
     @Test
     void shouldGetPlaylistTracksUnder50() {
-        PlaylistInfo playlistInfo = new PlaylistInfo();
-        playlistInfo.setId("id");
-        playlistInfo.setName("playlist");
+        PlaylistInfo playlistInfo = new PlaylistInfo(null, "id", null, "playlist", null);
         Playlist playlist = new Playlist("random", null, List.of(
                 new PlaylistTrack(), new PlaylistTrack(), new PlaylistTrack()
         ));
@@ -283,9 +281,7 @@ class SpotifyAPIServiceImplUnitTest {
 
     @Test
     void shouldGetPlaylistTracksAbove50() {
-        PlaylistInfo playlistInfo = new PlaylistInfo();
-        playlistInfo.setId("id");
-        playlistInfo.setName("playlist");
+        PlaylistInfo playlistInfo = new PlaylistInfo(null, "id", null, "playlist", null);
         Playlist playlist1 = new Playlist("first",
                 SpotifyAPI.PLAYLIST_TRACKS.get() + "next", List.of(
                 new PlaylistTrack(), new PlaylistTrack(), new PlaylistTrack()
@@ -308,9 +304,7 @@ class SpotifyAPIServiceImplUnitTest {
 
     @Test
     void shouldGetPlaylistTracksEmptyBody() {
-        PlaylistInfo playlistInfo = new PlaylistInfo();
-        playlistInfo.setId("id");
-        playlistInfo.setName("playlist");
+        PlaylistInfo playlistInfo = new PlaylistInfo(null, "id", null, "playlist", null);
         when(restTemplate.exchange(eq(SpotifyAPI.PLAYLIST_TRACKS.get()
                         .replace("playlist_id", playlistInfo.getId())
                         .replace("country_code", "ES")),
@@ -322,9 +316,7 @@ class SpotifyAPIServiceImplUnitTest {
 
     @Test
     void shouldGetPlaylistTracksWrongCountryCode() {
-        PlaylistInfo playlistInfo = new PlaylistInfo();
-        playlistInfo.setId("id");
-        playlistInfo.setName("playlist");
+        PlaylistInfo playlistInfo = new PlaylistInfo(null, "id", null, "playlist", null);
         when(restTemplate.exchange(eq(SpotifyAPI.PLAYLIST_TRACKS.get()
                         .replace("playlist_id", "id")
                         .replace("country_code", "123")),
