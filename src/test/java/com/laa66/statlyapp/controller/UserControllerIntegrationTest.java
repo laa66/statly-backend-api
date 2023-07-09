@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
@@ -196,6 +197,7 @@ class UserControllerIntegrationTest {
     void shouldGetProfileValidUserId() throws Exception {
         ProfileDTO profileDTO = new ProfileDTO(
                 1,
+                "externalId",
                 "username",
                 "url",
                 null,
@@ -203,7 +205,7 @@ class UserControllerIntegrationTest {
                 null,
                 null,
                 null,
-                null,
+                Map.of(),
                 500
         );
         when(socialService.getUserProfile(1)).thenReturn(profileDTO);

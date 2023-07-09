@@ -12,6 +12,7 @@ import java.util.Map;
 @Value
 public class ProfileDTO {
     long id;
+    String externalId;
     String username;
     String imageUrl;
     LocalDateTime joinDate;

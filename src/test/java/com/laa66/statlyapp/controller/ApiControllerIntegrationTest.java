@@ -220,8 +220,7 @@ class ApiControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf())
                         .content(mapper.writeValueAsString(new PlaylistInfo(
-                                new SpotifyURL(), "id", List.of(), "name", null
-                        ))))
+                                new SpotifyURL(), "id", List.of(), "name", null))))
                 .andExpect(status().isFound());
 
     }
@@ -278,8 +277,7 @@ class ApiControllerIntegrationTest {
                                 new BattleDTO(
                                         new PlaylistInfo(null, "id1", List.of(), "name1", null),
                                         new PlaylistInfo(null, "id2", List.of(), "name2", null)
-                                )
-                        )))
+                                ))))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.result", is(50.)),
@@ -293,9 +291,8 @@ class ApiControllerIntegrationTest {
                             map.put("userId", 1L);
                             map.put("country", "ES");
                         })).contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(
-                                null
-                        ))).andExpect(status().isBadRequest());
+                        .content(mapper.writeValueAsString(null)))
+                .andExpect(status().isBadRequest());
 
     }
 }

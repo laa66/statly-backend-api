@@ -21,6 +21,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 
@@ -62,12 +63,9 @@ public class SocialServiceImplUnitTest {
         assertEquals("title", profileDTO.getTopTracks().get(0).getName());
         assertEquals("artist", profileDTO.getTopArtists().get(0).getName());
         assertEquals(50.0, profileDTO.getStatsMap().get("mainstream"));
-    }
 
-    @Test
-    void shouldGetUserProfileNotValidUserId() {
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> socialService.getUserProfile(1L));
+        when(userRepository.findById(2L)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> socialService.getUserProfile(2L));
     }
 
     @Test
@@ -83,13 +81,10 @@ public class SocialServiceImplUnitTest {
     }
 
     @Test
-    void shouldFollowNotValidUserId() {
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> socialService.follow(1, 2));
-    }
+    void shouldFollowNotValidIds() {
+        when(userRepository.findById(3L)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> socialService.follow(3, 2));
 
-    @Test
-    void shouldFollowNotValidFollowId() {
         User fromUser = new User(1L, "id","username1","test1@mail.com", "url1", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats());
         when(userRepository.findById(1L)).thenReturn(Optional.of(fromUser));
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
@@ -108,10 +103,7 @@ public class SocialServiceImplUnitTest {
         assertEquals("2", followersDTO.getUsers().get(0).getId());
         assertEquals("username2", followersDTO.getUsers().get(0).getName());
         assertEquals("url2", followersDTO.getUsers().get(0).getImages().get(0).getUrl());
-    }
 
-    @Test
-    void shouldGetFollowingNotValidUserId() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> socialService.getFollowers(1, StatlyConstants.FOLLOWING));
     }
@@ -128,12 +120,9 @@ public class SocialServiceImplUnitTest {
         assertEquals("2", followersDTO.getUsers().get(0).getId());
         assertEquals("username2", followersDTO.getUsers().get(0).getName());
         assertEquals("url2", followersDTO.getUsers().get(0).getImages().get(0).getUrl());
-    }
 
-    @Test
-    void shouldGetFollowersNotValidUserId() {
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> socialService.getFollowers(1, StatlyConstants.FOLLOWERS));
+        when(userRepository.findById(3L)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> socialService.getFollowers(3, StatlyConstants.FOLLOWERS));
     }
 
     @Test
@@ -151,18 +140,32 @@ public class SocialServiceImplUnitTest {
     }
 
     @Test
-    void shouldUnfollowNotValidUserId() {
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> socialService.unfollow(1, 2));
-    }
+    void shouldUnfollowNotValidIds() {
+        when(userRepository.findById(3L)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> socialService.unfollow(3, 2));
 
-    @Test
-    void shouldUnfollowNotValidUnfollowId() {
         User fromUser = new User(1L, "id", "username1","test1@mail.com", "url1", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats());
         when(userRepository.findById(1L)).thenReturn(Optional.of(fromUser));
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> socialService.unfollow(1, 2));
+
     }
 
+    @Test
+    void shouldUpdatePointsValidUserId() {
+        User user = new User(1L, "id", "username1","test1@mail.com", "url1", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats(
+                1, 0,0,0,0,0
+        ));
+        User userToSave = new User(1L, "id", "username1","test1@mail.com", "url1", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats(
+                1, 0, 0, 0, 0, 10
+        ));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any())).thenReturn(userToSave);
+        User savedUser = socialService.updatePoints(1L, 10);
+        assertEquals(10, savedUser.getUserStats().getPoints());
+
+        when(userRepository.findById(2L)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> socialService.updatePoints(2L, 10));
+    }
 
 }

@@ -15,4 +15,6 @@ public interface SocialService {
 
     User unfollow(long userId, long unfollowId);
 
+    User updatePoints(long userId, int points);
+
 }

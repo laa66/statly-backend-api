@@ -70,10 +70,21 @@ public class SocialServiceImpl implements SocialService {
         return userRepository.save(user);
     }
 
+    @Override
+    public User updatePoints(long userId, int points) {
+        return userRepository.save(userRepository.findById(userId)
+                .map(user -> {
+                    user.getUserStats()
+                            .setPoints(user.getUserStats().getPoints() + points);
+                    return user;
+                }).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER));
+    }
+
     //helpers
     private ProfileDTO createProfileDTO(User user, long userId) {
         return new ProfileDTO(
                 user.getId(),
+                user.getExternalId(),
                 user.getUsername(),
                 user.getImage(),
                 user.getJoinDate(),
