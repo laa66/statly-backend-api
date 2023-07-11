@@ -51,10 +51,19 @@ class UserRepositoryIntegrationTest extends MySQLBaseContainerTest {
     @Test
     void shouldFindAllMatchingUsers() {
         List<User> users = (List<User>) userRepository.findAllMatchingUsers("name");
-        assertEquals(1, users.size());
+        assertEquals(2, users.size());
         assertEquals("username", users.get(0).getUsername());
+        assertEquals("usernameTwo", users.get(1).getUsername());
 
         List<User> emptyUsers = (List<User>) userRepository.findAllMatchingUsers("none");
         assertTrue(emptyUsers.isEmpty());
+    }
+
+    @Test
+    void shouldFindAllUsersOrderByPoints() {
+        List<User> users = (List<User>) userRepository.findAllUsersOrderByPoints();
+        assertEquals(2, users.size());
+        assertEquals("username", users.get(0).getUsername());
+        assertEquals("usernameTwo", users.get(1).getUsername());
     }
 }

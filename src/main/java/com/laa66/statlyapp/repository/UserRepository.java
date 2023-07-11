@@ -10,11 +10,14 @@ import java.util.Optional;
 
 public interface UserRepository extends CrudRepository<User, Long> {
 
-    @Query("SELECT u from User u WHERE u.username LIKE %:username%")
+    @Query("SELECT u FROM User u WHERE u.username LIKE %:username%")
     Collection<User> findAllMatchingUsers(@Param("username") String username);
 
     Optional<User> findByEmail(String email);
 
     Optional<User> findByUsername(String username);
+
+    @Query("SELECT u FROM User u INNER JOIN u.userStats ORDER BY u.userStats.points DESC")
+    Collection<User> findAllUsersOrderByPoints();
 
 }

@@ -34,7 +34,6 @@ public class UserServiceImpl implements UserService {
                 .map(Image::getUrl)
                 .orElse("none");
         return reactUrl + "/statly-frontend/#/callback?name=" + StringUtils.stripAccents(userDTO.getDisplayName()) + "&url=" + (imageUrl.equals("none") ? "./account.png"  : imageUrl);
-
     }
 
     @Override

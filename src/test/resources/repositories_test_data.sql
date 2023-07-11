@@ -71,6 +71,9 @@ CREATE TABLE IF NOT EXISTS user_genres (
 INSERT INTO user_stats(id, energy, tempo, mainstream, boringness, points) VALUES (null, 50.0, 122.0, 32.50, 85.0, 500.0);
 INSERT INTO users(id, external_id, username, email, image_url, join_date, user_stats_id) VALUES (null, 'id', 'username', 'user@mail.com', 'imageUrl', '2023-04-20 14:56:32', 1);
 
+INSERT INTO user_stats(id, energy, tempo, mainstream, boringness, points) VALUES (null, 50.0, 122.0, 32.50, 85.0, 200.0);
+INSERT INTO users(id, external_id, username, email, image_url, join_date, user_stats_id) VALUES (10, 'id', 'usernameTwo', 'userTwo@mail.com', 'imageUrl', '2023-04-20 14:33:32', 2);
+
 INSERT INTO user_tracks(id, user_id, time_range, tracks, date) VALUES (null, 1, 'short', '{"artist_track1":1, "artist_track2":2, "artist_track3":3}', '2023-04-20');
 INSERT INTO user_tracks(id, user_id, time_range, tracks, date) VALUES (null, 1, 'short', '{"artist_track1":1, "artist_track2":2, "artist_track3":3}', '2023-04-18');
 
