@@ -77,7 +77,7 @@ class UserControllerIntegrationTest {
 
     @Test
     void shouldSearchUser() throws Exception {
-        User user = new User("1", "uri", "username", List.of());
+        User user = new User("1", "uri", "username", List.of(), 0);
         when(userService.findAllMatchingUsers("name")).thenReturn(List.of(user));
         mockMvc.perform(get("/user/search?username=name")
                 .with(oauth2Login())
@@ -104,7 +104,7 @@ class UserControllerIntegrationTest {
 
     @Test
     void shouldGetCurrentUser() throws Exception {
-        User user = new User("1", "uri", "name", List.of());
+        User user = new User("1", "uri", "name", List.of(), 0);
         when(userService.findUserById(1L)).thenReturn(user);
         mockMvc.perform(get("/user/me")
                         .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
@@ -126,7 +126,7 @@ class UserControllerIntegrationTest {
     void shouldGetUserFollowing() throws Exception {
         FollowersDTO followersDTO = new FollowersDTO(1, List.of(new User(
                 "id", "uri", "name", List.of(new Image("url", null, null))
-        )));
+        ,0)));
         when(socialService.getFollowers(1, StatlyConstants.FOLLOWING))
                 .thenReturn(followersDTO);
         mockMvc.perform(get("/user/me/following")
@@ -231,4 +231,19 @@ class UserControllerIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 
+
+    @Test
+    void shouldGetRank() throws Exception {
+        when(userService.findAllUsersOrderByPoints()).thenReturn(List.of(new User(), new User()));
+        mockMvc.perform(get("/user/rank")
+                .with(oauth2Login()).contentType(MediaType.APPLICATION_JSON))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$").isArray(),
+                        jsonPath("$[1]").hasJsonPath()
+                );
+        mockMvc.perform(get("/user/profile?user_id=1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isFound());
+    }
 }

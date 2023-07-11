@@ -81,4 +81,10 @@ public class UserController {
         return ResponseEntity.ok(userProfile);
     }
 
+    @GetMapping("/rank")
+    public ResponseEntity<List<User>> getRank() {
+        List<User> users = userService.findAllUsersOrderByPoints();
+        return ResponseEntity.ok(users);
+    }
+
 }

@@ -11,6 +11,7 @@ public class EntityMapper {
                 Long.toString(user.getId()),
                 null,
                 user.getUsername(),
-                List.of(new Image(user.getImage(), null, null)));
+                List.of(new Image(user.getImage(), null, null)),
+                user.getUserStats().getPoints());
     }
 }

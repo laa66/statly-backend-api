@@ -24,4 +24,6 @@ public class User {
 
     private List<Image> images;
 
+    private long points;
+
 }

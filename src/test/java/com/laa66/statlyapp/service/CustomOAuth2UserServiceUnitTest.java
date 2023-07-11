@@ -1,7 +1,6 @@
 package com.laa66.statlyapp.service;
 
 import com.laa66.statlyapp.config.CustomOAuth2UserService;
-import com.laa66.statlyapp.entity.UserStats;
 import com.laa66.statlyapp.model.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,11 +11,9 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -34,7 +31,7 @@ class CustomOAuth2UserServiceUnitTest {
 
     @Test
     void shouldGetUser() {
-        User user = new User("1", null, null, null);
+        User user = new User("1", null, null, null, 0);
         OAuth2User oAuth2User = new DefaultOAuth2User(
                 Collections.singletonList(new OAuth2UserAuthority(Map.of("user","user"))),
                 Map.of(
@@ -53,7 +50,7 @@ class CustomOAuth2UserServiceUnitTest {
 
     @Test
     void shouldCreateUser() {
-        User createdUser = new User("1", null, null, null);
+        User createdUser = new User("1", null, null, null, 0);
         OAuth2User oAuth2User = new DefaultOAuth2User(
                 Collections.singletonList(new OAuth2UserAuthority(Map.of("user","user"))),
                 Map.of(
