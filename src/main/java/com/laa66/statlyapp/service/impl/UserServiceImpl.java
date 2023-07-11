@@ -58,6 +58,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> findAllUsersOrderByPoints() {
+        return userRepository.findAllUsersOrderByPoints().stream()
+                .map(EntityMapper::toUserDTO)
+                .toList();
+    }
+
+    @Override
     public User saveUser(com.laa66.statlyapp.entity.User user) {
         com.laa66.statlyapp.entity.User savedUser = userRepository.save(user);
         return EntityMapper.toUserDTO(savedUser);

@@ -16,6 +16,8 @@ public interface UserService {
 
     List<User> findAllMatchingUsers(String username);
 
+    List<User> findAllUsersOrderByPoints();
+
     User saveUser(com.laa66.statlyapp.entity.User user);
 
     void deleteUser(long id);

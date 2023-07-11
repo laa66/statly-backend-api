@@ -76,7 +76,21 @@ class UserServiceImplUnitTest {
         when(userRepository.findAllMatchingUsers("none")).thenReturn(List.of());
         List<com.laa66.statlyapp.model.User> emptyUsers = userService.findAllMatchingUsers("none");
         assertTrue(emptyUsers.isEmpty());
+    }
 
+    @Test
+    void shouldFindAllUsersOrderByPoints() {
+        User user1 = new User(1, "id1", "username1", "user1@mail.com", "url", LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats(
+                1, 0., 0., 0., 0., 130
+        ));
+        User user2 = new User(2, "id2", "username2", "user2@mail.com", "url", LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats(
+                2, 0., 0., 0., 0., 380
+        ));
+        when(userRepository.findAllUsersOrderByPoints()).thenReturn(List.of(user2, user1));
+        List<com.laa66.statlyapp.model.User> users = userService.findAllUsersOrderByPoints();
+        assertEquals(2, users.size());
+        assertEquals("2", users.get(0).getId());
+        assertEquals("1", users.get(1).getId());
     }
 
     @Test
