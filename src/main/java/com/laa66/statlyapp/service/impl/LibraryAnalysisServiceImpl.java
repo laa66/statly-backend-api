@@ -103,13 +103,20 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
         Battler user = new Battler(userId, playlistAnalysis);
         Battler battleUser = new Battler(battleUserId, battlePlaylistAnalysis);
         return Optional.ofNullable(user.battle(battleUser))
-                .map(winnerLoser -> new BattleResultDTO(
-                        socialService.getUserProfile(winnerLoser.getFirst().getId()),
-                        socialService.getUserProfile(winnerLoser.getSecond().getId()),
-                        winnerLoser.getFirst(),
-                        winnerLoser.getSecond(),
-                        user.getDifference(battleUser)
-                )).orElse(new BattleResultDTO(
+                .map(winnerLoser -> {
+                    Battler winner = winnerLoser.getFirst();
+                    Battler loser = winnerLoser.getSecond();
+                    double diff = winner.getDifference(loser);
+                    socialService.updatePoints(winner.getId(), (int) diff);
+                    socialService.updatePoints(loser.getId(), (int) -diff);
+                    return new BattleResultDTO(
+                            socialService.getUserProfile(winner.getId()),
+                            socialService.getUserProfile(loser.getId()),
+                            winner,
+                            loser,
+                            diff
+                    );
+                }).orElse(new BattleResultDTO(
                         null, null,
                         user, battleUser,0));
     }

@@ -38,7 +38,7 @@ public class SocialServiceImplUnitTest {
     SocialServiceImpl socialService;
 
     @Test
-    void shouldGetUserProfileValidUserId() {
+    void shouldGetUserProfile() {
         User user = new User(
                 1L,
                 "id",
@@ -92,7 +92,7 @@ public class SocialServiceImplUnitTest {
     }
 
     @Test
-    void shouldGetFollowingValidUserId() {
+    void shouldGetFollowing() {
         User user = new User(1L, "id", "username1","test1@mail.com", "url1", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats());
         User followedUser = new User(2L, "id","username2","test2@mail.com", "url2", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats());
         user.addFollower(followedUser);
@@ -109,7 +109,7 @@ public class SocialServiceImplUnitTest {
     }
 
     @Test
-    void shouldGetFollowersValidUserId() {
+    void shouldGetFollowers() {
         User user = new User(1L,"id", "username1","test1@mail.com", "url1", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats());
         User userFollower = new User(2L,"id", "username2","test2@mail.com", "url2", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats());
         user.setFollowers(List.of(userFollower));
@@ -152,7 +152,7 @@ public class SocialServiceImplUnitTest {
     }
 
     @Test
-    void shouldUpdatePointsValidUserId() {
+    void shouldUpdatePoints() {
         User user = new User(1L, "id", "username1","test1@mail.com", "url1", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats(
                 1, 0,0,0,0,0
         ));
@@ -163,6 +163,23 @@ public class SocialServiceImplUnitTest {
         when(userRepository.save(any())).thenReturn(userToSave);
         User savedUser = socialService.updatePoints(1L, 10);
         assertEquals(10, savedUser.getUserStats().getPoints());
+
+        when(userRepository.findById(2L)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> socialService.updatePoints(2L, 10));
+    }
+
+    @Test
+    void shouldUpdatePointsSubLessThan0() {
+        User user = new User(1L, "id", "username1","test1@mail.com", "url1", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats(
+                1, 0,0,0,0,3
+        ));
+        User userToSave = new User(1L, "id", "username1","test1@mail.com", "url1", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats(
+                1, 0, 0, 0, 0, 0
+        ));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any())).thenReturn(userToSave);
+        User savedUser = socialService.updatePoints(1L, -10);
+        assertEquals(0, savedUser.getUserStats().getPoints());
 
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> socialService.updatePoints(2L, 10));

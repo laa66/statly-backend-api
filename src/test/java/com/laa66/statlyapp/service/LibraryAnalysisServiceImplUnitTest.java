@@ -153,6 +153,7 @@ class LibraryAnalysisServiceImplUnitTest {
                 .getTracksAnalysis(tracks2, null);
         BattleResultDTO battleResultDTO = libraryAnalysisService.makePlaylistBattle(1L, 2L,
                 tracks1, tracks2);
+        verify(socialService, times(2)).updatePoints(anyLong(), anyInt());
         assertEquals(1L, battleResultDTO.getWinner().getId());
         assertEquals(2L, battleResultDTO.getLoser().getId());
         assertEquals(70., battleResultDTO.getResult());

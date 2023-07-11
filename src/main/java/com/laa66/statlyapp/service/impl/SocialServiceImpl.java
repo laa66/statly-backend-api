@@ -4,6 +4,7 @@ import com.laa66.statlyapp.DTO.FollowersDTO;
 import com.laa66.statlyapp.DTO.ProfileDTO;
 import com.laa66.statlyapp.constants.StatlyConstants;
 import com.laa66.statlyapp.entity.User;
+import com.laa66.statlyapp.entity.UserStats;
 import com.laa66.statlyapp.exception.UserNotFoundException;
 import com.laa66.statlyapp.mapper.EntityMapper;
 import com.laa66.statlyapp.repository.UserRepository;
@@ -74,8 +75,8 @@ public class SocialServiceImpl implements SocialService {
     public User updatePoints(long userId, int points) {
         return userRepository.save(userRepository.findById(userId)
                 .map(user -> {
-                    user.getUserStats()
-                            .setPoints(user.getUserStats().getPoints() + points);
+                    long score = user.getUserStats().getPoints() + points < 0 ? 0 : user.getUserStats().getPoints() + points;
+                    user.getUserStats().setPoints(score);
                     return user;
                 }).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER));
     }
