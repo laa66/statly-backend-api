@@ -71,9 +71,8 @@ public class SecurityConfig {
         tokenRepository.setSecure(true);
         delegate.setCsrfRequestAttributeName(null);
         CsrfTokenRequestHandler requestHandler = delegate::handle;
-        httpSecurity.csrf((csrf) -> csrf
-                        .csrfTokenRepository(tokenRepository)
-                        .csrfTokenRequestHandler(requestHandler))
+        httpSecurity.csrf()
+                .disable()
                 .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.GET, "/beta/join").permitAll()
                 .requestMatchers("/beta/all", "/beta/delete", "/beta/notification").access((authentication, object) ->
