@@ -2,9 +2,9 @@ package com.laa66.statlyapp.service.impl;
 
 import com.laa66.statlyapp.DTO.FollowersDTO;
 import com.laa66.statlyapp.DTO.ProfileDTO;
+import com.laa66.statlyapp.DTO.UserDTO;
 import com.laa66.statlyapp.constants.StatlyConstants;
 import com.laa66.statlyapp.entity.User;
-import com.laa66.statlyapp.entity.UserStats;
 import com.laa66.statlyapp.exception.UserNotFoundException;
 import com.laa66.statlyapp.mapper.EntityMapper;
 import com.laa66.statlyapp.repository.UserRepository;
@@ -38,7 +38,7 @@ public class SocialServiceImpl implements SocialService {
         return userRepository.findById(userId)
                 .map(foundUser -> {
                     List<User> followers = type == StatlyConstants.FOLLOWING ? foundUser.getFollowing() : foundUser.getFollowers();
-                    List<com.laa66.statlyapp.model.User> list = followers.stream()
+                    List<UserDTO> list = followers.stream()
                             .map(EntityMapper::toUserDTO)
                             .toList();
                     return new FollowersDTO(list.size(), list);

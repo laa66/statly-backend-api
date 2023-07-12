@@ -37,16 +37,16 @@ class UserServiceImplUnitTest {
 
     @Test
     void shouldAuthenticateUserWithImage() {
-        UserDTO userDTO = new UserDTO("id", "email", "name", List.of(new Image("url", 200, 200)));
+        UserDTO userDTO = new UserDTO("id", "uri", "email", "name", List.of(new Image("url", 200, 200)), 0);
         String redirectUrl = userService.authenticateUser(userDTO);
-        assertEquals("localhost/statly-frontend/#/callback?name=" + userDTO.getDisplayName() + "&url=" + userDTO.getImages().get(0).getUrl(), redirectUrl);
+        assertEquals("localhost/statly-frontend/#/callback?name=" + userDTO.getName() + "&url=" + userDTO.getImages().get(0).getUrl(), redirectUrl);
     }
 
     @Test
     void shouldAuthenticateUserWithoutImage() {
-        UserDTO userDTO = new UserDTO("id", "email", "name", List.of());
+        UserDTO userDTO = new UserDTO("id", "uri", "email", "name", List.of(), 0);
         String redirectUrl = userService.authenticateUser(userDTO);
-        assertEquals("localhost/statly-frontend/#/callback?name=" + userDTO.getDisplayName() + "&url=" + "./account.png", redirectUrl);
+        assertEquals("localhost/statly-frontend/#/callback?name=" + userDTO.getName() + "&url=" + "./account.png", redirectUrl);
 
     }
 
@@ -54,13 +54,13 @@ class UserServiceImplUnitTest {
     void shouldFindUserByEmail() {
         User user = new User(1, "id", "username", "user@mail.com", "url",LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
         when(userRepository.findByEmail("user@mail.com")).thenReturn(Optional.of(user));
-        com.laa66.statlyapp.model.User returnUser = userService.findUserByEmail("user@mail.com");
+        UserDTO returnUser = userService.findUserByEmail("user@mail.com");
         assertEquals("1", returnUser.getId());
         assertEquals(user.getUsername(), returnUser.getName());
         assertEquals(user.getImage(), returnUser.getImages().get(0).getUrl());
 
         when(userRepository.findByEmail("wrong@mail.com")).thenReturn(Optional.empty());
-        com.laa66.statlyapp.model.User returnEmptyUser = userService.findUserByEmail("wrong@mail.com");
+        UserDTO returnEmptyUser = userService.findUserByEmail("wrong@mail.com");
         assertNull(returnEmptyUser);
     }
 
@@ -68,13 +68,13 @@ class UserServiceImplUnitTest {
     void shouldFindAllMatchingUsers() {
         User user = new User(1, "id", "username", "user@mail.com", "url",LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
         when(userRepository.findAllMatchingUsers("name")).thenReturn(List.of(user));
-        List<com.laa66.statlyapp.model.User> users = userService.findAllMatchingUsers("name");
+        List<UserDTO> users = userService.findAllMatchingUsers("name");
         assertEquals(1, users.size());
         assertEquals("username", users.get(0).getName());
         assertEquals("url", users.get(0).getImages().get(0).getUrl());
 
         when(userRepository.findAllMatchingUsers("none")).thenReturn(List.of());
-        List<com.laa66.statlyapp.model.User> emptyUsers = userService.findAllMatchingUsers("none");
+        List<UserDTO> emptyUsers = userService.findAllMatchingUsers("none");
         assertTrue(emptyUsers.isEmpty());
     }
 
@@ -87,7 +87,7 @@ class UserServiceImplUnitTest {
                 2, 0., 0., 0., 0., 380
         ));
         when(userRepository.findAllUsersOrderByPoints()).thenReturn(List.of(user2, user1));
-        List<com.laa66.statlyapp.model.User> users = userService.findAllUsersOrderByPoints();
+        List<UserDTO> users = userService.findAllUsersOrderByPoints();
         assertEquals(2, users.size());
         assertEquals("2", users.get(0).getId());
         assertEquals("1", users.get(1).getId());
@@ -98,7 +98,7 @@ class UserServiceImplUnitTest {
         User beforeSaveUser = new User(0, "id", "username", "user@mail.com", "url", LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
         User afterSaveUser = new User(1, "id", "username", "user@mail.com", "url",LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
         when(userRepository.save(beforeSaveUser)).thenReturn(afterSaveUser);
-        com.laa66.statlyapp.model.User returnUser = userService.saveUser(beforeSaveUser);
+        UserDTO returnUser = userService.saveUser(beforeSaveUser);
         assertNotEquals("0", returnUser.getId());
         assertEquals("1", returnUser.getId());
         assertEquals(beforeSaveUser.getUsername(), returnUser.getName());

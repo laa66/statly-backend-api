@@ -142,16 +142,19 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
         int trackCount = tracksAnalysis.getTracksAnalysis().size();
 
         tracksAnalysis.getTracksAnalysis().forEach(
-                track -> {
-                    addToMap(analyzedTracks, "acousticness", track.getAcousticness() * 100);
-                    addToMap(analyzedTracks, "danceability", track.getDanceability() * 100);
-                    addToMap(analyzedTracks, "energy", track.getEnergy() * 100);
-                    addToMap(analyzedTracks, "instrumentalness", track.getInstrumentalness() * 100);
-                    addToMap(analyzedTracks, "liveness", track.getLiveness() * 100);
-                    addToMap(analyzedTracks, "loudness", track.getLoudness());
-                    addToMap(analyzedTracks, "speechiness", track.getSpeechiness() * 100);
-                    addToMap(analyzedTracks, "tempo", track.getTempo());
-                    addToMap(analyzedTracks, "valence", track.getValence() * 100);
+                nullableTrack -> {
+                    Optional.ofNullable(nullableTrack)
+                            .ifPresent(track -> {
+                                addToMap(analyzedTracks, "acousticness", track.getAcousticness() * 100);
+                                addToMap(analyzedTracks, "danceability", track.getDanceability() * 100);
+                                addToMap(analyzedTracks, "energy", track.getEnergy() * 100);
+                                addToMap(analyzedTracks, "instrumentalness", track.getInstrumentalness() * 100);
+                                addToMap(analyzedTracks, "liveness", track.getLiveness() * 100);
+                                addToMap(analyzedTracks, "loudness", track.getLoudness());
+                                addToMap(analyzedTracks, "speechiness", track.getSpeechiness() * 100);
+                                addToMap(analyzedTracks, "tempo", track.getTempo());
+                                addToMap(analyzedTracks, "valence", track.getValence() * 100);
+                            });
                 }
         );
 

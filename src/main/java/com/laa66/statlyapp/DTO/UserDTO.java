@@ -15,10 +15,14 @@ public class UserDTO {
 
     String id;
 
+    String uri;
+
     String email;
 
     @JsonProperty("display_name")
-    String displayName;
+    String name;
 
     List<Image> images;
+
+    long points;
 }

@@ -2,8 +2,8 @@ package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.DTO.FollowersDTO;
 import com.laa66.statlyapp.DTO.ProfileDTO;
+import com.laa66.statlyapp.DTO.UserDTO;
 import com.laa66.statlyapp.constants.StatlyConstants;
-import com.laa66.statlyapp.model.User;
 import com.laa66.statlyapp.service.SocialService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.UserService;
@@ -36,10 +36,10 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<User> getCurrentUser(@AuthenticationPrincipal OAuth2User principal) {
+    public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal OAuth2User principal) {
         long userId = (long) principal.getAttributes().get("userId");
-        User user = userService.findUserById(userId);
-        return ResponseEntity.ok(user);
+        UserDTO userDTO = userService.findUserById(userId);
+        return ResponseEntity.ok(userDTO);
     }
 
     @DeleteMapping("/me/delete")
@@ -56,9 +56,9 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<User>> searchUser(@RequestParam String username) {
-        List<User> users = username.isBlank() ? List.of() : userService.findAllMatchingUsers(username);
-        return ResponseEntity.ok(users);
+    public ResponseEntity<List<UserDTO>> searchUser(@RequestParam String username) {
+        List<UserDTO> userDTOList = username.isBlank() ? List.of() : userService.findAllMatchingUsers(username);
+        return ResponseEntity.ok(userDTOList);
     }
 
     @PutMapping("/follow")
@@ -82,9 +82,9 @@ public class UserController {
     }
 
     @GetMapping("/rank")
-    public ResponseEntity<List<User>> getRank() {
-        List<User> users = userService.findAllUsersOrderByPoints();
-        return ResponseEntity.ok(users);
+    public ResponseEntity<List<UserDTO>> getRank() {
+        List<UserDTO> userDTOList = userService.findAllUsersOrderByPoints();
+        return ResponseEntity.ok(userDTOList);
     }
 
 }

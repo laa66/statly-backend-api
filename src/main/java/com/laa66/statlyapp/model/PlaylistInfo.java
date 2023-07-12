@@ -2,10 +2,10 @@ package com.laa66.statlyapp.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import com.laa66.statlyapp.DTO.UserDTO;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.lang.NonNull;
 
 import java.util.List;
 
@@ -18,15 +18,15 @@ public class PlaylistInfo {
     @JsonProperty("external_urls")
     private SpotifyURL urls;
 
-    @NonNull
+    @NotNull
     private String id;
 
     private List<Image> images;
 
-    @NonNull
+    @NotNull
     private String name;
 
     @JsonProperty("owner")
-    private User user;
+    private UserDTO user;
 
 }

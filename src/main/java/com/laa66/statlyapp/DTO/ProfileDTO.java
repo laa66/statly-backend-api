@@ -2,7 +2,6 @@ package com.laa66.statlyapp.DTO;
 
 import com.laa66.statlyapp.model.Artist;
 import com.laa66.statlyapp.model.Track;
-import com.laa66.statlyapp.model.User;
 import lombok.Value;
 
 import java.time.LocalDateTime;
@@ -16,8 +15,8 @@ public class ProfileDTO {
     String username;
     String imageUrl;
     LocalDateTime joinDate;
-    List<User> following;
-    List<User> followers;
+    List<UserDTO> following;
+    List<UserDTO> followers;
     List<Track> topTracks;
     List<Artist> topArtists;
     Map<String, Double> statsMap;

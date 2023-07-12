@@ -1,6 +1,7 @@
 package com.laa66.statlyapp.config;
 
-import com.laa66.statlyapp.model.User;
+import com.laa66.statlyapp.DTO.UserDTO;
+import com.laa66.statlyapp.entity.User;
 import com.laa66.statlyapp.entity.UserStats;
 import com.laa66.statlyapp.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -35,8 +36,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             String spotifyUserId = (String) oAuth2User.getAttributes().get("id");
             String imageUrl = getImageUrl(attributes);
 
-            User user = Optional.ofNullable(userService.findUserByEmail(email))
-                    .orElseGet(() -> userService.saveUser(new com.laa66.statlyapp.entity.User(
+            UserDTO userDTO = Optional.ofNullable(userService.findUserByEmail(email))
+                    .orElseGet(() -> userService.saveUser(new User(
                             0,
                             spotifyUserId,
                             username,
@@ -44,7 +45,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                             imageUrl,
                             LocalDateTime.now(),
                             new UserStats())));
-            attributes.put("userId", Long.parseLong(user.getId()));
+            attributes.put("userId", Long.parseLong(userDTO.getId()));
             return new DefaultOAuth2User(oAuth2User.getAuthorities(), Collections.unmodifiableMap(attributes), "display_name");
         } catch (NullPointerException | NoSuchElementException e) {
             return oAuth2User;

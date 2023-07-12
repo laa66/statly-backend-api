@@ -1,7 +1,7 @@
 package com.laa66.statlyapp.service;
 
 import com.laa66.statlyapp.DTO.*;
-import com.laa66.statlyapp.model.User;
+import com.laa66.statlyapp.entity.User;
 
 
 import java.util.List;
@@ -10,15 +10,15 @@ public interface UserService {
 
     String authenticateUser(UserDTO userDTO);
 
-    User findUserByEmail(String email);
+    UserDTO findUserByEmail(String email);
 
-    User findUserById(long userId);
+    UserDTO findUserById(long userId);
 
-    List<User> findAllMatchingUsers(String username);
+    List<UserDTO> findAllMatchingUsers(String username);
 
-    List<User> findAllUsersOrderByPoints();
+    List<UserDTO> findAllUsersOrderByPoints();
 
-    User saveUser(com.laa66.statlyapp.entity.User user);
+    UserDTO saveUser(User user);
 
     void deleteUser(long id);
 

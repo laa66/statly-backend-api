@@ -138,7 +138,8 @@ class ApiControllerIntegrationTest {
         ResponsePlaylists playlists = new ResponsePlaylists(
                 null,
                 1,
-                List.of(new PlaylistInfo(new SpotifyURL(), "id", List.of(), "playlist", new User())));
+                List.of(new PlaylistInfo(new SpotifyURL(), "id", List.of(), "playlist", new UserDTO(
+                        "1", "uri", "mail", "username", List.of(), 0))));
         when(spotifyAPIService.getUserPlaylists(null))
                 .thenReturn(playlists);
         mockMvc.perform(get("/api/playlist/all")

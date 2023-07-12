@@ -14,7 +14,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.parameters.P;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -50,7 +49,7 @@ class UserControllerIntegrationTest {
     void shouldAuthUser() throws Exception {
         Image image = new Image();
         image.setUrl("imageurl");
-        UserDTO userDTO = new UserDTO("testuser", "test@mail.com", "testuser", List.of(image));
+        UserDTO userDTO = new UserDTO("testuser", "uri", "test@mail.com", "testuser", List.of(image), 0);
         when(spotifyAPIService.getCurrentUser()).thenReturn(userDTO);
         when(userService.authenticateUser(userDTO)).thenReturn("url/callback?name=testuser&url=imageurl");
         mockMvc.perform(MockMvcRequestBuilders.get("/user/auth").with(oauth2Login()))
@@ -77,8 +76,8 @@ class UserControllerIntegrationTest {
 
     @Test
     void shouldSearchUser() throws Exception {
-        User user = new User("1", "uri", "username", List.of(), 0);
-        when(userService.findAllMatchingUsers("name")).thenReturn(List.of(user));
+        UserDTO userDTO = new UserDTO("1", "uri", "mail", "username", List.of(), 0);
+        when(userService.findAllMatchingUsers("name")).thenReturn(List.of(userDTO));
         mockMvc.perform(get("/user/search?username=name")
                 .with(oauth2Login())
                 .contentType(MediaType.APPLICATION_JSON))
@@ -104,8 +103,8 @@ class UserControllerIntegrationTest {
 
     @Test
     void shouldGetCurrentUser() throws Exception {
-        User user = new User("1", "uri", "name", List.of(), 0);
-        when(userService.findUserById(1L)).thenReturn(user);
+        UserDTO userDTO = new UserDTO("1", "uri", "mail", "name", List.of(), 0);
+        when(userService.findUserById(1L)).thenReturn(userDTO);
         mockMvc.perform(get("/user/me")
                         .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -124,8 +123,8 @@ class UserControllerIntegrationTest {
 
     @Test
     void shouldGetUserFollowing() throws Exception {
-        FollowersDTO followersDTO = new FollowersDTO(1, List.of(new User(
-                "id", "uri", "name", List.of(new Image("url", null, null))
+        FollowersDTO followersDTO = new FollowersDTO(1, List.of(new UserDTO(
+                "id", "uri", "mail", "name", List.of(new Image("url", null, null))
         ,0)));
         when(socialService.getFollowers(1, StatlyConstants.FOLLOWING))
                 .thenReturn(followersDTO);
@@ -234,7 +233,14 @@ class UserControllerIntegrationTest {
 
     @Test
     void shouldGetRank() throws Exception {
-        when(userService.findAllUsersOrderByPoints()).thenReturn(List.of(new User(), new User()));
+        when(userService.findAllUsersOrderByPoints()).thenReturn(List.of(
+                new UserDTO(
+                        "id2", "uri2", "mail2", "name2", List.of(new Image("url", null, null))
+                        ,300),
+                new UserDTO(
+                        "id1", "uri1", "mail1", "name1", List.of(new Image("url", null, null))
+                        ,150)
+        ));
         mockMvc.perform(get("/user/rank")
                 .with(oauth2Login()).contentType(MediaType.APPLICATION_JSON))
                 .andExpectAll(

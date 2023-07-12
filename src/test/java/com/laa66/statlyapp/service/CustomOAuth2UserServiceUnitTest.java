@@ -1,7 +1,7 @@
 package com.laa66.statlyapp.service;
 
+import com.laa66.statlyapp.DTO.UserDTO;
 import com.laa66.statlyapp.config.CustomOAuth2UserService;
-import com.laa66.statlyapp.model.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,7 +31,7 @@ class CustomOAuth2UserServiceUnitTest {
 
     @Test
     void shouldGetUser() {
-        User user = new User("1", null, null, null, 0);
+        UserDTO userDTO = new UserDTO("1", null, null, null, List.of(), 0);
         OAuth2User oAuth2User = new DefaultOAuth2User(
                 Collections.singletonList(new OAuth2UserAuthority(Map.of("user","user"))),
                 Map.of(
@@ -39,7 +39,7 @@ class CustomOAuth2UserServiceUnitTest {
                         "images", List.of(), "id", "id"),
                 "display_name"
                 );
-        when(userService.findUserByEmail("test@mail.com")).thenReturn(user);
+        when(userService.findUserByEmail("test@mail.com")).thenReturn(userDTO);
         OAuth2User result = customOAuth2UserService.getUserOrCreate(oAuth2User);
         assertNotNull(result);
         assertEquals(oAuth2User.getAuthorities(), result.getAuthorities());
@@ -50,7 +50,7 @@ class CustomOAuth2UserServiceUnitTest {
 
     @Test
     void shouldCreateUser() {
-        User createdUser = new User("1", null, null, null, 0);
+        UserDTO userDTO = new UserDTO("1", null, null, null, List.of(), 0);
         OAuth2User oAuth2User = new DefaultOAuth2User(
                 Collections.singletonList(new OAuth2UserAuthority(Map.of("user","user"))),
                 Map.of(
@@ -59,7 +59,7 @@ class CustomOAuth2UserServiceUnitTest {
                 "display_name"
                 );
         when(userService.findUserByEmail("test@mail.com")).thenReturn(null);
-        when(userService.saveUser(any())).thenReturn(createdUser);
+        when(userService.saveUser(any())).thenReturn(userDTO);
         OAuth2User result = customOAuth2UserService.getUserOrCreate(oAuth2User);
         assertNotNull(result);
         assertEquals(oAuth2User.getAuthorities(), result.getAuthorities());
