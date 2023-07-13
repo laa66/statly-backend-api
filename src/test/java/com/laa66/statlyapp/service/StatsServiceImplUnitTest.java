@@ -94,33 +94,47 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldSaveUserTracks() {
-        Track item = new Track();
-        Artist artist = new Artist("artist");
-        item.setArtists(Collections.singletonList(artist));
-        item.setName("song");
-        TracksDTO dto = new TracksDTO(Collections.singletonList(item), "1", "short", null);
-        Map<TracksDTO, Long> dtoMap = Collections.singletonMap(dto, 1L);
-        statsService.saveUserTracks(dtoMap);
-        verify(trackRepository, times(1)).saveAll(anyList());
+        Track track = new Track(List.of(new Artist("artist")), "song");
+        TracksDTO trackDTO = new TracksDTO(Collections.singletonList(track), "1", "short", null);
+        Map<TracksDTO, Long> trackMap = Collections.singletonMap(trackDTO, 1L);
+        statsService.saveUserTracks(trackMap);
+
+        Track track1 = new Track(Collections.singletonList(new Artist("artist")), "song");
+        Track track2 = new Track(Collections.singletonList(new Artist("artist")), "song");
+        TracksDTO tracksDTO = new TracksDTO(List.of(track1, track2), "2", "short", null);
+        Map<TracksDTO, Long> tracksMap = Map.of(tracksDTO, 1L);
+        statsService.saveUserTracks(tracksMap);
+        verify(trackRepository, times(2)).saveAll(anyList());
     }
 
     @Test
     void shouldSaveUserArtists() {
-        Artist item = new Artist();
-        item.setName("artist");
-        ArtistsDTO dto = new ArtistsDTO("1", Collections.singletonList(item), "short", null);
-        Map<ArtistsDTO, Long> dtoMap = Collections.singletonMap(dto, 1L);
-        statsService.saveUserArtists(dtoMap);
-        verify(artistRepository, times(1)).saveAll(anyList());
+        Artist artist = new Artist("artist");
+        ArtistsDTO artistDTO = new ArtistsDTO("1", Collections.singletonList(artist), "short", null);
+        Map<ArtistsDTO, Long> artistMap = Collections.singletonMap(artistDTO, 1L);
+        statsService.saveUserArtists(artistMap);
+
+        Artist artist1 = new Artist("artist");
+        Artist artist2 = new Artist("artist");
+        ArtistsDTO artistsDTO = new ArtistsDTO("2", List.of(artist1, artist2), "short", null);
+        Map<ArtistsDTO, Long> artistsMap = Map.of(artistsDTO, 1L);
+        statsService.saveUserArtists(artistsMap);
+        verify(artistRepository, times(2)).saveAll(anyList());
     }
 
     @Test
     void shouldSaveUserGenres() {
-        GenresDTO dto = new GenresDTO(Collections
+        GenresDTO genreDTO = new GenresDTO(Collections
                 .singletonList(new Genre("genre", 20)), "short", null);
-        Map<GenresDTO, Long> dtoMap = Collections.singletonMap(dto, 1L);
-        statsService.saveUserGenres(dtoMap);
+        Map<GenresDTO, Long> genreMap = Collections.singletonMap(genreDTO, 1L);
+        statsService.saveUserGenres(genreMap);
         verify(genreRepository, times(1)).saveAll(anyList());
+
+        Genre genre1 = new Genre("rock", 30);
+        Genre genre2 = new Genre("rock", 60);
+        GenresDTO genresDTO = new GenresDTO(List.of(genre1, genre2), "short", null);
+        statsService.saveUserGenres(Map.of(genresDTO, 1L));
+        verify(genreRepository, times(2)).saveAll(anyList());
     }
 
     @Test

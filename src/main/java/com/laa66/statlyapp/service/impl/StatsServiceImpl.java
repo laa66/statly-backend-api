@@ -71,7 +71,7 @@ public class StatsServiceImpl implements StatsService {
                             .toMap(item -> {
                                 List<Artist> artists = item.getArtists();
                                 return (artists != null && !artists.isEmpty() ? artists.get(0).getName() : null) + "_" + item.getName(); //added null check
-                            }, s -> counter.getAndIncrement()));
+                            }, s -> counter.getAndIncrement(), (ex, rep) -> ex));
             return new UserTrack(0, entry.getValue(), entry.getKey().getRange(), tracks, LocalDate.now());
         }).toList();
         trackRepository.saveAll(userTrackList);
@@ -85,7 +85,7 @@ public class StatsServiceImpl implements StatsService {
                    .getArtists()
                    .stream()
                    .collect(Collectors
-                           .toMap(Artist::getName, s -> counter.getAndIncrement()));
+                           .toMap(Artist::getName, s -> counter.getAndIncrement(),  (ex, rep) -> ex));
            return new UserArtist(0, entry.getValue(), entry.getKey().getRange(), artists, LocalDate.now());
         }).toList();
         artistRepository.saveAll(userArtistList);
@@ -98,7 +98,7 @@ public class StatsServiceImpl implements StatsService {
                     .getGenres()
                     .stream()
                     .collect(Collectors
-                            .toMap(Genre::getGenre, Genre::getScore));
+                            .toMap(Genre::getGenre, Genre::getScore, (ex, rep) -> ex));
             return new UserGenre(0, entry.getValue(), entry.getKey().getRange(), genres, LocalDate.now());
         }).toList();
         genreRepository.saveAll(userGenreList);
