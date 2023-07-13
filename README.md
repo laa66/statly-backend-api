@@ -1,7 +1,7 @@
 # Statly - Your personal Spotify stats🎵
 
 Statly is a web application powered by Spotify API that lets you view your music
-statistics, analyze your audio library, playlists and check recently played tracks.
+statistics, analyze your audio library, playlists, check recently played tracks, follow friends, match music libraries and make playlist battles.
 You can also export a playlist to your Spotify account from your favourite tracks in three different
 ranges.
 
@@ -47,8 +47,7 @@ Create ``.env`` file in root project directory and set specific key/value pairs 
 
 ## How to use 🗺️
 
-1. At the very beginning, try to register as beta-tester on the Home page.
-   Your access should be granted after 15 minutes.
+1. At the very beginning, try to register as beta-tester on the Home page and your access should be granted after 15 minutes. You will receive confirmation email :)
 2. Click on ``Login with Spotify`` button on the Home page. You will be redirected to Spotify account service
 3. Login with your Spotify username and password
 4. **Congratulations!** Now you can use all features of Statly
@@ -66,15 +65,23 @@ Create ``.env`` file in root project directory and set specific key/value pairs 
 
 * Calculate and displays a user's ``library audio analysis`` based on different indicators such as average energy, tempo, mainstream, boringness etc.
 
-* Displays user's ``all playlists`` and give them ability to calculate their energy, tempo, mainstream and boringess score
+* Displays user's ``all playlists`` and give them ability to calculate playlist energy, tempo, mainstream and boringess score
 
 * Allows users to view their ``recently played`` tracks, giving them easy access to music they have enjoyed
 
-* Redirect user to ``Spotify web player`` immediately after clicking on some resources e.g. on special track, artist or created playlist
+* Searching, following/unfollowing ``friends`` and checking their favourite songs, artists and library audio analysis
+
+* Calculating percentage ``music library match`` (based on genres, artists and songs) with other users
+
+* Creating a ``playlist battle`` between users, earning points, and viewing the ranking.
+
+* Redirecting users to ``Spotify web player`` immediately after clicking on some resources e.g. on special track, artist or created playlist
+
+* Sending ``email notifications`` to users
 
 With these features Statly provides an easy and efficient way for users to explore and interact with their Spotify listening data.
 The app is powered by the Spotify API and makes use of the OAuth2 authorization flow with Spring Boot for backend and React for frontend.
-Users can access the app through the web, it is deployed on Railway cloud, GitHub pages and PlanetScale providing easy access to anyone who wants to connect their Spotify account and check their listening habits.
+Users can access the app through the web, it is deployed on Railway cloud and GitHub pages providing easy access to anyone who wants to connect their Spotify account and check their listening habits.
 
 ## Documentation 📖
 
@@ -91,13 +98,13 @@ You can view full documentation of this project in different paths:
 - Spring Boot 3 (Spring REST, Spring Data JPA, Spring MVC, Spring Security, Spring AOP, Spring Mail)
 - Hibernate & JPA
 - Maven
+- Project Lombok
 - OAuth 2.0
 - Docker
 - SQL
 - React.js
 - HTML & CSS
-- Bootstrap v5.3
-- PlanetScale
+- Bootstrap v5.2
 - Railway Cloud
 - GitHub Pages
 - IntelliJ IDEA Community Edition
@@ -115,10 +122,8 @@ You can view full documentation of this project in different paths:
 
 ## To-do 💡
 
-- Implement functionality for comparing user listening habits over the past 6 months/all time.
-- Implement functionality that will allow users to add friends and check their statistics
-- Develop 'Playlist-battle' functionality
-- Develop 'Silent-disco room' functionality
+- Develop functionality to find users in your area who matches the best with your library
+- Implement functionality for comparing user listening habits over the past 6 months/all time
 - Integrate small web player into the React-app that can play user's top songs within the browser
 - Move Spotify-powered app from development mode to extended modem, enabling anyone to use Statly without needing to register for the beta
 
@@ -142,10 +147,19 @@ You can view full documentation of this project in different paths:
 ![Statly-analysis](src/main/resources/image/statly-analysis.png)
 <hr/>
 
-![Statly-analysis2](src/main/resources/image/statly-analysis-2.png)
+![Statly-playlist](src/main/resources/image/statly-playlist.png)
 <hr/>
 
-![Statly-analysis3](src/main/resources/image/statly-analysis-3.png)
+![Statly-profile](src/main/resources/image/statly-profile.png)
+<hr/>
+
+![Statly-profile-stats](src/main/resources/image/statly-profile-stats.png)
+<hr/>
+
+![Statly-battle](src/main/resources/image/statly-battle.png)
+<hr/>
+
+![Statly-rank](src/main/resources/image/statly-rank.png)
 <hr/>
 
 ![Statly-dashboard](src/main/resources/image/statly-dashboard.png)
