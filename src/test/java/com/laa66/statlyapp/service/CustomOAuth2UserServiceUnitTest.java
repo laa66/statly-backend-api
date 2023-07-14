@@ -18,6 +18,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,11 +56,17 @@ class CustomOAuth2UserServiceUnitTest {
                 Collections.singletonList(new OAuth2UserAuthority(Map.of("user","user"))),
                 Map.of(
                         "display_name", "user", "email", "test@mail.com",
-                        "images", List.of(Map.of("url", "imageUrl")), "id", "id"),
+                        "images", List.of(
+                                Map.of("url", "imageUrl", "height", 200, "width", 200),
+                                Map.of("url", "imageUrlSmaller", "height", 150, "width", 150)
+                        ), "id", "id"),
                 "display_name"
                 );
         when(userService.findUserByEmail("test@mail.com")).thenReturn(null);
-        when(userService.saveUser(any())).thenReturn(userDTO);
+        when(userService.saveUser(argThat(arg -> arg
+                .getImage()
+                .equalsIgnoreCase("imageUrl"))))
+                .thenReturn(userDTO);
         OAuth2User result = customOAuth2UserService.getUserOrCreate(oAuth2User);
         assertNotNull(result);
         assertEquals(oAuth2User.getAuthorities(), result.getAuthorities());

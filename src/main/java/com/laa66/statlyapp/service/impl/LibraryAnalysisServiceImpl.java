@@ -96,7 +96,7 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
     }
 
     @Override
-    public BattleResultDTO makePlaylistBattle(long userId, long battleUserId,
+    public BattleResultDTO createPlaylistBattle(long userId, long battleUserId,
                                               TracksDTO playlist, TracksDTO battlePlaylist) {
         AnalysisDTO playlistAnalysis = getTracksAnalysis(playlist, null);
         AnalysisDTO battlePlaylistAnalysis = getTracksAnalysis(battlePlaylist, null);

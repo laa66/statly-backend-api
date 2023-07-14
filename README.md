@@ -1,7 +1,7 @@
 # Statly - Your personal Spotify stats🎵
 
 Statly is a web application powered by Spotify API that lets you view your music
-statistics, analyze your audio library, playlists, check recently played tracks, follow friends, match music libraries and make playlist battles.
+statistics, analyze your audio library, playlists, check recently played tracks, follow friends, match music libraries and create playlist battles.
 You can also export a playlist to your Spotify account from your favourite tracks in three different
 ranges.
 
@@ -73,7 +73,7 @@ Create ``.env`` file in root project directory and set specific key/value pairs 
 
 * Calculating percentage ``music library match`` (based on genres, artists and songs) with other users
 
-* Creating a ``playlist battle`` between users, earning points, and viewing the ranking.
+* Creating a ``playlist battle`` between users, earning points, and viewing the ranking
 
 * Redirecting users to ``Spotify web player`` immediately after clicking on some resources e.g. on special track, artist or created playlist
 

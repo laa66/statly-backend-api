@@ -151,7 +151,7 @@ class LibraryAnalysisServiceImplUnitTest {
                 .getTracksAnalysis(tracks1, null);
         doReturn(analysis2).when(libraryAnalysisService)
                 .getTracksAnalysis(tracks2, null);
-        BattleResultDTO battleResultDTO = libraryAnalysisService.makePlaylistBattle(1L, 2L,
+        BattleResultDTO battleResultDTO = libraryAnalysisService.createPlaylistBattle(1L, 2L,
                 tracks1, tracks2);
         verify(socialService, times(2)).updatePoints(anyLong(), anyInt());
         assertEquals(1L, battleResultDTO.getWinner().getId());
@@ -185,7 +185,7 @@ class LibraryAnalysisServiceImplUnitTest {
                 .getTracksAnalysis(tracks1, null);
         doReturn(analysis2).when(libraryAnalysisService)
                 .getTracksAnalysis(tracks2, null);
-        BattleResultDTO battleResultDTO = libraryAnalysisService.makePlaylistBattle(1L, 2L,
+        BattleResultDTO battleResultDTO = libraryAnalysisService.createPlaylistBattle(1L, 2L,
                 tracks1, tracks2);
         assertEquals(0., battleResultDTO.getResult());
         assertEquals(315., battleResultDTO.getWinner().getScore());

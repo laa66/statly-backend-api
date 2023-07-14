@@ -266,7 +266,7 @@ class ApiControllerIntegrationTest {
                 new Battler(2L, new AnalysisDTO(Map.of(), List.of())),
                 50.
         );
-        when(libraryAnalysisService.makePlaylistBattle(anyLong(), anyLong(), any(), any()))
+        when(libraryAnalysisService.createPlaylistBattle(anyLong(), anyLong(), any(), any()))
                 .thenReturn(battleResultDTO);
         mockMvc.perform(post("/api/analysis/battle?user_id=2")
                 .with(csrf())

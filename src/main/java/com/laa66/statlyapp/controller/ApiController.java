@@ -95,7 +95,7 @@ public class ApiController {
         String country = (String) principal.getAttributes().get("country");
         TracksDTO tracks = spotifyApiService.getPlaylistTracks(battleDTO.getPlaylist(), country);
         TracksDTO tracksBattle = spotifyApiService.getPlaylistTracks(battleDTO.getPlaylistBattle(), country);
-        BattleResultDTO battleResultDTO = libraryAnalysisService.makePlaylistBattle(userId, battleUserId, tracks, tracksBattle);
+        BattleResultDTO battleResultDTO = libraryAnalysisService.createPlaylistBattle(userId, battleUserId, tracks, tracksBattle);
         return ResponseEntity.ok(battleResultDTO);
     }
 }
