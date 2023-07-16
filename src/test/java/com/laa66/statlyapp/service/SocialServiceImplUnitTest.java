@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -200,11 +201,15 @@ public class SocialServiceImplUnitTest {
                 argument.getUserStats().getIg().equalsIgnoreCase("ig") &&
                 argument.getUserStats().getTwitter() == null)))
                 .thenReturn(returnUser);
-        User savedUser = socialService.updateSocialLinks(1, Map.of("fb", "fb"));
+        Map<String, String> links = new LinkedHashMap<>();
+        links.put("fb", "fb");
+        links.put("ig", "ig");
+        links.put("twitter", null);
+        User savedUser = socialService.updateSocialLinks(1, links);
         assertEquals(1L, savedUser.getId());
         assertEquals("username", savedUser.getUsername());
-        assertEquals("fb", user.getUserStats().getFb());
-        assertEquals("ig", user.getUserStats().getIg());
+        assertEquals("fb", savedUser.getUserStats().getFb());
+        assertEquals("ig", savedUser.getUserStats().getIg());
         assertNull(user.getUserStats().getTwitter());
 
         when(userRepository.findById(2L)).thenReturn(Optional.empty());

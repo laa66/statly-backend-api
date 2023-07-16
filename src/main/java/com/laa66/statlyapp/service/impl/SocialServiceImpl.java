@@ -85,9 +85,10 @@ public class SocialServiceImpl implements SocialService {
     public User updateSocialLinks(long userId, Map<String, String> socialLinks) {
         return userRepository.save(userRepository.findById(userId)
                 .map(user -> {
-                    if (socialLinks.containsKey("fb")) user.getUserStats().setFb(socialLinks.get("fb"));
-                    if (socialLinks.containsKey("ig")) user.getUserStats().setIg(socialLinks.get("ig"));
-                    if (socialLinks.containsKey("twitter")) user.getUserStats().setTwitter(socialLinks.get("twitter"));
+                    user.getUserStats()
+                            .setFb(socialLinks.getOrDefault("fb", null))
+                            .setIg(socialLinks.getOrDefault("ig", null))
+                            .setTwitter(socialLinks.getOrDefault("twitter", null));
                     return user;
                 }).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER));
     }

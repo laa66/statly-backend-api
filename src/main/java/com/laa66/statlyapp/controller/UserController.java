@@ -9,6 +9,7 @@ import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -85,6 +87,13 @@ public class UserController {
     public ResponseEntity<List<UserDTO>> getRank() {
         List<UserDTO> userDTOList = userService.findAllUsersOrderByPoints();
         return ResponseEntity.ok(userDTOList);
+    }
+
+    @PutMapping("/links")
+    public ResponseEntity<Void> addLinks(@AuthenticationPrincipal OAuth2User principal, @Valid @RequestBody Map<String, String> socialLinks) {
+        long userid = (long) principal.getAttributes().get("userId");
+        socialService.updateSocialLinks(userid, socialLinks);
+        return ResponseEntity.noContent().build();
     }
 
 }

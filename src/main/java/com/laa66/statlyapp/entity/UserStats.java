@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 @Table(name = "user_stats")
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 @Getter
 @Setter
 @ToString

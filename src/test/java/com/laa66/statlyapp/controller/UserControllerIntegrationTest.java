@@ -16,7 +16,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +46,8 @@ class UserControllerIntegrationTest {
 
     @Autowired
     MockMvc mockMvc;
+
+    ObjectMapper mapper = new ObjectMapper();
 
     @Test
     void shouldAuthUser() throws Exception {
@@ -252,6 +256,27 @@ class UserControllerIntegrationTest {
                         jsonPath("$[1]").hasJsonPath()
                 );
         mockMvc.perform(get("/user/profile?user_id=1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isFound());
+    }
+
+    @Test
+    void shouldAddLinks() throws Exception {
+        Map<String, String> links = new LinkedHashMap<>();
+        links.put("fb", "fb");
+        links.put("ig", "ig");
+        links.put("twitter", null);
+        mockMvc.perform(put("/user/links")
+                .with(oauth2Login().
+                        attributes(map -> map.put("userId", 1L)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(links)))
+                .andExpect(status().isNoContent());
+
+        verify(socialService, times(1)).updateSocialLinks(1, links);
+
+        mockMvc.perform(put("/user/links")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isFound());
     }
