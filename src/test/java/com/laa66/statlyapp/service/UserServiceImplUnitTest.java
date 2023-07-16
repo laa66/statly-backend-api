@@ -38,15 +38,20 @@ class UserServiceImplUnitTest {
     @Test
     void shouldAuthenticateUserWithImage() {
         UserDTO userDTO = new UserDTO("id", "uri", "email", "name", List.of(new Image("url", 200, 200)), 0);
-        String redirectUrl = userService.authenticateUser(userDTO);
-        assertEquals("localhost/statly-frontend/#/callback?name=" + userDTO.getName() + "&url=" + userDTO.getImages().get(0).getUrl(), redirectUrl);
+        String redirectUrl = userService.authenticateUser(userDTO, 1);
+        assertEquals("localhost/statly-frontend/#/callback?name="
+                + userDTO.getName()
+                + "&url="
+                + userDTO.getImages().get(0).getUrl()
+                + "&user_id=1"
+                , redirectUrl);
     }
 
     @Test
     void shouldAuthenticateUserWithoutImage() {
         UserDTO userDTO = new UserDTO("id", "uri", "email", "name", List.of(), 0);
-        String redirectUrl = userService.authenticateUser(userDTO);
-        assertEquals("localhost/statly-frontend/#/callback?name=" + userDTO.getName() + "&url=" + "./account.png", redirectUrl);
+        String redirectUrl = userService.authenticateUser(userDTO, 1);
+        assertEquals("localhost/statly-frontend/#/callback?name=" + userDTO.getName() + "&url=" + "./account.png&user_id=1", redirectUrl);
 
     }
 

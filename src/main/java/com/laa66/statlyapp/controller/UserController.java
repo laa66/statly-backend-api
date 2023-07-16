@@ -29,8 +29,8 @@ public class UserController {
     private final SocialService socialService;
 
     @GetMapping("/auth")
-    public void authenticate(HttpServletRequest request, HttpServletResponse response) {
-        String redirectUrl = userService.authenticateUser(spotifyApiService.getCurrentUser());
+    public void authenticate(@AuthenticationPrincipal OAuth2User principal, HttpServletRequest request, HttpServletResponse response) {
+        String redirectUrl = userService.authenticateUser(spotifyApiService.getCurrentUser(), (long) principal.getAttributes().get("userId"));
         response.setStatus(HttpStatus.TEMPORARY_REDIRECT.value());
         response.setHeader(HttpHeaders.LOCATION, redirectUrl);
     }

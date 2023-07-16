@@ -5,6 +5,9 @@ CREATE TABLE IF NOT EXISTS user_stats (
     mainstream DOUBLE NOT NULL,
     boringness DOUBLE NOT NULL,
     points BIGINT NOT NULL,
+    ig VARCHAR(100),
+    fb VARCHAR(100),
+    twitter VARCHAR(100),
     PRIMARY KEY (id)
 );
 

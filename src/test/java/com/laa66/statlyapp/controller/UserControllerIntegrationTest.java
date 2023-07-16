@@ -47,14 +47,14 @@ class UserControllerIntegrationTest {
 
     @Test
     void shouldAuthUser() throws Exception {
-        Image image = new Image();
-        image.setUrl("imageurl");
-        UserDTO userDTO = new UserDTO("testuser", "uri", "test@mail.com", "testuser", List.of(image), 0);
+        Image image = new Image("imageUrl", null, null);
+        UserDTO userDTO = new UserDTO("1", "uri", "test@mail.com", "testuser", List.of(image), 0);
         when(spotifyAPIService.getCurrentUser()).thenReturn(userDTO);
-        when(userService.authenticateUser(userDTO)).thenReturn("url/callback?name=testuser&url=imageurl");
-        mockMvc.perform(MockMvcRequestBuilders.get("/user/auth").with(oauth2Login()))
+        when(userService.authenticateUser(userDTO, 1)).thenReturn("url/callback?name=testuser&url=imageurl&user_id=1");
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/auth").with(oauth2Login()
+                        .attributes(map -> map.put("userId", 1L))))
                 .andExpect(status().isTemporaryRedirect())
-                .andExpect(header().string("location", "url/callback?name=testuser&url=imageurl"));
+                .andExpect(header().string("location", "url/callback?name=testuser&url=imageurl&user_id=1"));
 
         mockMvc.perform(get("/user/auth")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -205,6 +205,9 @@ class UserControllerIntegrationTest {
                 null,
                 null,
                 Map.of(),
+                null,
+                null,
+                null,
                 500
         );
         when(socialService.getUserProfile(1)).thenReturn(profileDTO);

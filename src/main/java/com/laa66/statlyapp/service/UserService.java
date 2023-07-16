@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface UserService {
 
-    String authenticateUser(UserDTO userDTO);
+    String authenticateUser(UserDTO userDTO, long userId);
 
     UserDTO findUserByEmail(String email);
 

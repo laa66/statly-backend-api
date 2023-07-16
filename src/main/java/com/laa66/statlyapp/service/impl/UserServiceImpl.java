@@ -27,12 +27,15 @@ public class UserServiceImpl implements UserService {
     private final String reactUrl;
 
     @Override
-    public String authenticateUser(UserDTO userDTO) {
+    public String authenticateUser(UserDTO userDTO, long userId) {
         String imageUrl = userDTO.getImages().stream()
                 .findFirst()
                 .map(Image::getUrl)
                 .orElse("none");
-        return reactUrl + "/statly-frontend/#/callback?name=" + StringUtils.stripAccents(userDTO.getName()) + "&url=" + (imageUrl.equals("none") ? "./account.png"  : imageUrl);
+        return reactUrl + "/statly-frontend/#/callback?name=" +
+                StringUtils.stripAccents(userDTO.getName()) + "&url=" +
+                (imageUrl.equals("none") ? "./account.png"  : imageUrl) +
+                "&user_id=" + userId;
     }
 
     @Override

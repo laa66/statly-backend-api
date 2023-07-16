@@ -81,6 +81,17 @@ public class SocialServiceImpl implements SocialService {
                 }).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER));
     }
 
+    @Override
+    public User updateSocialLinks(long userId, Map<String, String> socialLinks) {
+        return userRepository.save(userRepository.findById(userId)
+                .map(user -> {
+                    if (socialLinks.containsKey("fb")) user.getUserStats().setFb(socialLinks.get("fb"));
+                    if (socialLinks.containsKey("ig")) user.getUserStats().setIg(socialLinks.get("ig"));
+                    if (socialLinks.containsKey("twitter")) user.getUserStats().setTwitter(socialLinks.get("twitter"));
+                    return user;
+                }).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER));
+    }
+
     //helpers
     private ProfileDTO createProfileDTO(User user, long userId) {
         return new ProfileDTO(
@@ -103,6 +114,9 @@ public class SocialServiceImpl implements SocialService {
                         "boringness", user.getUserStats().getBoringness(),
                         "mainstream", user.getUserStats().getMainstream()
                 ),
+                user.getUserStats().getIg(),
+                user.getUserStats().getFb(),
+                user.getUserStats().getTwitter(),
                 user.getUserStats().getPoints()
         );
     }

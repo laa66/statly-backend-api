@@ -17,11 +17,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
 
 
@@ -183,6 +184,31 @@ public class SocialServiceImplUnitTest {
 
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> socialService.updatePoints(2L, 10));
+    }
+
+    @Test
+    void shouldUpdateSocialLinks() {
+        User user = new User(1L, "id", "username","test@mail.com", "url", LocalDateTime.of(2022, 11, 20, 20, 20),
+                new UserStats(
+                1, 0,0,0,0,0, "ig", null, null));
+        User returnUser = new User(1L, "id", "username","test@mail.com", "url", LocalDateTime.of(2022, 11, 20, 20, 20),
+                new UserStats(
+                        1, 0,0,0,0,0, "ig", "fb", null));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(argThat(argument ->
+                argument.getUserStats().getFb().equalsIgnoreCase("fb") &&
+                argument.getUserStats().getIg().equalsIgnoreCase("ig") &&
+                argument.getUserStats().getTwitter() == null)))
+                .thenReturn(returnUser);
+        User savedUser = socialService.updateSocialLinks(1, Map.of("fb", "fb"));
+        assertEquals(1L, savedUser.getId());
+        assertEquals("username", savedUser.getUsername());
+        assertEquals("fb", user.getUserStats().getFb());
+        assertEquals("ig", user.getUserStats().getIg());
+        assertNull(user.getUserStats().getTwitter());
+
+        when(userRepository.findById(2L)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> socialService.updateSocialLinks(2L, Map.of()));
     }
 
 }

@@ -20,5 +20,8 @@ public class ProfileDTO {
     List<Track> topTracks;
     List<Artist> topArtists;
     Map<String, Double> statsMap;
+    String linkIg;
+    String linkFb;
+    String linkTwitter;
     long points;
 }
