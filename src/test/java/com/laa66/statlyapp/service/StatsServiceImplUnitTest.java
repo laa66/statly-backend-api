@@ -11,6 +11,8 @@ import com.laa66.statlyapp.repository.*;
 import com.laa66.statlyapp.service.impl.StatsServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatcher;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -140,7 +142,7 @@ public class StatsServiceImplUnitTest {
     @Test
     void shouldSaveUserStats() {
         User user = new User(1L, "id", "username", "email", "image", LocalDateTime.now()
-        , new UserStats(1L, 0.0, 0.0, 0.0, 0.0, 0));
+        , new UserStats(1L, 0.0, 0.0, 0.0, 0.0, 0, "ig", "fb", "twitter"));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         Map<String, Double> statsMap = Map.of(
                 "energy", 50.0,
@@ -149,7 +151,7 @@ public class StatsServiceImplUnitTest {
                 "boringness", 300.0
         );
         statsService.saveUserStats(1L, statsMap);
-        verify(userRepository, times(1)).save(any(User.class));
+        verify(userRepository, times(1)).save(ArgumentMatchers.same(user));
 
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> statsService.saveUserStats(2L, statsMap));
