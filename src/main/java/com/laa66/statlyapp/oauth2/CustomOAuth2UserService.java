@@ -1,4 +1,4 @@
-package com.laa66.statlyapp.config;
+package com.laa66.statlyapp.oauth2;
 
 import com.laa66.statlyapp.DTO.UserDTO;
 import com.laa66.statlyapp.entity.User;

@@ -1,5 +1,7 @@
 package com.laa66.statlyapp.config;
 
+import com.laa66.statlyapp.oauth2.CustomOAuth2UserService;
+import com.laa66.statlyapp.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.laa66.statlyapp.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -10,6 +12,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
@@ -19,7 +22,6 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.*;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -46,6 +48,11 @@ public class SecurityConfig {
     private String ADMIN_EMAIL;
 
     @Bean
+    public HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository() {
+        return new HttpCookieOAuth2AuthorizationRequestRepository();
+    }
+
+    @Bean
     public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService(UserService userService) {
         return new CustomOAuth2UserService(userService);
     }
@@ -65,15 +72,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, OAuth2UserService<OAuth2UserRequest, OAuth2User> userService) throws Exception {
-        CookieCsrfTokenRepository tokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        XorCsrfTokenRequestAttributeHandler delegate = new XorCsrfTokenRequestAttributeHandler();
-        tokenRepository.setSecure(true);
-        delegate.setCsrfRequestAttributeName(null);
-        CsrfTokenRequestHandler requestHandler = delegate::handle;
-        httpSecurity.csrf((csrf) -> csrf
-                        .csrfTokenRepository(tokenRepository)
-                        .csrfTokenRequestHandler(requestHandler))
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity,
+                                                   OAuth2UserService<OAuth2UserRequest, OAuth2User> userService,
+                                                   HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) throws Exception {
+        httpSecurity.sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .csrf()
+                .disable()
                 .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.GET, "/beta/join").permitAll()
                 .requestMatchers("/beta/all", "/beta/delete", "/beta/notification").access((authentication, object) ->
@@ -81,13 +87,11 @@ public class SecurityConfig {
                 .anyRequest()
                 .authenticated()
                 .and()
-                .logout()
-                .deleteCookies("JSESSIONID")
-                .invalidateHttpSession(true)
-                .clearAuthentication(true)
-                .permitAll()
-                .and()
                 .oauth2Login()
+                .authorizationEndpoint()
+                .baseUri("/oauth2/authorize")
+                .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
+                .and()
                 .userInfoEndpoint()
                 .userService(userService);
         return httpSecurity.build();

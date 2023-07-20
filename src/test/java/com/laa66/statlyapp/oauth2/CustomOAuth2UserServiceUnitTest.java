@@ -1,7 +1,7 @@
-package com.laa66.statlyapp.service;
+package com.laa66.statlyapp.oauth2;
 
 import com.laa66.statlyapp.DTO.UserDTO;
-import com.laa66.statlyapp.config.CustomOAuth2UserService;
+import com.laa66.statlyapp.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
