@@ -1,11 +1,13 @@
 package com.laa66.statlyapp.config;
 
 import com.laa66.statlyapp.repository.*;
+import com.laa66.statlyapp.repository.impl.SpotifyTokenRepositoryImpl;
 import com.laa66.statlyapp.service.*;
 import com.laa66.statlyapp.service.impl.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.server.CookieSameSiteSupplier;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -56,5 +58,10 @@ public class AppConfig {
     @Bean
     public SocialService socialService(UserRepository userRepository, StatsService statsService) {
         return new SocialServiceImpl(userRepository, statsService);
+    }
+
+    @Bean
+    public SpotifyTokenRepository spotifyTokenRepository(CacheManager cacheManager) {
+        return new SpotifyTokenRepositoryImpl(cacheManager);
     }
 }
