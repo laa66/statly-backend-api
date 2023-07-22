@@ -3,8 +3,12 @@ package com.laa66.statlyapp.oauth2;
 import com.laa66.statlyapp.DTO.UserDTO;
 import com.laa66.statlyapp.entity.User;
 import com.laa66.statlyapp.entity.UserStats;
+import com.laa66.statlyapp.exception.UserAuthenticationException;
+import com.laa66.statlyapp.model.Image;
+import com.laa66.statlyapp.model.OAuth2UserWrapper;
 import com.laa66.statlyapp.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -24,31 +28,27 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         DefaultOAuth2UserService defaultOAuth2UserService = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = defaultOAuth2UserService.loadUser(userRequest);
-        return getUserOrCreate(oAuth2User);
+        return getUserOrCreate(new OAuth2UserWrapper(oAuth2User));
     }
 
-    public OAuth2User getUserOrCreate(OAuth2User oAuth2User) {
+    public OAuth2User getUserOrCreate(OAuth2UserWrapper oAuth2User) {
         Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
-
         try {
-            String username = (String) attributes.get("display_name");
-            String email = (String) oAuth2User.getAttributes().get("email");
-            String spotifyUserId = (String) oAuth2User.getAttributes().get("id");
-            String imageUrl = getImageUrl(attributes);
-
+            String email = oAuth2User.getEmail();
             UserDTO userDTO = Optional.ofNullable(userService.findUserByEmail(email))
-                    .orElseGet(() -> userService.saveUser(new User(
-                            0,
-                            spotifyUserId,
-                            username,
+                    .orElseGet(() -> userService.saveUser(new User(0,
+                            oAuth2User.getId(),
+                            oAuth2User.getDisplayName(),
                             email,
-                            imageUrl,
+                            getImageUrl(attributes),
                             LocalDateTime.now(),
                             new UserStats())));
             attributes.put("userId", Long.parseLong(userDTO.getId()));
-            return new DefaultOAuth2User(oAuth2User.getAuthorities(), Collections.unmodifiableMap(attributes), "display_name");
-        } catch (NullPointerException | NoSuchElementException e) {
-            return oAuth2User;
+            return new OAuth2UserWrapper(new DefaultOAuth2User(oAuth2User.getAuthorities(),
+                    Collections.unmodifiableMap(attributes),
+                    "display_name"));
+        } catch (NoSuchElementException | NullPointerException e) {
+            throw new UserAuthenticationException("User cannot be properly authenticated");
         }
     }
 
