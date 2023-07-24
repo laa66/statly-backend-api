@@ -3,6 +3,8 @@ package com.laa66.statlyapp.config;
 import com.laa66.statlyapp.jwt.JwtProvider;
 import com.laa66.statlyapp.oauth2.CustomOAuth2UserService;
 import com.laa66.statlyapp.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.laa66.statlyapp.oauth2.OAuth2SuccessHandler;
+import com.laa66.statlyapp.repository.SpotifyTokenRepository;
 import com.laa66.statlyapp.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -27,6 +29,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.Collections;
 
 @Configuration
@@ -42,8 +46,8 @@ public class SecurityConfig {
     @Value("${api.spotify.scope}")
     private String SCOPE;
 
-    @Value("${api.react-app.url}")
-    private String REACT_URL;
+    @Value("${api.client.url}")
+    private String CLIENT_URL;
 
     @Value("${statly.api.admin-email}")
     private String ADMIN_EMAIL;
@@ -54,6 +58,13 @@ public class SecurityConfig {
     @Bean
     public JwtProvider jwtProvider() {
         return new JwtProvider(STATLY_SECRET);
+    }
+
+    @Bean
+    public OAuth2SuccessHandler oAuth2SuccessHandler(SpotifyTokenRepository spotifyTokenRepository,
+                                                     HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository,
+                                                     JwtProvider jwtProvider) {
+        return new OAuth2SuccessHandler(spotifyTokenRepository, httpCookieOAuth2AuthorizationRequestRepository, jwtProvider, URI.create(CLIENT_URL));
     }
 
     @Bean
@@ -72,7 +83,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedMethods(Collections.singletonList("*"));
         config.setAllowedHeaders(Collections.singletonList("*"));
-        config.addAllowedOrigin(REACT_URL);
+        config.addAllowedOrigin(CLIENT_URL);
         config.setAllowCredentials(true);
         source.registerCorsConfiguration("/**", config);
         FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
@@ -83,7 +94,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity,
                                                    OAuth2UserService<OAuth2UserRequest, OAuth2User> userService,
-                                                   HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) throws Exception {
+                                                   HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository,
+                                                   OAuth2SuccessHandler oAuth2SuccessHandler) throws Exception {
         httpSecurity.sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -102,7 +114,9 @@ public class SecurityConfig {
                 .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
                 .and()
                 .userInfoEndpoint()
-                .userService(userService);
+                .userService(userService)
+                .and()
+                .successHandler(oAuth2SuccessHandler);
         return httpSecurity.build();
     }
 

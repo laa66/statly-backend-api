@@ -15,6 +15,12 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler({BadRequestException.class})
+    public ResponseEntity<ExceptionDTO> handleBadRequestException(BadRequestException e) {
+        ExceptionDTO exceptionDTO = new ExceptionDTO(HttpStatus.BAD_REQUEST.value(), e.getMessage(), System.currentTimeMillis());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionDTO);
+    }
+
     @ExceptionHandler({UserNotFoundException.class})
     public ResponseEntity<ExceptionDTO> handleUserNotFoundException(UserNotFoundException e) {
         ExceptionDTO exceptionDTO = new ExceptionDTO(HttpStatus.NOT_FOUND.value(), e.getMessage(), System.currentTimeMillis());

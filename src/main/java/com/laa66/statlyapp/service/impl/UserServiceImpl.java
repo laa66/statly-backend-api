@@ -11,7 +11,6 @@ import com.laa66.statlyapp.repository.*;
 import com.laa66.statlyapp.service.UserService;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -22,9 +21,7 @@ import java.util.*;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BetaUserRepository betaUserRepository;
-
-    @Value("${api.react-app.url}")
-    private final String reactUrl;
+    private final String clientUrl;
 
     @Override
     public String authenticateUser(UserDTO userDTO, long userId) {
@@ -32,7 +29,7 @@ public class UserServiceImpl implements UserService {
                 .findFirst()
                 .map(Image::getUrl)
                 .orElse("none");
-        return reactUrl + "/statly-frontend/#/callback?name=" +
+        return clientUrl + "/statly-frontend/#/callback?name=" +
                 StringUtils.stripAccents(userDTO.getName()) + "&url=" +
                 (imageUrl.equals("none") ? "./account.png"  : imageUrl) +
                 "&user_id=" + userId;
