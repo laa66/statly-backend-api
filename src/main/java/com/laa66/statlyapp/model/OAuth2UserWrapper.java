@@ -1,15 +1,19 @@
 package com.laa66.statlyapp.model;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 @Value
 public class OAuth2UserWrapper implements OAuth2User, Serializable {
+    private final static ObjectMapper mapper = new ObjectMapper();
     OAuth2User oAuth2User;
 
     @Override
@@ -30,6 +34,12 @@ public class OAuth2UserWrapper implements OAuth2User, Serializable {
     @Override
     public <A> A getAttribute(String name) {
         return oAuth2User.getAttribute(name);
+    }
+
+    public List<Image> getImages() {
+        List<?> images = (List<?>) oAuth2User.getAttributes().get("images");
+        return mapper.convertValue(images, new TypeReference<>(){});
+
     }
 
     public String getCountry() {

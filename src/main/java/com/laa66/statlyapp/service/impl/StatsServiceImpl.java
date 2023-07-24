@@ -13,6 +13,7 @@ import com.laa66.statlyapp.repository.GenreRepository;
 import com.laa66.statlyapp.repository.TrackRepository;
 import com.laa66.statlyapp.repository.UserRepository;
 import com.laa66.statlyapp.service.StatsService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Slf4j
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Transactional
 public class StatsServiceImpl implements StatsService {
 

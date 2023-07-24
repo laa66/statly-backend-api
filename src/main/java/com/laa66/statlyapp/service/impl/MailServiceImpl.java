@@ -2,6 +2,7 @@ package com.laa66.statlyapp.service.impl;
 
 import com.laa66.statlyapp.DTO.BetaUserDTO;
 import com.laa66.statlyapp.service.MailService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
@@ -16,7 +17,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import java.io.IOException;
 
 @Slf4j
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class MailServiceImpl implements MailService {
 
     private final JavaMailSender mailSender;

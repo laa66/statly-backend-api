@@ -4,6 +4,7 @@ import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.EmptyTokenException;
 import com.laa66.statlyapp.model.AccessToken;
 import com.laa66.statlyapp.service.SpotifyTokenService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -17,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class SpotifyTokenServiceImpl implements SpotifyTokenService {
 
     private final RestTemplate restTemplate;

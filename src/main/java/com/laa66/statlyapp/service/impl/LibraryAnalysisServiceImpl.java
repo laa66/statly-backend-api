@@ -7,6 +7,7 @@ import com.laa66.statlyapp.service.LibraryAnalysisService;
 import com.laa66.statlyapp.service.SocialService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.StatsService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,7 +20,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Slf4j
 public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
 

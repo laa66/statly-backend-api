@@ -8,7 +8,6 @@ import com.laa66.statlyapp.model.Image;
 import com.laa66.statlyapp.model.OAuth2UserWrapper;
 import com.laa66.statlyapp.service.UserService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -40,23 +39,22 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                             oAuth2User.getId(),
                             oAuth2User.getDisplayName(),
                             email,
-                            getImageUrl(attributes),
+                            getImageUrl(oAuth2User.getImages()),
                             LocalDateTime.now(),
                             new UserStats())));
             attributes.put("userId", Long.parseLong(userDTO.getId()));
             return new OAuth2UserWrapper(new DefaultOAuth2User(oAuth2User.getAuthorities(),
                     Collections.unmodifiableMap(attributes),
                     "display_name"));
-        } catch (NoSuchElementException | NullPointerException e) {
+        } catch (NullPointerException e) {
             throw new UserAuthenticationException("User cannot be properly authenticated");
         }
     }
 
-    private String getImageUrl(Map<String, Object> attributes) throws NoSuchElementException, NullPointerException {
-        return ((List<?>) attributes.get("images")).stream()
-                .map(o -> (Map<?, ?>) o)
-                .max(Comparator.comparing(o -> (Integer) o.get("height")))
-                .map(map -> (String) map.get("url"))
+    private String getImageUrl(List<Image> images) throws NullPointerException {
+        return images.stream()
+                .max(Comparator.comparing(Image::getHeight))
+                .map(Image::getUrl)
                 .orElse("./account.png");
     }
 

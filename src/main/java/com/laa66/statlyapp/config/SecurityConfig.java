@@ -1,5 +1,6 @@
 package com.laa66.statlyapp.config;
 
+import com.laa66.statlyapp.jwt.JwtProvider;
 import com.laa66.statlyapp.oauth2.CustomOAuth2UserService;
 import com.laa66.statlyapp.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.laa66.statlyapp.service.UserService;
@@ -46,6 +47,14 @@ public class SecurityConfig {
 
     @Value("${statly.api.admin-email}")
     private String ADMIN_EMAIL;
+
+    @Value("${jwt.provider.secret}")
+    private String STATLY_SECRET;
+
+    @Bean
+    public JwtProvider jwtProvider() {
+        return new JwtProvider(STATLY_SECRET);
+    }
 
     @Bean
     public HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository() {

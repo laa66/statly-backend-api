@@ -9,7 +9,7 @@ import com.laa66.statlyapp.mapper.EntityMapper;
 import com.laa66.statlyapp.model.Image;
 import com.laa66.statlyapp.repository.*;
 import com.laa66.statlyapp.service.UserService;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Transactional
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
