@@ -1,5 +1,6 @@
 package com.laa66.statlyapp.config;
 
+import com.laa66.statlyapp.jwt.JwtAuthenticationFilter;
 import com.laa66.statlyapp.jwt.JwtProvider;
 import com.laa66.statlyapp.oauth2.CustomOAuth2UserService;
 import com.laa66.statlyapp.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
@@ -22,6 +23,7 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -54,6 +56,11 @@ public class SecurityConfig {
 
     @Value("${jwt.provider.secret}")
     private String STATLY_SECRET;
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtProvider jwtProvider, SpotifyTokenRepository spotifyTokenRepository) {
+        return new JwtAuthenticationFilter(jwtProvider, spotifyTokenRepository);
+    }
 
     @Bean
     public JwtProvider jwtProvider() {
@@ -101,8 +108,10 @@ public class SecurityConfig {
                                                    OAuth2UserService<OAuth2UserRequest, OAuth2User> userService,
                                                    HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository,
                                                    OAuth2SuccessHandler oAuth2SuccessHandler,
-                                                   OAuth2FailureHandler oAuth2FailureHandler) throws Exception {
-        httpSecurity.sessionManagement()
+                                                   OAuth2FailureHandler oAuth2FailureHandler,
+                                                   JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+        httpSecurity.addFilterBefore(jwtAuthenticationFilter, OAuth2LoginAuthenticationFilter.class)
+                .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .csrf()
