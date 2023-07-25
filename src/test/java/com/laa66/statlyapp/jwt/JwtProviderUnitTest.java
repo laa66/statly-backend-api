@@ -1,11 +1,15 @@
 package com.laa66.statlyapp.jwt;
 
+import com.laa66.statlyapp.model.OAuth2UserWrapper;
 import io.jsonwebtoken.io.Decoders;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,15 +18,21 @@ class JwtProviderUnitTest {
 
     JwtProvider provider;
     ObjectMapper mapper = new ObjectMapper();
+    OAuth2UserWrapper principal;
 
     @BeforeEach
     void setup() {
         provider = new JwtProvider("WTYmp3xWh8EfrHXcaHrlwFfZ11cvc3Tgx9xUiNuz7+E=");
+        principal = new OAuth2UserWrapper(new DefaultOAuth2User(
+                Collections.emptyList(), Map.of(
+                        "userId", 1L, "display_name", "name"
+        ), "display_name"
+        ));
     }
 
     @Test
     void shouldCreateToken() throws IOException {
-        String token = provider.createToken(1);
+        String token = provider.createToken(principal);
         String[] split = token.split("\\.");
         String header = new String(Decoders.BASE64.decode(split[0]));
         String payload = new String(Decoders.BASE64.decode(split[1]));
@@ -37,21 +47,21 @@ class JwtProviderUnitTest {
 
     @Test
     void shouldGetIdFromToken() {
-        String token = provider.createToken(1);
+        String token = provider.createToken(principal);
         Long userId = provider.getIdFromToken(token);
         assertEquals(1, userId);
     }
 
     @Test
     void shouldValidateToken() {
-        String token = provider.createToken(1);
+        String token = provider.createToken(principal);
         boolean valid = provider.validateToken(token);
         assertTrue(valid);
     }
 
     @Test
     void shouldValidateTokenInvalidToken() {
-        String token = provider.createToken(1);
+        String token = provider.createToken(principal);
         String invalidSignature = token.substring(0, token.length()-2) + "dW";
         assertFalse(provider.validateToken(invalidSignature));
 

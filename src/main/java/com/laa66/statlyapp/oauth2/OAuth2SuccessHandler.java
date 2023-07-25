@@ -34,12 +34,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         OAuth2UserWrapper principal = (OAuth2UserWrapper) authentication.getPrincipal();
         spotifyTokenRepository.saveToken(principal.getUserId(), token);
         if (response.isCommitted()) return;
-        String url = determineTargetUrl(request, principal.getUserId());
+        String url = determineTargetUrl(request, principal);
         clearAuthenticationAttributes(request, response);
         getRedirectStrategy().sendRedirect(request, response, url);
     }
 
-    protected String determineTargetUrl(HttpServletRequest request, long userId) {
+    protected String determineTargetUrl(HttpServletRequest request, OAuth2UserWrapper principal) {
         Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
 
@@ -50,7 +50,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 });
 
         String redirectUrl = redirectUri.orElse(getDefaultTargetUrl());
-        String jwtToken = tokenProvider.createToken(userId);
+        String jwtToken = tokenProvider.createToken(principal);
         return UriComponentsBuilder.fromUriString(redirectUrl)
                 .queryParam("jwt", jwtToken)
                 .build()

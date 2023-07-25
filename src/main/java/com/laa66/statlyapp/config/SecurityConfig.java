@@ -3,6 +3,7 @@ package com.laa66.statlyapp.config;
 import com.laa66.statlyapp.jwt.JwtProvider;
 import com.laa66.statlyapp.oauth2.CustomOAuth2UserService;
 import com.laa66.statlyapp.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.laa66.statlyapp.oauth2.OAuth2FailureHandler;
 import com.laa66.statlyapp.oauth2.OAuth2SuccessHandler;
 import com.laa66.statlyapp.repository.SpotifyTokenRepository;
 import com.laa66.statlyapp.service.UserService;
@@ -30,7 +31,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.Collections;
 
 @Configuration
@@ -68,6 +68,11 @@ public class SecurityConfig {
     }
 
     @Bean
+    public OAuth2FailureHandler oAuth2FailureHandler(HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) {
+        return new OAuth2FailureHandler(httpCookieOAuth2AuthorizationRequestRepository);
+    }
+
+    @Bean
     public HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository() {
         return new HttpCookieOAuth2AuthorizationRequestRepository();
     }
@@ -95,7 +100,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity,
                                                    OAuth2UserService<OAuth2UserRequest, OAuth2User> userService,
                                                    HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository,
-                                                   OAuth2SuccessHandler oAuth2SuccessHandler) throws Exception {
+                                                   OAuth2SuccessHandler oAuth2SuccessHandler,
+                                                   OAuth2FailureHandler oAuth2FailureHandler) throws Exception {
         httpSecurity.sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -116,7 +122,8 @@ public class SecurityConfig {
                 .userInfoEndpoint()
                 .userService(userService)
                 .and()
-                .successHandler(oAuth2SuccessHandler);
+                .successHandler(oAuth2SuccessHandler)
+                .failureHandler(oAuth2FailureHandler);
         return httpSecurity.build();
     }
 

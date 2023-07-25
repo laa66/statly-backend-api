@@ -1,5 +1,6 @@
 package com.laa66.statlyapp.jwt;
 
+import com.laa66.statlyapp.model.OAuth2UserWrapper;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -18,11 +19,11 @@ public class JwtProvider {
         secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     }
 
-    public String createToken(long userId) {
+    public String createToken(OAuth2UserWrapper principal) {
         Date issuedAt = new Date();
         Date expiredAt = new Date(issuedAt.getTime() + TimeUnit.MINUTES.toMillis(60));
         return Jwts.builder()
-                .setSubject(Long.toString(userId))
+                .setSubject(Long.toString(principal.getUserId()))
                 .setIssuer("statly")
                 .setIssuedAt(issuedAt)
                 .setExpiration(expiredAt)

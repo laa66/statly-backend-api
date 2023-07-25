@@ -63,7 +63,7 @@ class OAuth2SuccessHandlerUnitTest {
     @Test
     void shouldOnAuthenticationSuccessValidRedirectUri() throws IOException {
         request.setCookies(new Cookie("redirect_uri", "http://localhost:3000"));
-        when(jwtProvider.createToken(1)).thenReturn("header.payload.signature");
+        when(jwtProvider.createToken((OAuth2UserWrapper) authentication.getPrincipal())).thenReturn("header.payload.signature");
         oAuth2SuccessHandler.onAuthenticationSuccess(request, response, authentication);
         assertEquals("http://localhost:3000?jwt=header.payload.signature", response.getRedirectedUrl());
         assertNotNull(request.getCookies());
@@ -71,7 +71,7 @@ class OAuth2SuccessHandlerUnitTest {
 
     @Test
     void shouldOnAuthenticationSuccessEmptyRedirectUri() throws IOException {
-        when(jwtProvider.createToken(1)).thenReturn("header.payload.signature");
+        when(jwtProvider.createToken((OAuth2UserWrapper) authentication.getPrincipal())).thenReturn("header.payload.signature");
         oAuth2SuccessHandler.onAuthenticationSuccess(request, response, authentication);
         assertEquals("/?jwt=header.payload.signature", response.getRedirectedUrl());
     }
