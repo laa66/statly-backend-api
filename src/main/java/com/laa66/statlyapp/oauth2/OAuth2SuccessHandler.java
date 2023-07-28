@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
@@ -49,8 +50,19 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                             .equalsIgnoreCase(reUri.getHost())) throw new BadRequestException("Unauthorized redirect URI");
                 });
 
-        String redirectUrl = redirectUri.orElse(getDefaultTargetUrl());
         String jwtToken = tokenProvider.createToken(principal);
+        String redirectUrl = redirectUri.orElse(getDefaultTargetUrl());
+        if (redirectUrl.contains("#")) {
+            String[] splitHashUrl = redirectUrl.split("#");
+            UriComponents fragmentUri = UriComponentsBuilder.fromUriString(splitHashUrl[1])
+                    .queryParam("jwt", jwtToken)
+                    .build();
+            UriComponents uri = UriComponentsBuilder.fromUriString(splitHashUrl[0])
+                    .fragment(fragmentUri.toUriString())
+                    .build();
+            return uri.toUriString();
+
+        }
         return UriComponentsBuilder.fromUriString(redirectUrl)
                 .queryParam("jwt", jwtToken)
                 .build()

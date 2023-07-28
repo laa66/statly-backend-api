@@ -2,10 +2,7 @@ package com.laa66.statlyapp.config;
 
 import com.laa66.statlyapp.jwt.JwtAuthenticationFilter;
 import com.laa66.statlyapp.jwt.JwtProvider;
-import com.laa66.statlyapp.oauth2.CustomOAuth2UserService;
-import com.laa66.statlyapp.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
-import com.laa66.statlyapp.oauth2.OAuth2FailureHandler;
-import com.laa66.statlyapp.oauth2.OAuth2SuccessHandler;
+import com.laa66.statlyapp.oauth2.*;
 import com.laa66.statlyapp.repository.SpotifyTokenRepository;
 import com.laa66.statlyapp.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
@@ -114,19 +111,24 @@ public class SecurityConfig {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .csrf()
-                .disable()
+                    .csrf()
+                    .disable()
                 .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.GET, "/beta/join").permitAll()
-                .requestMatchers("/beta/all", "/beta/delete", "/beta/notification").access((authentication, object) ->
-                        new AuthorizationDecision(((OAuth2User) authentication.get().getPrincipal()).getAttributes().get("email").equals(ADMIN_EMAIL)))
+                    .requestMatchers(HttpMethod.GET, "/beta/join")
+                    .permitAll()
+                    .requestMatchers("/beta/all", "/beta/delete", "/beta/notification")
+                    .access((authentication, object) ->
+                        new AuthorizationDecision(((OAuth2User) authentication.get().getPrincipal())
+                                .getAttributes()
+                                .get("email")
+                                .equals(ADMIN_EMAIL)))
                 .anyRequest()
                 .authenticated()
                 .and()
                 .oauth2Login()
-                .authorizationEndpoint()
-                .baseUri("/oauth2/authorize")
-                .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
+                    .authorizationEndpoint()
+                    .baseUri("/oauth2/authorize")
+                    .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
                 .and()
                 .userInfoEndpoint()
                 .userService(userService)

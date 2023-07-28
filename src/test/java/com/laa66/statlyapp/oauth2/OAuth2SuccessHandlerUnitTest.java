@@ -70,6 +70,15 @@ class OAuth2SuccessHandlerUnitTest {
     }
 
     @Test
+    void shouldOnAuthenticationSuccessValidRedirectUriWithHash() throws IOException {
+        request.setCookies(new Cookie("redirect_uri", "http://localhost:3000/statly-frontend/#/callback"));
+        when(jwtProvider.createToken((OAuth2UserWrapper) authentication.getPrincipal())).thenReturn("header.payload.signature");
+        oAuth2SuccessHandler.onAuthenticationSuccess(request, response, authentication);
+        assertEquals("http://localhost:3000/statly-frontend/#/callback?jwt=header.payload.signature", response.getRedirectedUrl());
+        assertNotNull(request.getCookies());
+    }
+
+    @Test
     void shouldOnAuthenticationSuccessEmptyRedirectUri() throws IOException {
         when(jwtProvider.createToken((OAuth2UserWrapper) authentication.getPrincipal())).thenReturn("header.payload.signature");
         oAuth2SuccessHandler.onAuthenticationSuccess(request, response, authentication);
