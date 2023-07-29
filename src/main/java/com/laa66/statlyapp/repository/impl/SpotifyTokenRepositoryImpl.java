@@ -3,7 +3,6 @@ package com.laa66.statlyapp.repository.impl;
 import com.laa66.statlyapp.exception.UserAuthenticationException;
 import com.laa66.statlyapp.repository.SpotifyTokenRepository;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.cache.CacheManager;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 

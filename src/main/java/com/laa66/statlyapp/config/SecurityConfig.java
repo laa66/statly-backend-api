@@ -11,20 +11,23 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -77,6 +80,11 @@ public class SecurityConfig {
     }
 
     @Bean
+    public OAuth2LogoutHandler oAuth2LogoutHandler(SpotifyTokenRepository spotifyTokenRepository) {
+        return new OAuth2LogoutHandler(spotifyTokenRepository);
+    }
+
+    @Bean
     public HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository() {
         return new HttpCookieOAuth2AuthorizationRequestRepository();
     }
@@ -106,13 +114,12 @@ public class SecurityConfig {
                                                    HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository,
                                                    OAuth2SuccessHandler oAuth2SuccessHandler,
                                                    OAuth2FailureHandler oAuth2FailureHandler,
-                                                   JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
-        httpSecurity.addFilterBefore(jwtAuthenticationFilter, OAuth2LoginAuthenticationFilter.class)
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                    .csrf()
-                    .disable()
+                                                   JwtAuthenticationFilter jwtAuthenticationFilter,
+                                                   OAuth2LogoutHandler oAuth2LogoutHandler) throws Exception {
+        httpSecurity
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests()
                     .requestMatchers(HttpMethod.GET, "/beta/join")
                     .permitAll()
@@ -125,16 +132,21 @@ public class SecurityConfig {
                 .anyRequest()
                 .authenticated()
                 .and()
-                .oauth2Login()
-                    .authorizationEndpoint()
-                    .baseUri("/oauth2/authorize")
-                    .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
-                .and()
-                .userInfoEndpoint()
-                .userService(userService)
-                .and()
-                .successHandler(oAuth2SuccessHandler)
-                .failureHandler(oAuth2FailureHandler);
+                .oauth2Login(login -> login
+                        .authorizationEndpoint(endpoint -> endpoint
+                                .baseUri("/oauth2/authorize")
+                                .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
+                        .userInfoEndpoint(infoEndpoint -> infoEndpoint
+                                .userService(userService))
+                        .successHandler(oAuth2SuccessHandler)
+                        .failureHandler(oAuth2FailureHandler))
+                .logout(logout -> logout
+                        .logoutUrl("/user/logout")
+                        .permitAll(false)
+                        .clearAuthentication(false)
+                        .addLogoutHandler(oAuth2LogoutHandler)
+                        .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
+                .addFilterBefore(jwtAuthenticationFilter, LogoutFilter.class);
         return httpSecurity.build();
     }
 
