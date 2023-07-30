@@ -1,6 +1,7 @@
 package com.laa66.statlyapp.oauth2;
 
 import com.laa66.statlyapp.exception.UserAuthenticationException;
+import com.laa66.statlyapp.model.OAuth2UserWrapper;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.security.core.AuthenticationException;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class OAuth2FailureHandlerUnitTest {
@@ -40,9 +42,16 @@ class OAuth2FailureHandlerUnitTest {
 
     @Test
     void shouldOnAuthenticationFailureWithRedirectUri() throws IOException {
-        request.setCookies(new Cookie("redirect_uri", "http://localhost:3000"));
+        request.setCookies(new Cookie("redirect_uri", "http://localhost:3000/callback"));
         oAuth2FailureHandler.onAuthenticationFailure(request, response, exception);
-        assertEquals("http://localhost:3000?error=User cannot be properly authenticated", response.getRedirectedUrl());
+        assertEquals("http://localhost:3000/callback?error=User cannot be properly authenticated", response.getRedirectedUrl());
+    }
+
+    @Test
+    void shouldOnAuthenticationSuccessValidRedirectUriWithHash() throws IOException {
+        request.setCookies(new Cookie("redirect_uri", "http://localhost:3000/statly-frontend/#/callback"));
+        oAuth2FailureHandler.onAuthenticationFailure(request, response, exception);
+        assertEquals("http://localhost:3000/statly-frontend/#/callback?error=User cannot be properly authenticated", response.getRedirectedUrl());
     }
 
     @Test
