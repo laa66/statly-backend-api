@@ -1,6 +1,7 @@
 package com.laa66.statlyapp.service;
 
 import com.laa66.statlyapp.DTO.*;
+import com.laa66.statlyapp.exception.TooManyRequestsException;
 import com.laa66.statlyapp.model.*;
 import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
 import com.laa66.statlyapp.service.impl.LibraryAnalysisServiceImpl;
@@ -127,7 +128,7 @@ class LibraryAnalysisServiceImplUnitTest {
     }
 
     @Test
-    void shouldMakePlaylistBattle() {
+    void shouldCreatePlaylistBattle() {
         TracksDTO tracks1 = new TracksDTO();
         TracksDTO tracks2 = new TracksDTO();
         AnalysisDTO analysis1 = new AnalysisDTO(Map.of("tempo", 120.,
@@ -151,6 +152,7 @@ class LibraryAnalysisServiceImplUnitTest {
                 .getTracksAnalysis(tracks1, null);
         doReturn(analysis2).when(libraryAnalysisService)
                 .getTracksAnalysis(tracks2, null);
+        when(statsService.isBattlePossible(1, 2)).thenReturn(true);
         BattleResultDTO battleResultDTO = libraryAnalysisService.createPlaylistBattle(1L, 2L,
                 tracks1, tracks2);
         verify(socialService, times(2)).updatePoints(anyLong(), anyInt());
@@ -162,7 +164,7 @@ class LibraryAnalysisServiceImplUnitTest {
     }
 
     @Test
-    void shouldMakePlaylistBattleNoContest() {
+    void shouldCreatePlaylistBattleNoContest() {
         TracksDTO tracks1 = new TracksDTO();
         TracksDTO tracks2 = new TracksDTO();
         AnalysisDTO analysis1 = new AnalysisDTO(Map.of("tempo", 120.,
@@ -185,11 +187,18 @@ class LibraryAnalysisServiceImplUnitTest {
                 .getTracksAnalysis(tracks1, null);
         doReturn(analysis2).when(libraryAnalysisService)
                 .getTracksAnalysis(tracks2, null);
+        when(statsService.isBattlePossible(1, 2)).thenReturn(true);
         BattleResultDTO battleResultDTO = libraryAnalysisService.createPlaylistBattle(1L, 2L,
                 tracks1, tracks2);
         assertEquals(0., battleResultDTO.getResult());
         assertEquals(315., battleResultDTO.getWinner().getScore());
         assertEquals(315., battleResultDTO.getLoser().getScore());
+    }
+
+    @Test
+    void shouldCreatePlaylistBattleTooManyBattle() {
+        when(statsService.isBattlePossible(1,2)).thenReturn(false);
+        assertThrows(TooManyRequestsException.class, () -> libraryAnalysisService.createPlaylistBattle(1, 2, null, null));
     }
 
 }

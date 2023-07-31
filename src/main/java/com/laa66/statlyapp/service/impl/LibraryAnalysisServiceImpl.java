@@ -1,14 +1,11 @@
 package com.laa66.statlyapp.service.impl;
 
 import com.laa66.statlyapp.DTO.*;
+import com.laa66.statlyapp.exception.TooManyRequestsException;
 import com.laa66.statlyapp.model.*;
 import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
-import com.laa66.statlyapp.service.LibraryAnalysisService;
-import com.laa66.statlyapp.service.SocialService;
-import com.laa66.statlyapp.service.SpotifyAPIService;
-import com.laa66.statlyapp.service.StatsService;
+import com.laa66.statlyapp.service.*;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.util.Pair;
@@ -99,6 +96,8 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
     @Override
     public BattleResultDTO createPlaylistBattle(long userId, long battleUserId,
                                               TracksDTO playlist, TracksDTO battlePlaylist) {
+        if (!statsService.isBattlePossible(userId, battleUserId))
+            throw new TooManyRequestsException("You can have a maximum of 10 battles");
         AnalysisDTO playlistAnalysis = getTracksAnalysis(playlist, null);
         AnalysisDTO battlePlaylistAnalysis = getTracksAnalysis(battlePlaylist, null);
         Battler user = new Battler(userId, playlistAnalysis);

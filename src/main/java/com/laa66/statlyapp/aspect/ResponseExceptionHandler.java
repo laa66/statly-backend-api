@@ -15,6 +15,12 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler({TooManyRequestsException.class})
+    public ResponseEntity<ExceptionDTO> handleTooManyRequestsException(TooManyRequestsException e) {
+        ExceptionDTO exceptionDTO = new ExceptionDTO(HttpStatus.TOO_MANY_REQUESTS.value(), e.getMessage(), System.currentTimeMillis());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(exceptionDTO);
+    }
+
     @ExceptionHandler({BadRequestException.class})
     public ResponseEntity<ExceptionDTO> handleBadRequestException(BadRequestException e) {
         ExceptionDTO exceptionDTO = new ExceptionDTO(HttpStatus.BAD_REQUEST.value(), e.getMessage(), System.currentTimeMillis());

@@ -48,7 +48,7 @@ public class SocialServiceImplUnitTest {
                 "test@mail.com",
                 "url",
                 LocalDateTime.of(2022, 11, 20, 20, 20),
-                new UserStats(1, 40.0, 30.0, 50.0, 300.0, 500));
+                new UserStats(1, 40.0, 30.0, 50.0, 300.0, 500, 0));
         TracksDTO tracksDTO = new TracksDTO(List.of(new Track(List.of(new Artist("artist")), "title"))
                 , "2", "long", null);
         ArtistsDTO artistsDTO = new ArtistsDTO("1", List.of(new Artist("artist"))
@@ -156,10 +156,10 @@ public class SocialServiceImplUnitTest {
     @Test
     void shouldUpdatePoints() {
         User user = new User(1L, "id", "username1","test1@mail.com", "url1", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats(
-                1, 0,0,0,0,0
+                1, 0,0,0,0,0, 0
         ));
         User userToSave = new User(1L, "id", "username1","test1@mail.com", "url1", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats(
-                1, 0, 0, 0, 0, 10
+                1, 0, 0, 0, 0, 10, 0
         ));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userRepository.save(any())).thenReturn(userToSave);
@@ -173,10 +173,10 @@ public class SocialServiceImplUnitTest {
     @Test
     void shouldUpdatePointsSubLessThan0() {
         User user = new User(1L, "id", "username1","test1@mail.com", "url1", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats(
-                1, 0,0,0,0,3
+                1, 0,0,0,0,3, 0
         ));
         User userToSave = new User(1L, "id", "username1","test1@mail.com", "url1", LocalDateTime.of(2022, 11, 20, 20, 20), new UserStats(
-                1, 0, 0, 0, 0, 0
+                1, 0, 0, 0, 0, 0, 0
         ));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userRepository.save(any())).thenReturn(userToSave);
@@ -191,10 +191,10 @@ public class SocialServiceImplUnitTest {
     void shouldUpdateSocialLinks() {
         User user = new User(1L, "id", "username","test@mail.com", "url", LocalDateTime.of(2022, 11, 20, 20, 20),
                 new UserStats(
-                1, 0,0,0,0,0, "ig", null, null));
+                1, 0,0,0,0,0, "ig", null, null, 0));
         User returnUser = new User(1L, "id", "username","test@mail.com", "url", LocalDateTime.of(2022, 11, 20, 20, 20),
                 new UserStats(
-                        1, 0,0,0,0,0, "ig", "fb", null));
+                        1, 0,0,0,0,0, "ig", "fb", null, 0));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userRepository.save(argThat(argument ->
                 argument.getUserStats().getFb().equalsIgnoreCase("fb") &&

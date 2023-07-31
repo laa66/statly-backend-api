@@ -26,13 +26,17 @@ public class UserStats {
     private String fb;
     private String twitter;
 
-    public UserStats(long id, double energy, double tempo, double mainstream, double boringness, long points) {
+    @Column(name = "battle_count")
+    private int battleCount;
+
+    public UserStats(long id, double energy, double tempo, double mainstream, double boringness, long points, int battleCount) {
         this.id = id;
         this.energy = energy;
         this.tempo = tempo;
         this.mainstream = mainstream;
         this.boringness = boringness;
         this.points = points;
+        this.battleCount = battleCount;
     }
 
 

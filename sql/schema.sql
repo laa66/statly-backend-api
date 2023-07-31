@@ -5,9 +5,10 @@ CREATE TABLE IF NOT EXISTS user_stats (
     mainstream DOUBLE NOT NULL,
     boringness DOUBLE NOT NULL,
     points BIGINT NOT NULL,
-    ig VARCHAR(100),
     fb VARCHAR(100),
+    ig VARCHAR(100),
     twitter VARCHAR(100),
+    battle_count INT NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -46,7 +47,7 @@ CREATE TABLE IF NOT EXISTS user_tracks (
     date DATE NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY (user_id, time_range, date),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+	KEY (user_id)
 );
 
 CREATE TABLE IF NOT EXISTS user_artists (
@@ -57,7 +58,7 @@ CREATE TABLE IF NOT EXISTS user_artists (
     date DATE NOT NULL,
     PRIMARY KEY (id),
 	UNIQUE KEY (user_id, time_range, date),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+	KEY (user_id)
 );
 
 CREATE TABLE IF NOT EXISTS user_genres (
@@ -68,5 +69,11 @@ CREATE TABLE IF NOT EXISTS user_genres (
     date DATE NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY (user_id, time_range, date),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+	KEY (user_id)
 );
+
+CREATE EVENT IF NOT EXISTS battle_event
+ON SCHEDULE EVERY 1 DAY
+STARTS (TIMESTAMP(CURRENT_DATE))
+DO
+UPDATE user_stats SET battle_count = 0;

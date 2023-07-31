@@ -33,4 +33,6 @@ public interface StatsService {
 
     Pair<Integer, Integer> matchGenres(long userId, long matchUserId);
 
+    boolean isBattlePossible(long userId, long battleUserId);
+
 }

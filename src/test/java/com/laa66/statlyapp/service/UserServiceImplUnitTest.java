@@ -86,10 +86,10 @@ class UserServiceImplUnitTest {
     @Test
     void shouldFindAllUsersOrderByPoints() {
         User user1 = new User(1, "id1", "username1", "user1@mail.com", "url", LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats(
-                1, 0., 0., 0., 0., 130
+                1, 0., 0., 0., 0., 130, 0
         ));
         User user2 = new User(2, "id2", "username2", "user2@mail.com", "url", LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats(
-                2, 0., 0., 0., 0., 380
+                2, 0., 0., 0., 0., 380, 0
         ));
         when(userRepository.findAllUsersOrderByPoints()).thenReturn(List.of(user2, user1));
         List<UserDTO> users = userService.findAllUsersOrderByPoints();

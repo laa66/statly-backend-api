@@ -118,7 +118,8 @@ public class StatsServiceImpl implements StatsService {
                             foundUser.getUserStats().getPoints(),
                             foundUser.getUserStats().getIg(),
                             foundUser.getUserStats().getFb(),
-                            foundUser.getUserStats().getTwitter()
+                            foundUser.getUserStats().getTwitter(),
+                            foundUser.getUserStats().getBattleCount()
                     ));
                     return foundUser;
                 }).orElseThrow(() -> new UserNotFoundException("User not found"));
@@ -246,5 +247,16 @@ public class StatsServiceImpl implements StatsService {
                         )))
                 .orElse(0);
         return Pair.of(matching, comparingSize.get());
+    }
+
+    @Override
+    public boolean isBattlePossible(long userId, long battleUserId) {
+        int battleCount = userRepository.findById(userId)
+                .map(user -> user.getUserStats().getBattleCount())
+                .orElse(10);
+        int battleCountBattle = userRepository.findById(battleUserId)
+                .map(user -> user.getUserStats().getBattleCount())
+                .orElse(10);
+        return battleCount < 10 && battleCountBattle < 10;
     }
 }

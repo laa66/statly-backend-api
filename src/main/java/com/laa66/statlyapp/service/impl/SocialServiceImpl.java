@@ -77,7 +77,9 @@ public class SocialServiceImpl implements SocialService {
         return userRepository.save(userRepository.findById(userId)
                 .map(user -> {
                     long score = user.getUserStats().getPoints() + points < 0 ? 0 : user.getUserStats().getPoints() + points;
+                    int battleCount = points <= 0 ? user.getUserStats().getBattleCount() : user.getUserStats().getBattleCount() + 1;
                     user.getUserStats().setPoints(score);
+                    user.getUserStats().setBattleCount(battleCount);
                     return user;
                 }).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER));
     }
