@@ -21,19 +21,6 @@ import java.util.*;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BetaUserRepository betaUserRepository;
-    private final String clientUrl;
-
-    @Override
-    public String authenticateUser(UserDTO userDTO, long userId) {
-        String imageUrl = userDTO.getImages().stream()
-                .findFirst()
-                .map(Image::getUrl)
-                .orElse("none");
-        return clientUrl + "/statly-frontend/#/callback?name=" +
-                StringUtils.stripAccents(userDTO.getName()) + "&url=" +
-                (imageUrl.equals("none") ? "./account.png"  : imageUrl) +
-                "&user_id=" + userId;
-    }
 
     @Override
     public UserDTO findUserByEmail(String email) {

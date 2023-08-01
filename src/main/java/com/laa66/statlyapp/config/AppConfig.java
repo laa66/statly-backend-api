@@ -48,9 +48,8 @@ public class AppConfig {
 
     @Bean
     public UserService userService(UserRepository userRepository,
-                                   BetaUserRepository betaUserRepository,
-                                   @Value("${api.client.url}") String clientUrl) {
-        return new UserServiceImpl(userRepository, betaUserRepository, clientUrl);
+                                   BetaUserRepository betaUserRepository) {
+        return new UserServiceImpl(userRepository, betaUserRepository);
     }
 
     @Bean

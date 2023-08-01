@@ -4,20 +4,26 @@ import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.config.TestSecurityConfig;
 import com.laa66.statlyapp.constants.StatlyConstants;
 import com.laa66.statlyapp.exception.UserNotFoundException;
+import com.laa66.statlyapp.jwt.JwtProvider;
 import com.laa66.statlyapp.model.*;
+import com.laa66.statlyapp.repository.SpotifyTokenRepository;
 import com.laa66.statlyapp.service.SocialService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +42,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserControllerIntegrationTest {
 
     @MockBean
+    SpotifyTokenRepository spotifyTokenRepository;
+
+    @MockBean
+    JwtProvider jwtProvider;
+
+    @MockBean
     SpotifyAPIService spotifyAPIService;
 
     @MockBean
@@ -49,27 +61,23 @@ class UserControllerIntegrationTest {
 
     ObjectMapper mapper = new ObjectMapper();
 
-    @Test
-    void shouldAuthUser() throws Exception {
-        Image image = new Image("imageUrl", null, null);
-        UserDTO userDTO = new UserDTO("1", "uri", "test@mail.com", "testuser", List.of(image), 0);
-        when(spotifyAPIService.getCurrentUser()).thenReturn(userDTO);
-        when(userService.authenticateUser(userDTO, 1)).thenReturn("url/callback?name=testuser&url=imageurl&user_id=1");
-        mockMvc.perform(MockMvcRequestBuilders.get("/user/auth").with(oauth2Login()
-                        .attributes(map -> map.put("userId", 1L))))
-                .andExpect(status().isTemporaryRedirect())
-                .andExpect(header().string("location", "url/callback?name=testuser&url=imageurl&user_id=1"));
+    OAuth2AuthenticationToken token;
 
-        mockMvc.perform(get("/user/auth")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isFound());
+    @BeforeEach
+    void setup() {
+        token = new OAuth2AuthenticationToken(new OAuth2UserWrapper(new DefaultOAuth2User(
+                Collections.emptyList(), Map.of("display_name", "name", "userId", 1L, "country", "ES"), "display_name"
+        )), Collections.emptyList(), "client");
+        when(jwtProvider.validateToken("token")).thenReturn(true);
+        when(jwtProvider.getIdFromToken("token")).thenReturn(1L);
+        when(spotifyTokenRepository.getToken(1L)).thenReturn(token);
     }
 
     @Test
     void shouldDelete() throws Exception {
         doNothing().when(userService).deleteUser(1L);
-        mockMvc.perform(delete("/user/me/delete").with(oauth2Login()
-                                .attributes(map -> map.put("userId", 1L)))
+        mockMvc.perform(delete("/user/me/delete")
+                        .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -83,8 +91,8 @@ class UserControllerIntegrationTest {
         UserDTO userDTO = new UserDTO("1", "uri", "mail", "username", List.of(), 0);
         when(userService.findAllMatchingUsers("name")).thenReturn(List.of(userDTO));
         mockMvc.perform(get("/user/search?username=name")
-                .with(oauth2Login())
-                .contentType(MediaType.APPLICATION_JSON))
+                        .header("Authorization", "Bearer token")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$[0].id", is("1")),
@@ -93,8 +101,8 @@ class UserControllerIntegrationTest {
 
         when(userService.findAllMatchingUsers("none")).thenReturn(List.of());
         mockMvc.perform(get("/user/search?username=none")
-                .with(oauth2Login())
-                .contentType(MediaType.APPLICATION_JSON))
+                        .header("Authorization", "Bearer token")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$").isEmpty()
@@ -110,8 +118,8 @@ class UserControllerIntegrationTest {
         UserDTO userDTO = new UserDTO("1", "uri", "mail", "name", List.of(), 0);
         when(userService.findUserById(1L)).thenReturn(userDTO);
         mockMvc.perform(get("/user/me")
-                        .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .header("Authorization", "Bearer token")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.id", is("1")),
@@ -133,8 +141,8 @@ class UserControllerIntegrationTest {
         when(socialService.getFollowers(1, StatlyConstants.FOLLOWING))
                 .thenReturn(followersDTO);
         mockMvc.perform(get("/user/me/following")
-                .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .header("Authorization", "Bearer token")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.size", is(1)),
@@ -151,8 +159,7 @@ class UserControllerIntegrationTest {
     @Test
     void shouldFollowValidFollowId() throws Exception {
         mockMvc.perform(put("/user/follow?user_id=2")
-                        .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
-                        .with(csrf())
+                        .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
         verify(socialService, times(1)).follow(1, 2);
@@ -166,8 +173,7 @@ class UserControllerIntegrationTest {
     void shouldFollowNotValidFollowId() throws Exception {
         when(socialService.follow(1, 3)).thenThrow(new UserNotFoundException("User not found"));
         mockMvc.perform(put("/user/follow?user_id=3")
-                        .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
-                        .with(csrf())
+                        .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -175,8 +181,7 @@ class UserControllerIntegrationTest {
     @Test
     void shouldUnfollowValidFollowId() throws Exception {
         mockMvc.perform(put("/user/unfollow?user_id=2")
-                        .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
-                        .with(csrf())
+                        .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
         verify(socialService, times(1)).unfollow(1, 2);
@@ -190,8 +195,7 @@ class UserControllerIntegrationTest {
     void shouldUnfollowNotValidFollowId() throws Exception {
         when(socialService.unfollow(1, 3)).thenThrow(new UserNotFoundException("User not found"));
         mockMvc.perform(put("/user/unfollow?user_id=3")
-                        .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
-                        .with(csrf())
+                        .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -216,8 +220,7 @@ class UserControllerIntegrationTest {
         );
         when(socialService.getUserProfile(1)).thenReturn(profileDTO);
         mockMvc.perform(get("/user/profile?user_id=1")
-                .with(oauth2Login())
-                .contentType(MediaType.APPLICATION_JSON))
+                        .header("Authorization", "Bearer token"))
                 .andExpectAll(status().isOk(),
                         jsonPath("$.username", is("username")),
                         jsonPath("$.imageUrl", is("url")),
@@ -232,7 +235,7 @@ class UserControllerIntegrationTest {
     void shouldGetProfileNotValidId() throws Exception {
         when(socialService.getUserProfile(2)).thenThrow(new UserNotFoundException("User not found"));
         mockMvc.perform(get("/user/profile?user_id=2")
-                        .with(oauth2Login())
+                        .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -249,7 +252,8 @@ class UserControllerIntegrationTest {
                         ,150)
         ));
         mockMvc.perform(get("/user/rank")
-                .with(oauth2Login()).contentType(MediaType.APPLICATION_JSON))
+                        .header("Authorization", "Bearer token")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$").isArray(),
@@ -267,9 +271,7 @@ class UserControllerIntegrationTest {
         links.put("ig", "ig");
         links.put("twitter", null);
         mockMvc.perform(put("/user/links")
-                .with(oauth2Login().
-                        attributes(map -> map.put("userId", 1L)))
-                        .with(csrf())
+                        .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(links)))
                 .andExpect(status().isNoContent());

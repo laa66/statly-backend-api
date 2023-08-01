@@ -3,30 +3,40 @@ package com.laa66.statlyapp.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.config.TestSecurityConfig;
+import com.laa66.statlyapp.jwt.JwtProvider;
 import com.laa66.statlyapp.model.*;
 import com.laa66.statlyapp.model.response.ResponsePlaylists;
+import com.laa66.statlyapp.repository.SpotifyTokenRepository;
 import com.laa66.statlyapp.service.LibraryAnalysisService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.*;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ApiController.class)
 @Import(TestSecurityConfig.class)
 class ApiControllerIntegrationTest {
+
+    @MockBean
+    SpotifyTokenRepository spotifyTokenRepository;
+
+    @MockBean
+    JwtProvider jwtProvider;
 
     @MockBean
     LibraryAnalysisService libraryAnalysisService;
@@ -39,12 +49,24 @@ class ApiControllerIntegrationTest {
 
     ObjectMapper mapper = new ObjectMapper();
 
+    OAuth2AuthenticationToken token;
+
+    @BeforeEach
+    void setup() {
+        token = new OAuth2AuthenticationToken(new OAuth2UserWrapper(new DefaultOAuth2User(
+                        Collections.emptyList(), Map.of("display_name", "name", "userId", 1L, "country", "ES"), "display_name"
+                )), Collections.emptyList(), "client");
+        when(jwtProvider.validateToken("token")).thenReturn(true);
+        when(jwtProvider.getIdFromToken("token")).thenReturn(1L);
+        when(spotifyTokenRepository.getToken(1L)).thenReturn(token);
+    }
+
     @Test
     void shouldGetTopTracks() throws Exception {
         TracksDTO tracksDTO = new TracksDTO(List.of(new Track()), "1", "short", null);
         when(spotifyAPIService.getTopTracks(1, "short")).thenReturn(tracksDTO);
-        mockMvc.perform(get("/api/top/tracks").with(oauth2Login()
-                                .attributes(map -> map.put("userId", 1L)))
+        mockMvc.perform(get("/api/top/tracks")
+                        .header("Authorization", "Bearer token")
                         .param("range", "short")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -62,10 +84,10 @@ class ApiControllerIntegrationTest {
     void shouldGetTopArtists() throws Exception {
         ArtistsDTO artistsDTO = new ArtistsDTO("1", List.of(new Artist()), "short", null);
         when(spotifyAPIService.getTopArtists(1, "short")).thenReturn(artistsDTO);
-        mockMvc.perform(get("/api/top/artists").with(oauth2Login()
-                                .attributes(map -> map.put("userId", 1L)))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .param("range", "short"))
+        mockMvc.perform(get("/api/top/artists")
+                        .header("Authorization", "Bearer token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("range", "short"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total", is("1")))
                 .andExpect(jsonPath("$.items").exists());
@@ -83,10 +105,10 @@ class ApiControllerIntegrationTest {
         ArtistsDTO artistsDTO = new ArtistsDTO("1", List.of(new Artist()), "short", null);
         when(spotifyAPIService.getTopArtists(1, "short")).thenReturn(artistsDTO);
         when(libraryAnalysisService.getTopGenres(1, "short", artistsDTO)).thenReturn(genresDTO);
-        mockMvc.perform(get("/api/top/genres").with(oauth2Login()
-                                .attributes(map -> map.put("userId", 1L)))
-                .contentType(MediaType.APPLICATION_JSON)
-                .param("range", "short"))
+        mockMvc.perform(get("/api/top/genres")
+                        .header("Authorization", "Bearer token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("range", "short"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.genres[0].genre", is("rock")))
                 .andExpect(jsonPath("$.genres[0].score", is(2)));
@@ -102,8 +124,9 @@ class ApiControllerIntegrationTest {
         RecentlyPlayedDTO recentlyDTO = new RecentlyPlayedDTO("1", List.of(new PlaybackEvent()));
         when(spotifyAPIService.getRecentlyPlayed())
                 .thenReturn(recentlyDTO);
-        mockMvc.perform(get("/api/recently").with(oauth2Login())
-                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/recently")
+                        .header("Authorization", "Bearer token")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total", is("1")))
                 .andExpect(jsonPath("$.items").exists());
@@ -119,10 +142,9 @@ class ApiControllerIntegrationTest {
         when(spotifyAPIService.postTopTracksPlaylist(1, "short"))
                 .thenReturn(playlistDTO);
         mockMvc.perform(post("/api/playlist/create")
-                        .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
-                        .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .param("range", "short"))
+                        .header("Authorization", "Bearer token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("range", "short"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", is("1")))
                 .andExpect(jsonPath("$.external_urls").exists());
@@ -143,16 +165,14 @@ class ApiControllerIntegrationTest {
         when(spotifyAPIService.getUserPlaylists(null))
                 .thenReturn(playlists);
         mockMvc.perform(get("/api/playlist/all")
-                .with(oauth2Login())
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON))
+                        .header("Authorization", "Bearer token")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.next").doesNotExist())
                 .andExpect(jsonPath("$.total", is(1)))
                 .andExpect(jsonPath("$.items").exists());
 
         mockMvc.perform(get("/api/playlist/all")
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isFound());
     }
@@ -169,9 +189,8 @@ class ApiControllerIntegrationTest {
         when(libraryAnalysisService.getTracksAnalysis(tracksDTO, 1L))
                 .thenReturn(analysisDTO);
         mockMvc.perform(get("/api/analysis/library")
-                .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON))
+                        .header("Authorization", "Bearer token")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.analysis", hasEntry("acousticness", 0.34)),
@@ -180,7 +199,6 @@ class ApiControllerIntegrationTest {
                 );
 
         mockMvc.perform(get("/api/analysis/library")
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isFound());
     }
@@ -198,10 +216,9 @@ class ApiControllerIntegrationTest {
         when(libraryAnalysisService.getTracksAnalysis(tracksDTO, null))
                 .thenReturn(analysisDTO);
         mockMvc.perform(post("/api/analysis/playlist")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(playlistInfo))
-                .with(csrf())
-                .with(oauth2Login().attributes(map -> map.put("country", "ES"))))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(playlistInfo))
+                        .header("Authorization", "Bearer token"))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.analysis", hasEntry("acousticness", 0.34)),
@@ -231,8 +248,8 @@ class ApiControllerIntegrationTest {
         Map<String, Double> usersMatch = Map.of("track", 22., "artist", 30., "genre", 31., "overall", 40.);
         when(libraryAnalysisService.getUsersMatching(1,2)).thenReturn(usersMatch);
         mockMvc.perform(get("/api/analysis/match?user_id=2")
-                .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .header("Authorization", "Bearer token")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$", hasEntry("track", 22.)),
@@ -246,7 +263,7 @@ class ApiControllerIntegrationTest {
                 "track", 0., "artist", 0., "genre", 0., "overall", 0.
         ));
         mockMvc.perform(get("/api/analysis/match?user_id=3")
-                        .with(oauth2Login().attributes(map -> map.put("userId", 1L)))
+                        .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpectAll(
                         status().isOk(),
@@ -269,16 +286,11 @@ class ApiControllerIntegrationTest {
         when(libraryAnalysisService.createPlaylistBattle(anyLong(), anyLong(), any(), any()))
                 .thenReturn(battleResultDTO);
         mockMvc.perform(post("/api/analysis/battle?user_id=2")
-                .with(csrf())
-                .with(oauth2Login().attributes(map -> {
-                    map.put("userId", 1L);
-                    map.put("country", "ES");
-                })).contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(
-                                new BattleDTO(
+                        .header("Authorization", "Bearer token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(new BattleDTO(
                                         new PlaylistInfo(null, "id1", List.of(), "name1", null),
-                                        new PlaylistInfo(null, "id2", List.of(), "name2", null)
-                                ))))
+                                        new PlaylistInfo(null, "id2", List.of(), "name2", null)))))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.result", is(50.)),
@@ -287,11 +299,8 @@ class ApiControllerIntegrationTest {
 
 
         mockMvc.perform(post("/api/analysis/battle?user_id=2")
-                        .with(csrf())
-                        .with(oauth2Login().attributes(map -> {
-                            map.put("userId", 1L);
-                            map.put("country", "ES");
-                        })).contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer token")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(null)))
                 .andExpect(status().isBadRequest());
 

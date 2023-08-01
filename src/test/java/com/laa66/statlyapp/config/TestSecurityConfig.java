@@ -1,30 +1,41 @@
 package com.laa66.statlyapp.config;
 
+import com.laa66.statlyapp.jwt.JwtAuthenticationFilter;
+import com.laa66.statlyapp.jwt.JwtProvider;
+import com.laa66.statlyapp.oauth2.*;
+import com.laa66.statlyapp.repository.SpotifyTokenRepository;
+import com.laa66.statlyapp.repository.impl.SpotifyTokenRepositoryImpl;
+import com.laa66.statlyapp.service.UserService;
+import com.laa66.statlyapp.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
-import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import java.net.URI;
 import java.util.Collections;
 
 @TestConfiguration
@@ -40,8 +51,64 @@ public class TestSecurityConfig {
     @Value("${api.spotify.scope}")
     private String SCOPE;
 
+    @Value("${api.client.url}")
+    private String CLIENT_URL;
+
+    @Value("${statly.api.admin-email}")
+    private String ADMIN_EMAIL;
+
     @Value("${dev.react-app.url}")
     private String DEV_REACT_URL;
+
+    @Value("${jwt.provider.secret}")
+    private String STATLY_SECRET;
+
+    @Bean
+    public SpotifyTokenRepository spotifyTokenRepository() {
+        return new SpotifyTokenRepositoryImpl(null);
+    }
+
+    @Bean
+    public UserService userService() {
+        return new UserServiceImpl(null, null);
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtProvider jwtProvider, SpotifyTokenRepository spotifyTokenRepository) {
+        return new JwtAuthenticationFilter(jwtProvider, spotifyTokenRepository);
+    }
+
+    @Bean
+    public JwtProvider jwtProvider() {
+        return new JwtProvider(STATLY_SECRET);
+    }
+
+    @Bean
+    public OAuth2SuccessHandler oAuth2SuccessHandler(SpotifyTokenRepository spotifyTokenRepository,
+                                                     HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository,
+                                                     JwtProvider jwtProvider) {
+        return new OAuth2SuccessHandler(spotifyTokenRepository, httpCookieOAuth2AuthorizationRequestRepository, jwtProvider, URI.create(CLIENT_URL));
+    }
+
+    @Bean
+    public OAuth2FailureHandler oAuth2FailureHandler(HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) {
+        return new OAuth2FailureHandler(httpCookieOAuth2AuthorizationRequestRepository);
+    }
+
+    @Bean
+    public OAuth2LogoutHandler oAuth2LogoutHandler(SpotifyTokenRepository spotifyTokenRepository) {
+        return new OAuth2LogoutHandler(spotifyTokenRepository);
+    }
+
+    @Bean
+    public HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository() {
+        return new HttpCookieOAuth2AuthorizationRequestRepository();
+    }
+
+    @Bean
+    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService(UserService userService) {
+        return new CustomOAuth2UserService(userService);
+    }
 
     @Bean
     public FilterRegistrationBean<CorsFilter> customCorsFilter() {
@@ -49,7 +116,7 @@ public class TestSecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedMethods(Collections.singletonList("*"));
         config.setAllowedHeaders(Collections.singletonList("*"));
-        config.addAllowedOrigin(DEV_REACT_URL);
+        config.addAllowedOrigin(CLIENT_URL);
         config.setAllowCredentials(true);
         source.registerCorsConfiguration("/**", config);
         FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
@@ -58,29 +125,47 @@ public class TestSecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        CookieCsrfTokenRepository tokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        XorCsrfTokenRequestAttributeHandler delegate = new XorCsrfTokenRequestAttributeHandler();
-        delegate.setCsrfRequestAttributeName(null);
-        CsrfTokenRequestHandler requestHandler = delegate::handle;
-        httpSecurity.csrf().disable()
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity,
+                                                   OAuth2UserService<OAuth2UserRequest, OAuth2User> userService,
+                                                   HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository,
+                                                   OAuth2SuccessHandler oAuth2SuccessHandler,
+                                                   OAuth2FailureHandler oAuth2FailureHandler,
+                                                   JwtAuthenticationFilter jwtAuthenticationFilter,
+                                                   OAuth2LogoutHandler oAuth2LogoutHandler) throws Exception {
+        httpSecurity
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.GET, "/beta/join").permitAll()
-                .requestMatchers("/beta/all", "/beta/delete", "/beta/notification").access((authentication, object) ->
-                        new AuthorizationDecision(((OAuth2User) authentication.get().getPrincipal()).getAttributes().get("email").equals("admin@mail.com")))
+                .requestMatchers(HttpMethod.GET, "/beta/join")
+                .permitAll()
+                .requestMatchers("/beta/all", "/beta/delete", "/beta/notification")
+                .access((authentication, object) ->
+                        new AuthorizationDecision(((OAuth2User) authentication.get()
+                                .getPrincipal())
+                                .getAttributes()
+                                .get("email")
+                                .equals(ADMIN_EMAIL)))
                 .anyRequest()
                 .authenticated()
                 .and()
-                .logout()
-                .deleteCookies("JSESSIONID")
-                .invalidateHttpSession(true)
-                .clearAuthentication(true)
-                .permitAll()
-                .and()
-                .oauth2Login();
+                .oauth2Login(login -> login
+                        .authorizationEndpoint(endpoint -> endpoint
+                                .baseUri("/oauth2/authorize")
+                                .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
+                        .userInfoEndpoint(infoEndpoint -> infoEndpoint
+                                .userService(userService))
+                        .successHandler(oAuth2SuccessHandler)
+                        .failureHandler(oAuth2FailureHandler))
+                .logout(logout -> logout
+                        .logoutUrl("/user/logout")
+                        .permitAll(false)
+                        .clearAuthentication(false)
+                        .addLogoutHandler(oAuth2LogoutHandler)
+                        .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
+                .addFilterBefore(jwtAuthenticationFilter, LogoutFilter.class);
         return httpSecurity.build();
     }
-
 
     @Bean
     public ClientRegistrationRepository clientRegistrationRepository() {

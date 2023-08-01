@@ -27,15 +27,7 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
-    private final SpotifyAPIService spotifyApiService;
     private final SocialService socialService;
-
-    @GetMapping("/auth")
-    public void authenticate(@AuthenticationPrincipal OAuth2User principal, HttpServletRequest request, HttpServletResponse response) {
-        String redirectUrl = userService.authenticateUser(spotifyApiService.getCurrentUser(), (long) principal.getAttributes().get("userId"));
-        response.setStatus(HttpStatus.TEMPORARY_REDIRECT.value());
-        response.setHeader(HttpHeaders.LOCATION, redirectUrl);
-    }
 
     @GetMapping("/me")
     public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal OAuth2User principal) {

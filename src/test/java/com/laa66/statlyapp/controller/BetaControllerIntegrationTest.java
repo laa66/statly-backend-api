@@ -2,19 +2,27 @@ package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.DTO.BetaUserDTO;
 import com.laa66.statlyapp.config.TestSecurityConfig;
+import com.laa66.statlyapp.jwt.JwtProvider;
+import com.laa66.statlyapp.model.OAuth2UserWrapper;
+import com.laa66.statlyapp.repository.SpotifyTokenRepository;
 import com.laa66.statlyapp.service.MailService;
 import com.laa66.statlyapp.service.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -32,6 +40,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class BetaControllerIntegrationTest {
 
     @MockBean
+    SpotifyTokenRepository spotifyTokenRepository;
+
+    @MockBean
+    JwtProvider jwtProvider;
+
+    @MockBean
     UserService userService;
 
     @MockBean
@@ -42,6 +56,22 @@ public class BetaControllerIntegrationTest {
 
     ObjectMapper mapper = new ObjectMapper();
 
+    OAuth2AuthenticationToken token1;
+    OAuth2AuthenticationToken token2;
+
+    @BeforeEach
+    void setup() {
+        token1 = new OAuth2AuthenticationToken(new OAuth2UserWrapper(new DefaultOAuth2User(
+                Collections.emptyList(), Map.of("display_name", "name", "userId", 1L, "country", "ES", "email", "admin@mail.com"), "display_name"
+        )), Collections.emptyList(), "client");
+        token2 = new OAuth2AuthenticationToken(new OAuth2UserWrapper(new DefaultOAuth2User(
+                Collections.emptyList(), Map.of("display_name", "name", "userId", 2L, "country", "ES", "email", "user@mail.com"), "display_name"
+        )), Collections.emptyList(), "client");
+        when(jwtProvider.validateToken("token")).thenReturn(true);
+        when(jwtProvider.getIdFromToken("token")).thenReturn(1L);
+        when(spotifyTokenRepository.getToken(1L)).thenReturn(token1);
+    }
+
     @Test
     void shouldGetAllBetaUsers() throws Exception {
         List<BetaUserDTO> betaUsers = List.of(
@@ -49,8 +79,7 @@ public class BetaControllerIntegrationTest {
                 new BetaUserDTO("user2", "user2@email.com", LocalDateTime.of(2023, 1,1,11, 0, 0).toString()));
         when(userService.findAllBetaUsers()).thenReturn(betaUsers);
         mockMvc.perform(get("/beta/all")
-                        .with(oauth2Login().attributes(map ->
-                                map.put("email", "admin@mail.com")))
+                        .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -62,16 +91,19 @@ public class BetaControllerIntegrationTest {
 
     @Test
     void shouldGetAllBetaUsersWrongEmail() throws Exception {
-        mockMvc.perform(get("/beta/all").with(oauth2Login().attributes(map ->
-                                map.put("email", "wrong@mail.com")))
+        when(jwtProvider.validateToken("token2")).thenReturn(true);
+        when(jwtProvider.getIdFromToken("token2")).thenReturn(2L);
+        when(spotifyTokenRepository.getToken(2L)).thenReturn(token2);
+        mockMvc.perform(get("/beta/all")
+                        .header("Authorization", "Bearer token2")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void shouldJoinBeta() throws Exception {
-        mockMvc.perform(get("/beta/join").with(oauth2Login())
-                        .contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(get("/beta/join")
+                        .header("Authorization", "Bearer token")
                         .param("name", "name")
                         .param("email", "email"))
                 .andExpect(status().isNoContent());
@@ -82,9 +114,8 @@ public class BetaControllerIntegrationTest {
     @Test
     void shouldSentNotification() throws Exception {
         BetaUserDTO dto = new BetaUserDTO("name", "email", null);
-        mockMvc.perform(post("/beta/notification").with(oauth2Login()
-                                .attributes(map ->
-                                map.put("email", "admin@mail.com")))
+        mockMvc.perform(post("/beta/notification")
+                        .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isNoContent());
@@ -93,16 +124,19 @@ public class BetaControllerIntegrationTest {
 
     @Test
     void shouldDeleteAllBetaUsers() throws Exception {
-        mockMvc.perform(delete("/beta/delete").with(oauth2Login().attributes(map ->
-                                map.put("email", "admin@mail.com")))
+        mockMvc.perform(delete("/beta/delete")
+                        .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void shouldDeleteAllBetaUsersWrongEmail() throws Exception {
-        mockMvc.perform(delete("/beta/delete").with(oauth2Login().attributes(map ->
-                                map.put("email", "wrong@mail.com")))
+        when(jwtProvider.validateToken("token2")).thenReturn(true);
+        when(jwtProvider.getIdFromToken("token2")).thenReturn(2L);
+        when(spotifyTokenRepository.getToken(2L)).thenReturn(token2);
+        mockMvc.perform(delete("/beta/delete")
+                        .header("Authorization", "Bearer token2")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
