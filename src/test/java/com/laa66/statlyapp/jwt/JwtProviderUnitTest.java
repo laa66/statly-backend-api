@@ -2,8 +2,8 @@ package com.laa66.statlyapp.jwt;
 
 import com.laa66.statlyapp.model.OAuth2UserWrapper;
 import io.jsonwebtoken.io.Decoders;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
@@ -62,12 +62,10 @@ class JwtProviderUnitTest {
     @Test
     void shouldValidateTokenInvalidToken() {
         String token = provider.createToken(principal);
-        String invalidSignature = token.substring(0, token.length()-2) + "dW";
+        String invalidSignature = token.substring(0, token.length()-2) + RandomStringUtils.randomAlphanumeric(2);
         assertFalse(provider.validateToken(invalidSignature));
 
         String invalidToken = "219i3iji21.3km1k2";
         assertFalse(provider.validateToken(invalidToken));
-
-
     }
 }

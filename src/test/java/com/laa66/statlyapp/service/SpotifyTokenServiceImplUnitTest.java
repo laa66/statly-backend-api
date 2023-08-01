@@ -3,6 +3,7 @@ package com.laa66.statlyapp.service;
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.EmptyTokenException;
 import com.laa66.statlyapp.model.AccessToken;
+import com.laa66.statlyapp.repository.SpotifyTokenRepository;
 import com.laa66.statlyapp.service.impl.SpotifyTokenServiceImpl;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -27,10 +29,13 @@ import java.time.Instant;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SpotifyTokenServiceImplUnitTest {
+
+    @Mock
+    SpotifyTokenRepository spotifyTokenRepository;
 
     @Mock
     RestTemplate restTemplate;
@@ -67,6 +72,27 @@ class SpotifyTokenServiceImplUnitTest {
         refreshToken =
                 new OAuth2RefreshToken("refresh", Instant.EPOCH, Instant.EPOCH.plusSeconds(30));
         client = new OAuth2AuthorizedClient(clientRegistration, "user", accessToken, refreshToken);
+    }
+
+    @Test
+    void shouldGetToken() {
+        OAuth2AuthenticationToken token = mock(OAuth2AuthenticationToken.class);
+        when(spotifyTokenRepository.getToken(1)).thenReturn(token);
+        OAuth2AuthenticationToken returnToken = spotifyTokenService.getToken(1);
+        assertEquals(token, returnToken);
+    }
+
+    @Test
+    void shouldSaveToken() {
+        OAuth2AuthenticationToken token = mock(OAuth2AuthenticationToken.class);
+        spotifyTokenRepository.saveToken(1, token);
+        verify(spotifyTokenRepository, times(1)).saveToken(1, token);
+    }
+
+    @Test
+    void shouldRemoveToken() {
+        spotifyTokenRepository.removeToken(1);
+        verify(spotifyTokenRepository, times(1)).removeToken(1);
     }
 
     @Test

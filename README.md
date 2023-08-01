@@ -32,6 +32,7 @@ Create ``.env`` file in root project directory and set specific key/value pairs 
 3. Set ``STATLY_APP_URL`` variable to `http://localhost:3000`
 4. Set ``STATLY_ADMIN_EMAIL`` variable to administrator's email to receive notifications about the app
 5. Set ``STATLY_MAIL_ADDRESS`` and ``STATLY_MAIL_PASSWORD`` for Gmail SMTP server properties
+6. Set ``STATLY_SECRET`` to Base64 encoded secret phrase for JWT signature Secret Key generation (HMAC-SHA256)
 <!-- end -->
 
       # Run statly-backend-api using docker-compose in root directory
@@ -99,6 +100,7 @@ You can view full documentation of this project in different paths:
 - Hibernate & JPA
 - Maven
 - Project Lombok
+- JWT
 - OAuth 2.0
 - Docker
 - SQL

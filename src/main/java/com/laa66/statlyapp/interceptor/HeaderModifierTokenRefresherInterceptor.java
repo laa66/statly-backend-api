@@ -4,7 +4,9 @@ import com.laa66.statlyapp.exception.ClientAuthorizationException;
 import com.laa66.statlyapp.exception.EmptyTokenException;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
 import com.laa66.statlyapp.exception.UserAuthenticationException;
+import com.laa66.statlyapp.model.OAuth2UserWrapper;
 import com.laa66.statlyapp.service.SpotifyTokenService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpRequest;
@@ -23,7 +25,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 @Slf4j
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class HeaderModifierTokenRefresherInterceptor implements ClientHttpRequestInterceptor {
 
     private final OAuth2AuthorizedClientService clientService;
@@ -43,8 +45,9 @@ public class HeaderModifierTokenRefresherInterceptor implements ClientHttpReques
                 log.info("-->> Spotify API access forbidden, refreshing token and sending new request...");
                 OAuth2AccessToken newAccessToken = refreshAccessToken(client);
                 OAuth2AuthorizedClient newAuthorizedClient = createAuthorizedClient(client, newAccessToken);
-                Authentication newAuthentication = createOAuth2AuthenticationToken(authentication);
+                OAuth2AuthenticationToken newAuthentication = createOAuth2AuthenticationToken(authentication);
                 updateAuthorizedClient(client, newAuthorizedClient, newAuthentication);
+                tokenService.saveToken(((OAuth2UserWrapper) authentication.getPrincipal()).getUserId(), newAuthentication);
 
                 request.getHeaders().clearContentHeaders();
                 setBearerToken(request, newAccessToken);
@@ -89,7 +92,7 @@ public class HeaderModifierTokenRefresherInterceptor implements ClientHttpReques
         );
     }
 
-    private Authentication createOAuth2AuthenticationToken(Authentication authentication) {
+    private OAuth2AuthenticationToken createOAuth2AuthenticationToken(Authentication authentication) {
         OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
         return new OAuth2AuthenticationToken(
                 token.getPrincipal(),

@@ -35,6 +35,6 @@ public class SpotifyTokenRepositoryImpl implements SpotifyTokenRepository {
                 .ifPresentOrElse(cache -> cache.evictIfPresent(userId),
                         () -> {
                     throw new UserAuthenticationException("API token repository does not exists");
-                        });
+                });
     }
 }

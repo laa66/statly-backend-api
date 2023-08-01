@@ -6,13 +6,11 @@ import com.laa66.statlyapp.service.*;
 import com.laa66.statlyapp.service.impl.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.server.CookieSameSiteSupplier;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class AppConfig {
@@ -28,8 +26,8 @@ public class AppConfig {
     }
 
     @Bean
-    public SpotifyTokenService spotifyTokenService(@Qualifier("restTemplate") RestTemplate restTemplate) {
-        return new SpotifyTokenServiceImpl(restTemplate);
+    public SpotifyTokenService spotifyTokenService(@Qualifier("restTemplate") RestTemplate restTemplate, SpotifyTokenRepository spotifyTokenRepository) {
+        return new SpotifyTokenServiceImpl(restTemplate, spotifyTokenRepository);
     }
 
     @Bean

@@ -17,6 +17,7 @@ services:
       STATLY_DB_USERNAME: user
       STATLY_MAIL_ADDRESS: ${STATLY_MAIL_ADDRESS}
       STATLY_MAIL_PASSWORD: ${STATLY_MAIL_PASSWORD}
+      STATLY_SECRET: ${STATLY_SECRET}
     depends_on:
       db:
         condition: service_healthy

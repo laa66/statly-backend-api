@@ -3,12 +3,12 @@ package com.laa66.statlyapp.service.impl;
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.EmptyTokenException;
 import com.laa66.statlyapp.model.AccessToken;
+import com.laa66.statlyapp.repository.SpotifyTokenRepository;
 import com.laa66.statlyapp.service.SpotifyTokenService;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.core.AbstractOAuth2Token;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -22,6 +22,22 @@ import java.util.*;
 public class SpotifyTokenServiceImpl implements SpotifyTokenService {
 
     private final RestTemplate restTemplate;
+    private final SpotifyTokenRepository spotifyTokenRepository;
+
+    @Override
+    public OAuth2AuthenticationToken getToken(long userId) {
+        return spotifyTokenRepository.getToken(userId);
+    }
+
+    @Override
+    public void saveToken(long userId, OAuth2AuthenticationToken token) {
+        spotifyTokenRepository.saveToken(userId, token);
+    }
+
+    @Override
+    public void removeToken(long userId) {
+        spotifyTokenRepository.removeToken(userId);
+    }
 
     @Override
     public OAuth2AccessToken refreshAccessToken(OAuth2AuthorizedClient client) {
@@ -32,8 +48,7 @@ public class SpotifyTokenServiceImpl implements SpotifyTokenService {
                 OAuth2AccessToken.TokenType.BEARER,
                 refreshedToken.getAccessToken(),
                 Instant.now(),
-                Instant.now().plusSeconds(refreshedToken.getExpiresIn()), scopes
-        );
+                Instant.now().plusSeconds(refreshedToken.getExpiresIn()), scopes);
     }
 
     // helpers

@@ -3,6 +3,7 @@ package com.laa66.statlyapp.config;
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
 import com.laa66.statlyapp.interceptor.HeaderModifierTokenRefresherInterceptor;
+import com.laa66.statlyapp.model.OAuth2UserWrapper;
 import com.laa66.statlyapp.service.impl.SpotifyTokenServiceImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,7 +74,7 @@ class RestTemplateIntegrationTest {
                 new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER, "newAccess", Instant.EPOCH, Instant.EPOCH.plusSeconds(10));
         when(authentication.getAuthorizedClientRegistrationId()).thenReturn("spotify");
         when(authentication.getName()).thenReturn("user");
-        when(authentication.getPrincipal()).thenReturn(new DefaultOAuth2User(List.of(new SimpleGrantedAuthority("USER")), Map.of("name", "test"), "name"));
+        when(authentication.getPrincipal()).thenReturn(new OAuth2UserWrapper(new DefaultOAuth2User(List.of(new SimpleGrantedAuthority("USER")), Map.of("name", "test", "userId", 1L), "name")));
         when(authentication.getAuthorities()).thenReturn(List.of());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         when(clientService.loadAuthorizedClient("spotify", "user"))
