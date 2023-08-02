@@ -1,6 +1,5 @@
 package com.laa66.statlyapp.entity;
 
-import com.laa66.statlyapp.model.Image;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@Builder(toBuilder = true)
 public class User {
 
     @Id
@@ -38,6 +38,10 @@ public class User {
     @JoinColumn(name = "user_stats_id", referencedColumnName = "id")
     private UserStats userStats;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_info_id", referencedColumnName = "id")
+    private UserInfo userInfo;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_friends",
@@ -54,7 +58,7 @@ public class User {
     )
     private List<User> followers = new ArrayList<>();
 
-    public User(long id, String externalId, String username, String email, String image, LocalDateTime joinDate, UserStats userStats) {
+    public User(long id, String externalId, String username, String email, String image, LocalDateTime joinDate, UserStats userStats, UserInfo userInfo) {
         this.id = id;
         this.externalId = externalId;
         this.username = username;
@@ -62,6 +66,7 @@ public class User {
         this.image = image;
         this.joinDate = joinDate;
         this.userStats = userStats;
+        this.userInfo = userInfo;
     }
 
     public void addFollower(User follower) {

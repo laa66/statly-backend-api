@@ -2,6 +2,7 @@ package com.laa66.statlyapp.oauth2;
 
 import com.laa66.statlyapp.DTO.UserDTO;
 import com.laa66.statlyapp.entity.User;
+import com.laa66.statlyapp.entity.UserInfo;
 import com.laa66.statlyapp.entity.UserStats;
 import com.laa66.statlyapp.exception.UserAuthenticationException;
 import com.laa66.statlyapp.model.Image;
@@ -42,7 +43,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                             email,
                             getImageUrl(oAuth2User.getImages()),
                             LocalDateTime.now(),
-                            new UserStats())));
+                            new UserStats(),
+                            new UserInfo())));
             attributes.put("userId", Long.parseLong(userDTO.getId()));
             return new OAuth2UserWrapper(new DefaultOAuth2User(oAuth2User.getAuthorities(),
                     Collections.unmodifiableMap(attributes),

@@ -116,9 +116,6 @@ public class StatsServiceImpl implements StatsService {
                             statsMap.getOrDefault("mainstream", 0.),
                             statsMap.getOrDefault("boringness", 0.),
                             foundUser.getUserStats().getPoints(),
-                            foundUser.getUserStats().getIg(),
-                            foundUser.getUserStats().getFb(),
-                            foundUser.getUserStats().getTwitter(),
                             foundUser.getUserStats().getBattleCount()
                     ));
                     return foundUser;

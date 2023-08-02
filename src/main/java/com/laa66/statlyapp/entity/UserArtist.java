@@ -2,19 +2,16 @@ package com.laa66.statlyapp.entity;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.Map;
 
 @Entity
 @Table(name = "user_artists")
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @ToString
@@ -36,11 +33,4 @@ public class UserArtist {
 
     private LocalDate date;
 
-    public UserArtist(long id, long userId, String range, Map<String, Integer> artists, LocalDate date) {
-        this.id = id;
-        this.userId = userId;
-        this.range = range;
-        this.artists = artists;
-        this.date = date;
-    }
 }

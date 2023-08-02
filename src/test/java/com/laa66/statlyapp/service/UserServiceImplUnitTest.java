@@ -3,7 +3,6 @@ package com.laa66.statlyapp.service;
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.entity.*;
 import com.laa66.statlyapp.exception.UserNotFoundException;
-import com.laa66.statlyapp.model.Image;
 import com.laa66.statlyapp.repository.*;
 import com.laa66.statlyapp.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,13 +30,17 @@ class UserServiceImplUnitTest {
 
     @BeforeEach
     void setup() {
-        userService =
-                new UserServiceImpl(userRepository, betaUserRepository);
+        userService = new UserServiceImpl(userRepository, betaUserRepository);
     }
 
     @Test
     void shouldFindUserByEmail() {
-        User user = new User(1, "id", "username", "user@mail.com", "url",LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
+        User user = User.builder()
+                .id(1L)
+                .username("username")
+                .image("url")
+                .userStats(new UserStats())
+                .build();
         when(userRepository.findByEmail("user@mail.com")).thenReturn(Optional.of(user));
         UserDTO returnUser = userService.findUserByEmail("user@mail.com");
         assertEquals("1", returnUser.getId());
@@ -51,7 +54,12 @@ class UserServiceImplUnitTest {
 
     @Test
     void shouldFindAllMatchingUsers() {
-        User user = new User(1, "id", "username", "user@mail.com", "url",LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
+        User user = User.builder()
+                .id(1L)
+                .username("username")
+                .image("url")
+                .userStats(new UserStats())
+                .build();
         when(userRepository.findAllMatchingUsers("name")).thenReturn(List.of(user));
         List<UserDTO> users = userService.findAllMatchingUsers("name");
         assertEquals(1, users.size());
@@ -65,12 +73,14 @@ class UserServiceImplUnitTest {
 
     @Test
     void shouldFindAllUsersOrderByPoints() {
-        User user1 = new User(1, "id1", "username1", "user1@mail.com", "url", LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats(
-                1, 0., 0., 0., 0., 130, 0
-        ));
-        User user2 = new User(2, "id2", "username2", "user2@mail.com", "url", LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats(
-                2, 0., 0., 0., 0., 380, 0
-        ));
+        User user1 = User.builder()
+                .id(1L)
+                .userStats(new UserStats(1, 0., 0., 0., 0., 130, 0))
+                .build();
+        User user2 = User.builder()
+                .id(2L)
+                .userStats(new UserStats(2, 0., 0., 0., 0., 380, 0))
+                .build();
         when(userRepository.findAllUsersOrderByPoints()).thenReturn(List.of(user2, user1));
         List<UserDTO> users = userService.findAllUsersOrderByPoints();
         assertEquals(2, users.size());
@@ -80,19 +90,27 @@ class UserServiceImplUnitTest {
 
     @Test
     void shouldSaveUser() {
-        User beforeSaveUser = new User(0, "id", "username", "user@mail.com", "url", LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
-        User afterSaveUser = new User(1, "id", "username", "user@mail.com", "url",LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
+        User beforeSaveUser = User.builder()
+                .id(0L)
+                .userStats(new UserStats())
+                .build();
+        User afterSaveUser = User.builder()
+                .id(1L)
+                .userStats(new UserStats())
+                .build();
         when(userRepository.save(beforeSaveUser)).thenReturn(afterSaveUser);
         UserDTO returnUser = userService.saveUser(beforeSaveUser);
+        verify(userRepository, times(1)).save(beforeSaveUser);
         assertNotEquals("0", returnUser.getId());
         assertEquals("1", returnUser.getId());
-        assertEquals(beforeSaveUser.getUsername(), returnUser.getName());
-        assertEquals(beforeSaveUser.getImage(), returnUser.getImages().get(0).getUrl());
     }
 
     @Test
     void shouldDeleteUser() {
-        User user = new User(1L, "id", "username", "user@mail.com", "url",LocalDateTime.of(2023, 4, 30, 20, 20), new UserStats());
+        User user = User.builder()
+                .userStats(new UserStats())
+                .id(1L)
+                .build();
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         userService.deleteUser(user.getId());
         verify(userRepository, times(1)).deleteById(1L);

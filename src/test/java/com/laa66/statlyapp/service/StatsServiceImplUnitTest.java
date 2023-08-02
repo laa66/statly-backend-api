@@ -141,8 +141,10 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldSaveUserStats() {
-        User user = new User(1L, "id", "username", "email", "image", LocalDateTime.now()
-        , new UserStats(1L, 0.0, 0.0, 0.0, 0.0, 0, "ig", "fb", "twitter", 0));
+        User user = User.builder()
+                .id(1L)
+                .userStats(new UserStats(1L, 0., 0., 0., 0., 0, 0))
+                .build();
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         Map<String, Double> statsMap = Map.of(
                 "energy", 50.0,
@@ -568,13 +570,14 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldIsBattlePossibleTrue() {
-        User user1 = new User(1, null, null ,null, null, null, new UserStats(
-                1, .0, .0, .0, .0, 0, 0
-        ));
-
-        User user2 = new User(2, null, null ,null, null, null, new UserStats(
-                1, .0, .0, .0, .0, 0, 9
-        ));
+        User user1 = User.builder()
+                .id(1L)
+                .userStats(new UserStats(1, 0., 0., 0., 0., 0 ,0))
+                .build();
+        User user2 = User.builder()
+                .id(2L)
+                .userStats(new UserStats(2, 0., 0., 0., 0., 0,9))
+                .build();
         when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
         when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
         assertTrue(statsService.isBattlePossible(1, 2));
@@ -582,13 +585,14 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldIsBattlePossibleFalse() {
-        User user1 = new User(1, null, null ,null, null, null, new UserStats(
-                1, .0, .0, .0, .0, 0, 11
-        ));
-
-        User user2 = new User(2, null, null ,null, null, null, new UserStats(
-                1, .0, .0, .0, .0, 0, 9
-        ));
+        User user1 = User.builder()
+                .id(1L)
+                .userStats(new UserStats(1, 0., 0., 0., 0., 0 ,11))
+                .build();
+        User user2 = User.builder()
+                .id(2L)
+                .userStats(new UserStats(2, 0., 0., 0., 0., 0,9))
+                .build();
         when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
         when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
         assertFalse(statsService.isBattlePossible(1, 2));

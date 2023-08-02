@@ -13,7 +13,6 @@ import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.StatsService;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;

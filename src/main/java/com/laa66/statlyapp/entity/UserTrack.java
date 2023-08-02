@@ -2,10 +2,7 @@ package com.laa66.statlyapp.entity;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.Type;
 
 import java.io.Serializable;
@@ -15,6 +12,7 @@ import java.util.Map;
 
 @Entity
 @Table(name = "user_tracks")
+@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
@@ -36,12 +34,4 @@ public class UserTrack implements Serializable {
     private Map<String, Integer> tracks;
 
     private LocalDate date;
-
-    public UserTrack(long id, long userId, String range, Map<String, Integer> tracks, LocalDate date) {
-        this.id = id;
-        this.userId = userId;
-        this.range = range;
-        this.tracks = tracks;
-        this.date = date;
-    }
 }
