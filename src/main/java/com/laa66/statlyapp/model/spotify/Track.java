@@ -1,4 +1,4 @@
-package com.laa66.statlyapp.model;
+package com.laa66.statlyapp.model.spotify;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -7,7 +7,6 @@ import lombok.*;
 
 import java.util.List;
 
-@JsonPropertyOrder({"album", "artists", "name", "popularity", "uri", "external_urls", "id"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @NoArgsConstructor

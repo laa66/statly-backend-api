@@ -1,8 +1,8 @@
-package com.laa66.statlyapp.model.response;
+package com.laa66.statlyapp.model.spotify.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.laa66.statlyapp.model.TrackAnalysis;
+import com.laa66.statlyapp.model.spotify.TrackAnalysis;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

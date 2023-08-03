@@ -1,6 +1,6 @@
 package com.laa66.statlyapp.DTO;
 
-import com.laa66.statlyapp.model.PlaylistInfo;
+import com.laa66.statlyapp.model.spotify.PlaylistInfo;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

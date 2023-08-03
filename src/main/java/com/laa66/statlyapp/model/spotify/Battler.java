@@ -1,4 +1,4 @@
-package com.laa66.statlyapp.model;
+package com.laa66.statlyapp.model.spotify;
 
 import com.laa66.statlyapp.DTO.AnalysisDTO;
 import lombok.Value;

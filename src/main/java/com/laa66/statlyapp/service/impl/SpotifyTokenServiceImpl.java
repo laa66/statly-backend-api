@@ -2,7 +2,7 @@ package com.laa66.statlyapp.service.impl;
 
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.EmptyTokenException;
-import com.laa66.statlyapp.model.AccessToken;
+import com.laa66.statlyapp.model.spotify.AccessToken;
 import com.laa66.statlyapp.repository.SpotifyTokenRepository;
 import com.laa66.statlyapp.service.SpotifyTokenService;
 import lombok.AllArgsConstructor;

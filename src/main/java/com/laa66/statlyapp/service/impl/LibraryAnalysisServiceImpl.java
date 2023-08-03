@@ -2,8 +2,11 @@ package com.laa66.statlyapp.service.impl;
 
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.exception.TooManyRequestsException;
-import com.laa66.statlyapp.model.*;
-import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
+import com.laa66.statlyapp.model.spotify.response.ResponseTracksAnalysis;
+import com.laa66.statlyapp.model.spotify.Battler;
+import com.laa66.statlyapp.model.spotify.Genre;
+import com.laa66.statlyapp.model.spotify.Image;
+import com.laa66.statlyapp.model.spotify.Track;
 import com.laa66.statlyapp.service.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

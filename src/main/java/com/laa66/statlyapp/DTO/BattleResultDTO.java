@@ -1,6 +1,6 @@
 package com.laa66.statlyapp.DTO;
 
-import com.laa66.statlyapp.model.Battler;
+import com.laa66.statlyapp.model.spotify.Battler;
 import lombok.Value;
 
 @Value

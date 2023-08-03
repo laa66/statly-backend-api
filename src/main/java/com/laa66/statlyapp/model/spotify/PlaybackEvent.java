@@ -1,4 +1,4 @@
-package com.laa66.statlyapp.model;
+package com.laa66.statlyapp.model.spotify;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

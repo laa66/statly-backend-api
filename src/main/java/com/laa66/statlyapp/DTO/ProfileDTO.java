@@ -1,7 +1,7 @@
 package com.laa66.statlyapp.DTO;
 
-import com.laa66.statlyapp.model.Artist;
-import com.laa66.statlyapp.model.Track;
+import com.laa66.statlyapp.model.spotify.Artist;
+import com.laa66.statlyapp.model.spotify.Track;
 import lombok.Value;
 
 import java.time.LocalDateTime;

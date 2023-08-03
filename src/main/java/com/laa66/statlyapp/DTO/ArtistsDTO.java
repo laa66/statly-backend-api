@@ -2,8 +2,7 @@ package com.laa66.statlyapp.DTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.laa66.statlyapp.model.Artist;
+import com.laa66.statlyapp.model.spotify.Artist;
 import lombok.*;
 
 import java.time.LocalDate;

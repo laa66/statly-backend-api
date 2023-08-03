@@ -1,8 +1,8 @@
 package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.DTO.*;
-import com.laa66.statlyapp.model.PlaylistInfo;
-import com.laa66.statlyapp.model.response.ResponsePlaylists;
+import com.laa66.statlyapp.model.spotify.PlaylistInfo;
+import com.laa66.statlyapp.model.spotify.response.ResponsePlaylists;
 import com.laa66.statlyapp.service.LibraryAnalysisService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import jakarta.validation.Valid;

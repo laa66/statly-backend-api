@@ -1,4 +1,4 @@
-package com.laa66.statlyapp.model;
+package com.laa66.statlyapp.model.spotify;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

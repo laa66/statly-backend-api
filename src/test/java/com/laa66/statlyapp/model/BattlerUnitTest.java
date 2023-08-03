@@ -1,6 +1,7 @@
 package com.laa66.statlyapp.model;
 
 import com.laa66.statlyapp.DTO.AnalysisDTO;
+import com.laa66.statlyapp.model.spotify.Battler;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.util.Pair;
 

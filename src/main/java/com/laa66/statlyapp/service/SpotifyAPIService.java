@@ -1,9 +1,9 @@
 package com.laa66.statlyapp.service;
 
 import com.laa66.statlyapp.DTO.*;
-import com.laa66.statlyapp.model.PlaylistInfo;
-import com.laa66.statlyapp.model.response.ResponsePlaylists;
-import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
+import com.laa66.statlyapp.model.spotify.PlaylistInfo;
+import com.laa66.statlyapp.model.spotify.response.ResponsePlaylists;
+import com.laa66.statlyapp.model.spotify.response.ResponseTracksAnalysis;
 import org.springframework.lang.Nullable;
 
 public interface SpotifyAPIService {

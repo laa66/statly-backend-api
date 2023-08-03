@@ -26,6 +26,11 @@ public class AppConfig {
     }
 
     @Bean
+    public MatrixAPIService matrixAPIService(@Value("${api.matrix.access-token}") String accessToken, @Qualifier("restTemplate") RestTemplate restTemplate) {
+        return new MapboxMatrixAPIService(accessToken, restTemplate);
+    }
+
+    @Bean
     public SpotifyTokenService spotifyTokenService(@Qualifier("restTemplate") RestTemplate restTemplate, SpotifyTokenRepository spotifyTokenRepository) {
         return new SpotifyTokenServiceImpl(restTemplate, spotifyTokenRepository);
     }

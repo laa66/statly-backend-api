@@ -2,8 +2,8 @@ package com.laa66.statlyapp.mapper;
 
 import com.laa66.statlyapp.DTO.UserDTO;
 import com.laa66.statlyapp.entity.User;
-import com.laa66.statlyapp.model.Coordinates;
-import com.laa66.statlyapp.model.Image;
+import com.laa66.statlyapp.model.mapbox.Coordinates;
+import com.laa66.statlyapp.model.spotify.Image;
 
 import java.util.List;
 

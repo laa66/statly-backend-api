@@ -1,8 +1,7 @@
-package com.laa66.statlyapp.model.response;
+package com.laa66.statlyapp.model.spotify;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.laa66.statlyapp.model.PlaylistInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,16 +12,17 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponsePlaylists {
+public class Playlist {
+
+    private String name;
 
     private String next;
 
-    private int total;
-
     @JsonProperty("items")
-    private List<PlaylistInfo> playlists;
+    private List<PlaylistTrack> tracks;
 
-    public void addAll(List<PlaylistInfo> playlistInfoList) {
-        playlists.addAll(playlistInfoList);
+    public void addAll(List<PlaylistTrack> playlistTracks) {
+        tracks.addAll(playlistTracks);
     }
+
 }

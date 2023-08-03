@@ -6,20 +6,17 @@ import com.laa66.statlyapp.DTO.TracksDTO;
 import com.laa66.statlyapp.entity.*;
 import com.laa66.statlyapp.entity.User;
 import com.laa66.statlyapp.exception.UserNotFoundException;
-import com.laa66.statlyapp.model.*;
+import com.laa66.statlyapp.model.spotify.*;
 import com.laa66.statlyapp.repository.*;
 import com.laa66.statlyapp.service.impl.StatsServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatcher;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;

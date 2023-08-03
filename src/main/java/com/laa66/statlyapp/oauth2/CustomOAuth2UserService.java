@@ -5,7 +5,7 @@ import com.laa66.statlyapp.entity.User;
 import com.laa66.statlyapp.entity.UserInfo;
 import com.laa66.statlyapp.entity.UserStats;
 import com.laa66.statlyapp.exception.UserAuthenticationException;
-import com.laa66.statlyapp.model.Image;
+import com.laa66.statlyapp.model.spotify.Image;
 import com.laa66.statlyapp.model.OAuth2UserWrapper;
 import com.laa66.statlyapp.service.UserService;
 import lombok.AllArgsConstructor;

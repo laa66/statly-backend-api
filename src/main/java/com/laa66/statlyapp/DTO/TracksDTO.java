@@ -2,7 +2,7 @@ package com.laa66.statlyapp.DTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.laa66.statlyapp.model.Track;
+import com.laa66.statlyapp.model.spotify.Track;
 import lombok.*;
 
 import java.time.LocalDate;

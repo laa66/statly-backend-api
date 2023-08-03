@@ -1,4 +1,4 @@
-package com.laa66.statlyapp.model.request;
+package com.laa66.statlyapp.model.spotify.request;
 
 import lombok.*;
 
