@@ -2,27 +2,44 @@ package com.laa66.statlyapp.DTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.laa66.statlyapp.model.Coordinates;
 import com.laa66.statlyapp.model.Image;
 import lombok.*;
 
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Value
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
 @AllArgsConstructor
+@Getter
+@ToString
+@Builder
 public class UserDTO {
 
-    String id;
+    private final String id;
 
-    String uri;
+    private final String uri;
 
-    String email;
+    private final String email;
 
     @JsonProperty("display_name")
-    String name;
+    private final String name;
 
-    List<Image> images;
+    private final List<Image> images;
 
-    long points;
+    private final long points;
+
+    private final Coordinates coordinates;
+
+    private Double match;
+
+    private Double distance;
+
+    public void withMatch(Double match) {
+        this.match = match;
+    }
+
+    public void withDistance(Double distance) {
+        this.distance = distance;
+    }
 }

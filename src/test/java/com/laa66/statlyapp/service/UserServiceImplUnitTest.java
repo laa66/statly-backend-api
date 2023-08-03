@@ -35,12 +35,12 @@ class UserServiceImplUnitTest {
 
     @Test
     void shouldFindUserByEmail() {
-        User user = User.builder()
-                .id(1L)
-                .username("username")
-                .image("url")
-                .userStats(new UserStats())
-                .build();
+        User user = new User()
+                .withId(1L)
+                .withUsername("username")
+                .withUserStats(new UserStats())
+                .withUserInfo(new UserInfo())
+                .withImage("url");
         when(userRepository.findByEmail("user@mail.com")).thenReturn(Optional.of(user));
         UserDTO returnUser = userService.findUserByEmail("user@mail.com");
         assertEquals("1", returnUser.getId());
@@ -54,12 +54,12 @@ class UserServiceImplUnitTest {
 
     @Test
     void shouldFindAllMatchingUsers() {
-        User user = User.builder()
-                .id(1L)
-                .username("username")
-                .image("url")
-                .userStats(new UserStats())
-                .build();
+        User user = new User()
+                .withId(1L)
+                .withUsername("username")
+                .withUserStats(new UserStats())
+                .withImage("url")
+                .withUserInfo(new UserInfo());
         when(userRepository.findAllMatchingUsers("name")).thenReturn(List.of(user));
         List<UserDTO> users = userService.findAllMatchingUsers("name");
         assertEquals(1, users.size());
@@ -73,14 +73,14 @@ class UserServiceImplUnitTest {
 
     @Test
     void shouldFindAllUsersOrderByPoints() {
-        User user1 = User.builder()
-                .id(1L)
-                .userStats(new UserStats(1, 0., 0., 0., 0., 130, 0))
-                .build();
-        User user2 = User.builder()
-                .id(2L)
-                .userStats(new UserStats(2, 0., 0., 0., 0., 380, 0))
-                .build();
+        User user1 = new User()
+                .withId(1L)
+                .withUserStats(new UserStats(1, 0., 0., 0., 0., 130, 0))
+                .withUserInfo(new UserInfo());
+        User user2 = new User()
+                .withId(2L)
+                .withUserStats(new UserStats(2, 0., 0., 0., 0., 380, 0))
+                .withUserInfo(new UserInfo());
         when(userRepository.findAllUsersOrderByPoints()).thenReturn(List.of(user2, user1));
         List<UserDTO> users = userService.findAllUsersOrderByPoints();
         assertEquals(2, users.size());
@@ -90,14 +90,14 @@ class UserServiceImplUnitTest {
 
     @Test
     void shouldSaveUser() {
-        User beforeSaveUser = User.builder()
-                .id(0L)
-                .userStats(new UserStats())
-                .build();
-        User afterSaveUser = User.builder()
-                .id(1L)
-                .userStats(new UserStats())
-                .build();
+        User beforeSaveUser = new User()
+                .withId(0L)
+                .withUserStats(new UserStats())
+                .withUserInfo(new UserInfo());
+        User afterSaveUser = new User()
+                .withId(1L)
+                .withUserStats(new UserStats())
+                .withUserInfo(new UserInfo());
         when(userRepository.save(beforeSaveUser)).thenReturn(afterSaveUser);
         UserDTO returnUser = userService.saveUser(beforeSaveUser);
         verify(userRepository, times(1)).save(beforeSaveUser);
@@ -107,10 +107,8 @@ class UserServiceImplUnitTest {
 
     @Test
     void shouldDeleteUser() {
-        User user = User.builder()
-                .userStats(new UserStats())
-                .id(1L)
-                .build();
+        User user = new User()
+                .withId(1L);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         userService.deleteUser(user.getId());
         verify(userRepository, times(1)).deleteById(1L);

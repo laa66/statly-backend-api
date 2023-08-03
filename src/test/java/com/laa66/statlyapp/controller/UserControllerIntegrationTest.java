@@ -88,7 +88,10 @@ class UserControllerIntegrationTest {
 
     @Test
     void shouldSearchUser() throws Exception {
-        UserDTO userDTO = new UserDTO("1", "uri", "mail", "username", List.of(), 0);
+        UserDTO userDTO = UserDTO.builder()
+                .id("1")
+                .name("username")
+                .build();
         when(userService.findAllMatchingUsers("name")).thenReturn(List.of(userDTO));
         mockMvc.perform(get("/user/search?username=name")
                         .header("Authorization", "Bearer token")
@@ -115,7 +118,10 @@ class UserControllerIntegrationTest {
 
     @Test
     void shouldGetCurrentUser() throws Exception {
-        UserDTO userDTO = new UserDTO("1", "uri", "mail", "name", List.of(), 0);
+        UserDTO userDTO = UserDTO.builder()
+                .id("1")
+                .name("name")
+                .build();
         when(userService.findUserById(1L)).thenReturn(userDTO);
         mockMvc.perform(get("/user/me")
                         .header("Authorization", "Bearer token")
@@ -135,9 +141,12 @@ class UserControllerIntegrationTest {
 
     @Test
     void shouldGetUserFollowing() throws Exception {
-        FollowersDTO followersDTO = new FollowersDTO(1, List.of(new UserDTO(
-                "id", "uri", "mail", "name", List.of(new Image("url", null, null))
-        ,0)));
+        FollowersDTO followersDTO = new FollowersDTO(1, List.of(
+                UserDTO.builder()
+                        .id("id")
+                        .name("name")
+                        .images(List.of(new Image("url", null, null)))
+                        .build()));
         when(socialService.getFollowers(1, StatlyConstants.FOLLOWING))
                 .thenReturn(followersDTO);
         mockMvc.perform(get("/user/me/following")
@@ -244,13 +253,14 @@ class UserControllerIntegrationTest {
     @Test
     void shouldGetRank() throws Exception {
         when(userService.findAllUsersOrderByPoints()).thenReturn(List.of(
-                new UserDTO(
-                        "id2", "uri2", "mail2", "name2", List.of(new Image("url", null, null))
-                        ,300),
-                new UserDTO(
-                        "id1", "uri1", "mail1", "name1", List.of(new Image("url", null, null))
-                        ,150)
-        ));
+                UserDTO.builder()
+                        .id("id2")
+                        .points(300)
+                        .build(),
+                UserDTO.builder()
+                        .id("id1")
+                        .points(150)
+                        .build()));
         mockMvc.perform(get("/user/rank")
                         .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON))

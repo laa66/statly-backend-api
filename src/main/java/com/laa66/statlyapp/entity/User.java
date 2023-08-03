@@ -2,6 +2,7 @@ package com.laa66.statlyapp.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,9 +13,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
+@With
 @ToString
-@Builder(toBuilder = true)
+@Accessors(chain = true)
 public class User {
 
     @Id

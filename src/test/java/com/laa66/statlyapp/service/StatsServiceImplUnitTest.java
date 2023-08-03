@@ -141,10 +141,9 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldSaveUserStats() {
-        User user = User.builder()
-                .id(1L)
-                .userStats(new UserStats(1L, 0., 0., 0., 0., 0, 0))
-                .build();
+        User user = new User()
+                .withId(1L)
+                .withUserStats(new UserStats(1L, 0., 0., 0., 0., 0, 0));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         Map<String, Double> statsMap = Map.of(
                 "energy", 50.0,
@@ -153,7 +152,11 @@ public class StatsServiceImplUnitTest {
                 "boringness", 300.0
         );
         statsService.saveUserStats(1L, statsMap);
-        verify(userRepository, times(1)).save(ArgumentMatchers.same(user));
+        verify(userRepository, times(1)).save(argThat(argument ->
+                argument.getUserStats().getBoringness() == statsMap.get("boringness") &&
+                argument.getUserStats().getMainstream() == statsMap.get("mainstream") &&
+                argument.getUserStats().getEnergy() == statsMap.get("energy") &&
+                argument.getUserStats().getTempo() == statsMap.get("tempo")));
 
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> statsService.saveUserStats(2L, statsMap));
@@ -570,14 +573,12 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldIsBattlePossibleTrue() {
-        User user1 = User.builder()
-                .id(1L)
-                .userStats(new UserStats(1, 0., 0., 0., 0., 0 ,0))
-                .build();
-        User user2 = User.builder()
-                .id(2L)
-                .userStats(new UserStats(2, 0., 0., 0., 0., 0,9))
-                .build();
+        User user1 = new User()
+                .withId(1L)
+                .withUserStats(new UserStats(1, 0., 0., 0., 0., 0 ,0));
+        User user2 = new User()
+                .withId(2L)
+                .withUserStats(new UserStats(2, 0., 0., 0., 0., 0,9));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
         when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
         assertTrue(statsService.isBattlePossible(1, 2));
@@ -585,14 +586,12 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldIsBattlePossibleFalse() {
-        User user1 = User.builder()
-                .id(1L)
-                .userStats(new UserStats(1, 0., 0., 0., 0., 0 ,11))
-                .build();
-        User user2 = User.builder()
-                .id(2L)
-                .userStats(new UserStats(2, 0., 0., 0., 0., 0,9))
-                .build();
+        User user1 = new User()
+                .withId(1L)
+                .withUserStats(new UserStats(1, 0., 0., 0., 0., 0 ,11));
+        User user2 = new User()
+                .withId(2L)
+                .withUserStats(new UserStats(2, 0., 0., 0., 0., 0,9));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
         when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
         assertFalse(statsService.isBattlePossible(1, 2));

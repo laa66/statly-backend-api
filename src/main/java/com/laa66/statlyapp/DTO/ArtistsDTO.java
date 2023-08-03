@@ -9,7 +9,6 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.List;
 
-@JsonPropertyOrder({"total", "items"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @AllArgsConstructor

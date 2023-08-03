@@ -108,18 +108,15 @@ public class StatsServiceImpl implements StatsService {
     @Override
     public void saveUserStats(long userId, Map<String, Double> statsMap) {
         User user = userRepository.findById(userId)
-                .map(foundUser -> {
-                    foundUser.setUserStats(new UserStats(
-                            foundUser.getUserStats().getId(),
-                            statsMap.getOrDefault("energy", 0.),
-                            statsMap.getOrDefault("tempo", 0.),
-                            statsMap.getOrDefault("mainstream", 0.),
-                            statsMap.getOrDefault("boringness", 0.),
-                            foundUser.getUserStats().getPoints(),
-                            foundUser.getUserStats().getBattleCount()
-                    ));
-                    return foundUser;
-                }).orElseThrow(() -> new UserNotFoundException("User not found"));
+                .map(foundUser -> foundUser.withUserStats(new UserStats(
+                        foundUser.getUserStats().getId(),
+                        statsMap.getOrDefault("energy", 0.),
+                        statsMap.getOrDefault("tempo", 0.),
+                        statsMap.getOrDefault("mainstream", 0.),
+                        statsMap.getOrDefault("boringness", 0.),
+                        foundUser.getUserStats().getPoints(),
+                        foundUser.getUserStats().getBattleCount()
+                ))).orElseThrow(() -> new UserNotFoundException("User not found"));
         userRepository.save(user);
     }
 

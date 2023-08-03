@@ -32,7 +32,11 @@ class CustomOAuth2UserServiceUnitTest {
 
     @Test
     void shouldGetUser() {
-        UserDTO userDTO = new UserDTO("1", null, null, null, List.of(), 0);
+        UserDTO userDTO = UserDTO.builder()
+                .id("1")
+                .images(List.of())
+                .points(0)
+                .build();
         OAuth2UserWrapper oAuth2User = new OAuth2UserWrapper(
                 new DefaultOAuth2User(
                         Collections.singletonList(new OAuth2UserAuthority(Map.of("user","user"))),
@@ -53,7 +57,11 @@ class CustomOAuth2UserServiceUnitTest {
 
     @Test
     void shouldCreateUser() {
-        UserDTO userDTO = new UserDTO("1", null, null, null, List.of(), 0);
+        UserDTO userDTO = UserDTO.builder()
+                .id("1")
+                .images(List.of())
+                .points(0)
+                .build();
         OAuth2UserWrapper oAuth2User = new OAuth2UserWrapper(
                 new DefaultOAuth2User(
                         Collections.singletonList(new OAuth2UserAuthority(Map.of("user","user"))),

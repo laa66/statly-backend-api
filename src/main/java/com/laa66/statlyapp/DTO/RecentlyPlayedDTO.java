@@ -8,7 +8,6 @@ import lombok.*;
 
 import java.util.List;
 
-@JsonPropertyOrder({"total", "items"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Value
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)

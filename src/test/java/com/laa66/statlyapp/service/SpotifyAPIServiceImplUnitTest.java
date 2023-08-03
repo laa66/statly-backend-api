@@ -42,7 +42,12 @@ class SpotifyAPIServiceImplUnitTest {
 
     @Test
     void shouldGetCurrentUser() {
-        UserDTO dto = new UserDTO("testuser", "uri", "test@mail.com", "testuser", List.of(new Image()), 0);
+        UserDTO dto = UserDTO.builder()
+                .id("testuser")
+                .email("test@mail.com")
+                .name("testuser")
+                .images(List.of(new Image()))
+                .build();
         when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER.get()),
                 eq(HttpMethod.GET), any(), eq(UserDTO.class)))
                 .thenReturn(new ResponseEntity<>(dto, HttpStatus.OK));
@@ -176,10 +181,8 @@ class SpotifyAPIServiceImplUnitTest {
     @Test
     void shouldGetUserPlaylistsUnder50() {
         ResponsePlaylists responsePlaylists = new ResponsePlaylists(null, 2, List.of(
-                new PlaylistInfo(new SpotifyURL(), "id1", List.of(), "playlist1", new UserDTO(
-                       "1", "uri", "mail", "username", List.of(), 0)),
-                new PlaylistInfo(new SpotifyURL(), "id2", List.of(), "playlist2", new UserDTO(
-                        "1", "uri", "mail", "username", List.of(), 0)))
+                new PlaylistInfo(new SpotifyURL(), "id1", List.of(), "playlist1", null),
+                new PlaylistInfo(new SpotifyURL(), "id2", List.of(), "playlist2", null))
         );
         when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER_PLAYLISTS.get()),
                 eq(HttpMethod.GET), any(), eq(ResponsePlaylists.class)))
@@ -194,10 +197,8 @@ class SpotifyAPIServiceImplUnitTest {
     @Test
     void shouldGetUserPlaylistsUnder50Parameter() {
         ResponsePlaylists responsePlaylists = new ResponsePlaylists(null, 2, List.of(
-                new PlaylistInfo(new SpotifyURL(), "id1", List.of(), "playlist1", new UserDTO(
-                        "1", "uri", "mail", "username", List.of(), 0)),
-                new PlaylistInfo(new SpotifyURL(), "id2", List.of(), "playlist2", new UserDTO(
-                        "1", "uri", "mail", "username", List.of(), 0)))
+                new PlaylistInfo(new SpotifyURL(), "id1", List.of(), "playlist1", null),
+                new PlaylistInfo(new SpotifyURL(), "id2", List.of(), "playlist2", null))
         );
         when(restTemplate.exchange(eq(SpotifyAPI.USER_PLAYLISTS.get().replace("user_id", "username")),
                 eq(HttpMethod.GET), any(), eq(ResponsePlaylists.class)))
@@ -212,18 +213,13 @@ class SpotifyAPIServiceImplUnitTest {
     @Test
     void shouldGetUserPlaylistsAbove50() {
         ResponsePlaylists responsePlaylists1 = new ResponsePlaylists("next", 5, List.of(
-                new PlaylistInfo(new SpotifyURL(), "id1", List.of(), "playlist1", new UserDTO(
-                        "1", "uri", "mail", "username", List.of(), 0)),
-                new PlaylistInfo(new SpotifyURL(), "id2", List.of(), "playlist2", new UserDTO(
-                        "1", "uri", "mail", "username", List.of(), 0)))
+                new PlaylistInfo(new SpotifyURL(), "id1", List.of(), "playlist1", null),
+                new PlaylistInfo(new SpotifyURL(), "id2", List.of(), "playlist2", null))
         );
         ResponsePlaylists responsePlaylists2 = new ResponsePlaylists(null, 5, List.of(
-                new PlaylistInfo(new SpotifyURL(), "id3", List.of(), "playlist3", new UserDTO(
-                        "1", "uri", "mail", "username", List.of(), 0)),
-                new PlaylistInfo(new SpotifyURL(), "id4", List.of(), "playlist4", new UserDTO(
-                        "1", "uri", "mail", "username", List.of(), 0)),
-                new PlaylistInfo(new SpotifyURL(), "id5", List.of(), "playlist5", new UserDTO(
-                        "1", "uri", "mail", "username", List.of(), 0)))
+                new PlaylistInfo(new SpotifyURL(), "id3", List.of(), "playlist3",null),
+                new PlaylistInfo(new SpotifyURL(), "id4", List.of(), "playlist4", null),
+                new PlaylistInfo(new SpotifyURL(), "id5", List.of(), "playlist5", null))
         );
         when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER_PLAYLISTS.get()),
                 eq(HttpMethod.GET), any(), eq(ResponsePlaylists.class)))
@@ -241,18 +237,13 @@ class SpotifyAPIServiceImplUnitTest {
     @Test
     void shouldGetUserPlaylistsAbove50Parameter() {
         ResponsePlaylists responsePlaylists1 = new ResponsePlaylists("next", 5, List.of(
-                new PlaylistInfo(new SpotifyURL(), "id1", List.of(), "playlist1", new UserDTO(
-                        "1", "uri", "mail", "username", List.of(), 0)),
-                new PlaylistInfo(new SpotifyURL(), "id2", List.of(), "playlist2", new UserDTO(
-                        "1", "uri", "mail", "username", List.of(), 0)))
+                new PlaylistInfo(new SpotifyURL(), "id1", List.of(), "playlist1", null),
+                new PlaylistInfo(new SpotifyURL(), "id2", List.of(), "playlist2", null))
         );
         ResponsePlaylists responsePlaylists2 = new ResponsePlaylists(null, 5, List.of(
-                new PlaylistInfo(new SpotifyURL(), "id3", List.of(), "playlist3", new UserDTO(
-                        "1", "uri", "mail", "username", List.of(), 0)),
-                new PlaylistInfo(new SpotifyURL(), "id4", List.of(), "playlist4", new UserDTO(
-                        "1", "uri", "mail", "username", List.of(), 0)),
-                new PlaylistInfo(new SpotifyURL(), "id5", List.of(), "playlist5", new UserDTO(
-                        "1", "uri", "mail", "username", List.of(), 0)))
+                new PlaylistInfo(new SpotifyURL(), "id3", List.of(), "playlist3", null),
+                new PlaylistInfo(new SpotifyURL(), "id4", List.of(), "playlist4", null),
+                new PlaylistInfo(new SpotifyURL(), "id5", List.of(), "playlist5", null))
         );
         when(restTemplate.exchange(eq(SpotifyAPI.USER_PLAYLISTS.get().replace("user_id", "username")),
                 eq(HttpMethod.GET), any(), eq(ResponsePlaylists.class)))
@@ -340,7 +331,13 @@ class SpotifyAPIServiceImplUnitTest {
 
     @Test
     void shouldPostTopTracksPlaylistWithValidUrl() {
-        UserDTO userDTO = new UserDTO("testuser", "uri", "test@mail.com", "testuser", List.of(new Image()), 0);
+        UserDTO userDTO = UserDTO.builder()
+                .id("testuser")
+                .uri("uri")
+                .email("test@mail.com")
+                .name("testuser")
+                .images(List.of(new Image()))
+                .build();
         TracksDTO tracksDTO = new TracksDTO(List.of(new Track(), new Track()), "2", "long", null);
         PlaylistDTO playlistDTO = new PlaylistDTO("1", new SpotifyURL());
         String snapshotId = "snapshotId";
@@ -368,7 +365,13 @@ class SpotifyAPIServiceImplUnitTest {
 
     @Test
     void shouldPostTopTracksPlaylistWithNotValidUrl() {
-        UserDTO userDTO = new UserDTO("testuser", "uri", "test@mail.com","testuser", List.of(new Image()), 0);
+        UserDTO userDTO = UserDTO.builder()
+                .id("testuser")
+                .uri("uri")
+                .email("test@mail.com")
+                .name("testuser")
+                .images(List.of(new Image()))
+                .build();
         when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER.get()),
                 eq(HttpMethod.GET), any(), eq(UserDTO.class)))
                 .thenReturn(new ResponseEntity<>(userDTO, HttpStatus.CREATED));
@@ -377,7 +380,13 @@ class SpotifyAPIServiceImplUnitTest {
 
     @Test
     void shouldPostTopTracksPlaylistEmptyPlaylistBody() {
-        UserDTO userDTO = new UserDTO("testuser", "uri", "test@mail.com", "testuser", List.of(new Image()), 0);
+        UserDTO userDTO = UserDTO.builder()
+                .id("testuser")
+                .uri("uri")
+                .email("test@mail.com")
+                .name("testuser")
+                .images(List.of(new Image()))
+                .build();
         when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER.get()),
                 eq(HttpMethod.GET), any(), eq(UserDTO.class)))
                 .thenReturn(new ResponseEntity<>(userDTO, HttpStatus.OK));
@@ -389,7 +398,13 @@ class SpotifyAPIServiceImplUnitTest {
 
     @Test
     void shouldPostTopTracksPlaylistEmptyTopTracksBody() {
-        UserDTO userDTO = new UserDTO("testuser", "uri", "test@mail.com", "testuser", List.of(new Image()), 0);
+        UserDTO userDTO = UserDTO.builder()
+                .id("testuser")
+                .uri("uri")
+                .email("test@mail.com")
+                .name("testuser")
+                .images(List.of(new Image()))
+                .build();
         PlaylistDTO playlistDTO = new PlaylistDTO("1", new SpotifyURL());
 
         when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER.get()),
@@ -406,7 +421,13 @@ class SpotifyAPIServiceImplUnitTest {
 
     @Test
     void shouldPostTopTracksPlaylistWithValidUrlIfPostingTracksFailed() {
-        UserDTO userDTO = new UserDTO("testuser", "uri", "test@mail.com","testuser", List.of(new Image()), 0);
+        UserDTO userDTO = UserDTO.builder()
+                .id("testuser")
+                .uri("uri")
+                .email("test@mail.com")
+                .name("testuser")
+                .images(List.of(new Image()))
+                .build();
         TracksDTO tracksDTO = new TracksDTO(List.of(new Track(), new Track()), "2", "long", null);
         PlaylistDTO playlistDTO = new PlaylistDTO("1", new SpotifyURL());
 
@@ -430,7 +451,13 @@ class SpotifyAPIServiceImplUnitTest {
 
     @Test
     void shouldPostTopTracksPlaylistWithValidUrlIfPuttingImageFailed() {
-        UserDTO userDTO = new UserDTO("testuser", "uri", "test@mail.com","testuser", List.of(new Image()), 0);
+        UserDTO userDTO = UserDTO.builder()
+                .id("testuser")
+                .uri("uri")
+                .email("test@mail.com")
+                .name("testuser")
+                .images(List.of(new Image()))
+                .build();
         TracksDTO tracksDTO = new TracksDTO(List.of(new Track(), new Track()), "2", "long", null);
         PlaylistDTO playlistDTO = new PlaylistDTO("1", new SpotifyURL());
         String snapshotId = "snapshotId";
