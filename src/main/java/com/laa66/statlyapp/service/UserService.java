@@ -20,10 +20,4 @@ public interface UserService {
 
     void deleteUser(long id);
 
-    void saveBetaUser(BetaUserDTO dto);
-
-    List<BetaUserDTO> findAllBetaUsers();
-
-    void deleteAllBetaUsers();
-
 }

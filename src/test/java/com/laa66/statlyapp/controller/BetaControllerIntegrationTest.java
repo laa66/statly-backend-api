@@ -5,8 +5,8 @@ import com.laa66.statlyapp.config.TestSecurityConfig;
 import com.laa66.statlyapp.jwt.JwtProvider;
 import com.laa66.statlyapp.model.OAuth2UserWrapper;
 import com.laa66.statlyapp.repository.SpotifyTokenRepository;
+import com.laa66.statlyapp.service.BetaUserService;
 import com.laa66.statlyapp.service.MailService;
-import com.laa66.statlyapp.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,6 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -46,7 +45,7 @@ public class BetaControllerIntegrationTest {
     JwtProvider jwtProvider;
 
     @MockBean
-    UserService userService;
+    BetaUserService betaUserService;
 
     @MockBean
     MailService mailService;
@@ -77,7 +76,7 @@ public class BetaControllerIntegrationTest {
         List<BetaUserDTO> betaUsers = List.of(
                 new BetaUserDTO("user1", "user1@mail.com", LocalDateTime.of(2023, 1, 1, 12, 0, 0).toString()),
                 new BetaUserDTO("user2", "user2@email.com", LocalDateTime.of(2023, 1,1,11, 0, 0).toString()));
-        when(userService.findAllBetaUsers()).thenReturn(betaUsers);
+        when(betaUserService.findAllBetaUsers()).thenReturn(betaUsers);
         mockMvc.perform(get("/beta/all")
                         .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -107,7 +106,7 @@ public class BetaControllerIntegrationTest {
                         .param("name", "name")
                         .param("email", "email"))
                 .andExpect(status().isNoContent());
-        verify(userService, times(1)).saveBetaUser(isA(BetaUserDTO.class));
+        verify(betaUserService, times(1)).saveBetaUser(isA(BetaUserDTO.class));
         verify(mailService, times(1)).sendJoinBetaNotification();
     }
 

@@ -70,7 +70,7 @@ public class TestSecurityConfig {
 
     @Bean
     public UserService userService() {
-        return new UserServiceImpl(null, null);
+        return new UserServiceImpl(null);
     }
 
     @Bean

@@ -1,8 +1,8 @@
 package com.laa66.statlyapp.controller;
 
 import com.laa66.statlyapp.DTO.BetaUserDTO;
+import com.laa66.statlyapp.service.BetaUserService;
 import com.laa66.statlyapp.service.MailService;
-import com.laa66.statlyapp.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,18 +14,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BetaController {
 
-    private final UserService userService;
+    private final BetaUserService betaUserService;
     private final MailService mailService;
 
     @GetMapping("/all")
     public ResponseEntity<List<BetaUserDTO>> getAllBetaUsers() {
-        List<BetaUserDTO> dto = userService.findAllBetaUsers();
+        List<BetaUserDTO> dto = betaUserService.findAllBetaUsers();
         return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/join")
     public ResponseEntity<Void> join(@RequestParam("name") String fullName, @RequestParam String email) {
-        userService.saveBetaUser(new BetaUserDTO(fullName, email, null));
+        betaUserService.saveBetaUser(new BetaUserDTO(fullName, email, null));
         mailService.sendJoinBetaNotification();
         return ResponseEntity.noContent().build();
     }
@@ -38,7 +38,7 @@ public class BetaController {
 
     @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteAllBetaUsers() {
-        userService.deleteAllBetaUsers();
+        betaUserService.deleteAllBetaUsers();
         return ResponseEntity.noContent().build();
     }
 }

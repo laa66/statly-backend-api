@@ -52,9 +52,13 @@ public class AppConfig {
     }
 
     @Bean
-    public UserService userService(UserRepository userRepository,
-                                   BetaUserRepository betaUserRepository) {
-        return new UserServiceImpl(userRepository, betaUserRepository);
+    public UserService userService(UserRepository userRepository) {
+        return new UserServiceImpl(userRepository);
+    }
+
+    @Bean
+    public BetaUserService betaUserService(BetaUserRepository betaUserRepository) {
+        return new BetaUserServiceImpl(betaUserRepository);
     }
 
     @Bean
