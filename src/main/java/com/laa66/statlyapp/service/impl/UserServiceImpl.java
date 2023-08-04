@@ -18,6 +18,14 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
+    public Collection<UserDTO> findAllUsers() {
+        Collection<User> users = (Collection<User>) userRepository.findAll();
+        return users.stream()
+                .map(EntityMapper::toUserDTO)
+                .toList();
+    }
+
+    @Override
     public UserDTO findUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .map(EntityMapper::toUserDTO)

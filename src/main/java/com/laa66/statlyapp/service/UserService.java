@@ -4,9 +4,12 @@ import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.entity.User;
 
 
+import java.util.Collection;
 import java.util.List;
 
 public interface UserService {
+
+    Collection<UserDTO> findAllUsers();
 
     UserDTO findUserByEmail(String email);
 

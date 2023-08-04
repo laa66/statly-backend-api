@@ -26,6 +26,26 @@ class UserServiceImplUnitTest {
     UserServiceImpl userService;
 
     @Test
+    void shouldFindAllUsers() {
+        User user1 = new User().withId(1)
+                .withUserStats(new UserStats())
+                .withUserInfo(new UserInfo());
+        User user2 = new User().withId(2)
+                .withUserStats(new UserStats())
+                .withUserInfo(new UserInfo());
+        when(userRepository.findAll())
+                .thenReturn(List.of(user1, user2))
+                .thenReturn(List.of());
+        List<UserDTO> users = (List<UserDTO>) userService.findAllUsers();
+        assertEquals(2, users.size());
+        assertEquals("1", users.get(0).getId());
+        assertEquals("2", users.get(1).getId());
+
+        Collection<UserDTO> emptyUsers = userService.findAllUsers();
+        assertTrue(emptyUsers.isEmpty());
+    }
+
+    @Test
     void shouldFindUserByEmail() {
         User user = new User()
                 .withId(1L)
