@@ -3,6 +3,7 @@ package com.laa66.statlyapp.DTO;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.laa66.statlyapp.model.mapbox.Coordinates;
+import com.laa66.statlyapp.model.mapbox.Location;
 import com.laa66.statlyapp.model.spotify.Image;
 import lombok.*;
 
@@ -35,11 +36,17 @@ public class UserDTO {
 
     private Double distance;
 
+    private Location location;
+
     public void withMatch(Double match) {
         this.match = match;
     }
 
     public void withDistance(Double distance) {
         this.distance = distance;
+    }
+
+    public void withLocation(Location location) {
+        this.location = location;
     }
 }

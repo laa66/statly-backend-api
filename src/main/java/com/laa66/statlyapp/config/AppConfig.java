@@ -26,8 +26,8 @@ public class AppConfig {
     }
 
     @Bean
-    public MatrixAPIService matrixAPIService(@Value("${api.matrix.access-token}") String accessToken, @Qualifier("restTemplate") RestTemplate restTemplate) {
-        return new MapboxMatrixAPIService(accessToken, restTemplate);
+    public MapAPIService matrixAPIService(@Value("${api.matrix.access-token}") String accessToken, @Qualifier("restTemplate") RestTemplate restTemplate) {
+        return new MapboxMapAPIService(accessToken, restTemplate);
     }
 
     @Bean
