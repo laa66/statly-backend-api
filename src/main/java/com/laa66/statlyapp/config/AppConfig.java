@@ -31,6 +31,11 @@ public class AppConfig {
     }
 
     @Bean
+    public LocationService locationService(MapAPIService mapAPIService, UserService userService, LibraryAnalysisService analysisService) {
+        return new LocationServiceImpl(mapAPIService, userService, analysisService);
+    }
+
+    @Bean
     public SpotifyTokenService spotifyTokenService(@Qualifier("restTemplate") RestTemplate restTemplate, SpotifyTokenRepository spotifyTokenRepository) {
         return new SpotifyTokenServiceImpl(restTemplate, spotifyTokenRepository);
     }

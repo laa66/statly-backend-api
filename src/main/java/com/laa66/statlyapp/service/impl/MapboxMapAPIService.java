@@ -31,10 +31,8 @@ public class MapboxMapAPIService implements MapAPIService {
                 .filter(list -> !list.isEmpty())
                 .map(list -> list.get(0))
                 .map(dist -> IntStream.range(0, dist.size())
-                        .mapToObj(i -> {
-                            users.get(i).withDistance(dist.get(i));
-                            return users.get(i);
-                        }).toList())
+                        .mapToObj(i -> users.get(i).withDistance(dist.get(i)))
+                        .toList())
                 .orElse(Collections.emptyList());
     }
 
@@ -42,10 +40,8 @@ public class MapboxMapAPIService implements MapAPIService {
     public UserDTO getReverseGeocoding(UserDTO user) {
         Location response = restTemplate.getForObject(prepareReverseGeocodingUrl(user), Location.class);
         return Optional.ofNullable(response)
-                .map(location -> {
-                    user.withLocation(location);
-                    return user;
-                }).orElse(user);
+                .map(user::withLocation)
+                .orElse(user);
     }
 
     // helpers

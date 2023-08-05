@@ -38,15 +38,18 @@ public class UserDTO {
 
     private Location location;
 
-    public void withMatch(Double match) {
+    public UserDTO withMatch(Double match) {
         this.match = match;
+        return this;
     }
 
-    public void withDistance(Double distance) {
+    public UserDTO withDistance(Double distance) {
         this.distance = distance;
+        return this;
     }
 
-    public void withLocation(Location location) {
+    public UserDTO withLocation(Location location) {
         this.location = location;
+        return this;
     }
 }
