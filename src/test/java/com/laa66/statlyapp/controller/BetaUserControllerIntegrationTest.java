@@ -34,9 +34,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(BetaController.class)
+@WebMvcTest(BetaUserController.class)
 @Import(TestSecurityConfig.class)
-public class BetaControllerIntegrationTest {
+public class BetaUserControllerIntegrationTest {
 
     @MockBean
     SpotifyTokenRepository spotifyTokenRepository;

@@ -16,28 +16,28 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/spotify")
 @RequiredArgsConstructor
-public class ApiController {
+public class SpotifyDataController {
 
     private final SpotifyAPIService spotifyApiService;
     private final LibraryAnalysisService libraryAnalysisService;
 
-    @GetMapping("/top/tracks")
+    @GetMapping("/tracks/top")
     public ResponseEntity<TracksDTO> tracks(@RequestParam String range, @AuthenticationPrincipal OAuth2User principal) {
         long userId = (long) principal.getAttributes().get("userId");
         TracksDTO tracksDTO = spotifyApiService.getTopTracks(userId, range);
         return ResponseEntity.ok(tracksDTO);
     }
 
-    @GetMapping("/top/artists")
+    @GetMapping("/artists/top")
     public ResponseEntity<ArtistsDTO> artists(@RequestParam String range, @AuthenticationPrincipal OAuth2User principal) {
         long userId = (long) principal.getAttributes().get("userId");
         ArtistsDTO artistsDTO = spotifyApiService.getTopArtists(userId, range);
         return ResponseEntity.ok(artistsDTO);
     }
 
-    @GetMapping("/top/genres")
+    @GetMapping("/genres/top")
     public ResponseEntity<GenresDTO> genres(@RequestParam String range, @AuthenticationPrincipal OAuth2User principal) {
         long userId = (long) principal.getAttributes().get("userId");
         ArtistsDTO artistsDTO = spotifyApiService.getTopArtists(userId, range);
@@ -45,7 +45,7 @@ public class ApiController {
         return ResponseEntity.ok(genresDTO);
     }
 
-    @GetMapping("/recently")
+    @GetMapping("/tracks/history")
     public ResponseEntity<RecentlyPlayedDTO> recently() {
         RecentlyPlayedDTO recentlyPlayedDTO = spotifyApiService.getRecentlyPlayed();
         return ResponseEntity.ok(recentlyPlayedDTO);

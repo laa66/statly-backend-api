@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/beta")
 @RequiredArgsConstructor
-public class BetaController {
+public class BetaUserController {
 
     private final BetaUserService betaUserService;
     private final MailService mailService;
