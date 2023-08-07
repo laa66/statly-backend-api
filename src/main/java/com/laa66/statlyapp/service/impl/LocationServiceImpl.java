@@ -39,6 +39,15 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public Collection<UserDTO> findUsersNearby(long userId) {
-        return null;
+        UserDTO baseUser = userService.findUserById(userId);
+        List<UserDTO> users = userService.findAllUsers()
+                .stream()
+                .filter(userDTO -> userId != Long.parseLong(userDTO.getId()) && baseUser.isNearby(userDTO))
+                .map(mapAPIService::getReverseGeocoding)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), collected -> {
+                    collected.add(0, baseUser);
+                    return collected;
+                }));
+        return mapAPIService.getDistanceMatrix(users);
     }
 }

@@ -68,14 +68,7 @@ public class BattlerUnitTest {
                 "mainstream", 45.,
                 "boringness", 260.),
                 List.of())); // 315
-        battler2 = new Battler(1L, new AnalysisDTO(Map.of("tempo", 120.,
-                "valence", .35,
-                "energy", .60,
-                "danceability", .45,
-                "mainstream", 45.,
-                "boringness", 260.),
-                List.of())); // 315
-        Pair<Battler, Battler> battle = battler1.battle(battler2);
+        Pair<Battler, Battler> battle = battler1.battle(battler1);
         assertNull(battle);
     }
 

@@ -52,4 +52,9 @@ public class UserDTO {
         this.location = location;
         return this;
     }
+
+    public boolean isNearby(UserDTO user) {
+        return Math.abs(this.getCoordinates().getLongitude() - user.getCoordinates().getLongitude()) < 0.3
+                && Math.abs(this.getCoordinates().getLatitude() - user.getCoordinates().getLatitude()) < 0.3;
+    }
 }

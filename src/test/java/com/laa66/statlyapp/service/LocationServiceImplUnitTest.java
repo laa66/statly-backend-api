@@ -78,5 +78,43 @@ class LocationServiceImplUnitTest {
         assertThrows(UserNotFoundException.class, () -> locationService.findClosestMatchingUsers(1));
     }
 
+    @Test
+    void shouldFindUsersNearbyValidId() {
+        UserDTO user1 = UserDTO.builder()
+                .id("1")
+                .coordinates(new Coordinates(50.5, 54.3))
+                .build();
+        UserDTO user2 = UserDTO.builder()
+                .id("2")
+                .coordinates(new Coordinates(50.3, 54.54))
+                .build();
+        UserDTO user3 = UserDTO.builder()
+                .id("3")
+                .coordinates(new Coordinates(12.3, 45.0))
+                .build();
+        List<UserDTO> users = List.of(user1, user2, user3);
+        when(userService.findUserById(1L)).thenReturn(user1);
+        when(userService.findAllUsers()).thenReturn(users);
+        when(mapAPIService.getReverseGeocoding(argThat(user1::isNearby)))
+                .thenReturn(user2);
+        when(mapAPIService.getDistanceMatrix(argThat(arg ->
+                arg.size() == 2 && arg.get(0)
+                        .getId()
+                        .equals(user1.getId()) && arg.get(1).isNearby(user1)
+        ))).thenReturn(users);
+        Collection<UserDTO> usersNearby = locationService.findUsersNearby(1L);
+        assertEquals(3, usersNearby.size());
+        verify(userService, times(1)).findUserById(anyLong());
+        verify(userService, times(1)).findAllUsers();
+        verify(mapAPIService, times(1)).getReverseGeocoding(any());
+        verify(mapAPIService, times(1)).getDistanceMatrix(anyList());
+    }
+
+    @Test
+    void shouldFindUsersNearbyInvalidId() {
+        when(userService.findUserById(1)).thenThrow(UserNotFoundException.class);
+        assertThrows(UserNotFoundException.class, () -> locationService.findUsersNearby(1));
+
+    }
 
 }
