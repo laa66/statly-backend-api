@@ -1,5 +1,6 @@
 package com.laa66.statlyapp.controller;
 
+import com.icegreen.greenmail.configuration.UserBean;
 import com.laa66.statlyapp.DTO.UserDTO;
 import com.laa66.statlyapp.config.TestSecurityConfig;
 import com.laa66.statlyapp.jwt.JwtProvider;
@@ -75,6 +76,30 @@ class LocationDataControllerUnitTest {
                 );
 
         mockMvc.perform(get("/api/location/users/matching")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isFound());
+    }
+
+    @Test
+    void shouldFindUsersNearby() throws Exception {
+        UserDTO user1 = UserDTO.builder()
+                .id("1")
+                .build();
+        UserDTO user2 = UserDTO.builder()
+                .id("2")
+                .build();
+        when(locationService.findUsersNearby(1L))
+                .thenReturn(List.of(user1, user2));
+
+        mockMvc.perform(get("/api/location/users/nearby")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer token"))
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$", hasSize(2))
+                );
+
+        mockMvc.perform(get("/api/location/users/nearby")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isFound());
     }

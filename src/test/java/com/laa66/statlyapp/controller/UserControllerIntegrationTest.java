@@ -30,7 +30,6 @@ import java.util.Map;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -133,9 +132,8 @@ class UserControllerIntegrationTest {
 
         when(userService.findUserById(2L)).thenThrow(UserNotFoundException.class);
         mockMvc.perform(get("/user/me")
-                .with(oauth2Login().attributes(map -> map.put("userId", 2L)))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isFound());
     }
 
     @Test

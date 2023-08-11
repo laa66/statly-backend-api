@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(BetaUserController.class)
 @Import(TestSecurityConfig.class)
-public class BetaUserControllerIntegrationTest {
+class BetaUserControllerIntegrationTest {
 
     @MockBean
     SpotifyTokenRepository spotifyTokenRepository;

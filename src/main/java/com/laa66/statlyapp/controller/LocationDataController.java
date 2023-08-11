@@ -26,4 +26,11 @@ public class LocationDataController {
         return ResponseEntity.ok(closestMatchingUsers);
     }
 
+    @GetMapping("/users/nearby")
+    public ResponseEntity<Collection<UserDTO>> findUsersNearby(@AuthenticationPrincipal OAuth2UserWrapper principal) {
+        Long userId = principal.getUserId();
+        Collection<UserDTO> usersNearby = locationService.findUsersNearby(userId);
+        return ResponseEntity.ok(usersNearby);
+    }
+
 }

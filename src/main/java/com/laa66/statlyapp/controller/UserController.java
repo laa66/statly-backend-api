@@ -4,6 +4,7 @@ import com.laa66.statlyapp.DTO.FollowersDTO;
 import com.laa66.statlyapp.DTO.ProfileDTO;
 import com.laa66.statlyapp.DTO.UserDTO;
 import com.laa66.statlyapp.constants.StatlyConstants;
+import com.laa66.statlyapp.model.OAuth2UserWrapper;
 import com.laa66.statlyapp.service.SocialService;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.UserService;
@@ -30,8 +31,8 @@ public class UserController {
     private final SocialService socialService;
 
     @GetMapping("/me")
-    public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal OAuth2User principal) {
-        long userId = (long) principal.getAttributes().get("userId");
+    public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal OAuth2UserWrapper principal) {
+        long userId = principal.getUserId();
         UserDTO userDTO = userService.findUserById(userId);
         return ResponseEntity.ok(userDTO);
     }
@@ -43,8 +44,8 @@ public class UserController {
     }
 
     @GetMapping("/me/following")
-    public ResponseEntity<FollowersDTO> getCurrentUserFollowing(@AuthenticationPrincipal OAuth2User principal) {
-        long userId = (long) principal.getAttributes().get("userId");
+    public ResponseEntity<FollowersDTO> getCurrentUserFollowing(@AuthenticationPrincipal OAuth2UserWrapper principal) {
+        long userId = principal.getUserId();
         FollowersDTO followersDTO = socialService.getFollowers(userId, StatlyConstants.FOLLOWING);
         return ResponseEntity.ok(followersDTO);
     }
@@ -56,15 +57,15 @@ public class UserController {
     }
 
     @PutMapping("/follow")
-    public ResponseEntity<Void> follow(@AuthenticationPrincipal OAuth2User principal, @RequestParam("user_id") long followId) {
-        long userId = (long) principal.getAttributes().get("userId");
+    public ResponseEntity<Void> follow(@AuthenticationPrincipal OAuth2UserWrapper principal, @RequestParam("user_id") long followId) {
+        long userId = principal.getUserId();
         socialService.follow(userId, followId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/unfollow")
-    public ResponseEntity<Void> unfollow(@AuthenticationPrincipal OAuth2User principal, @RequestParam("user_id") long followId) {
-        long userId = (long) principal.getAttributes().get("userId");
+    public ResponseEntity<Void> unfollow(@AuthenticationPrincipal OAuth2UserWrapper principal, @RequestParam("user_id") long followId) {
+        long userId = principal.getUserId();
         socialService.unfollow(userId, followId);
         return ResponseEntity.noContent().build();
     }
@@ -82,9 +83,9 @@ public class UserController {
     }
 
     @PutMapping("/links")
-    public ResponseEntity<Void> addLinks(@AuthenticationPrincipal OAuth2User principal, @Valid @RequestBody Map<String, String> socialLinks) {
-        long userid = (long) principal.getAttributes().get("userId");
-        socialService.updateSocialLinks(userid, socialLinks);
+    public ResponseEntity<Void> addLinks(@AuthenticationPrincipal OAuth2UserWrapper principal, @Valid @RequestBody Map<String, String> socialLinks) {
+        long userId = principal.getUserId();
+        socialService.updateSocialLinks(userId, socialLinks);
         return ResponseEntity.noContent().build();
     }
 

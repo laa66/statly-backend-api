@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = {CacheConfig.class, SpotifyTokenRepositoryImpl.class})
 @MockBean(value = StatsService.class)
-public class SpotifyTokenRepositoryIntegrationTest {
+class SpotifyTokenRepositoryIntegrationTest {
 
     @Autowired
     SpotifyTokenRepository spotifyTokenRepository;

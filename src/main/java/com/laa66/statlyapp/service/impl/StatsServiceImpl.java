@@ -133,7 +133,6 @@ public class StatsServiceImpl implements StatsService {
                             Integer lastPosition = item.getTracks().getOrDefault(artist + "_" + name, null);
                             Integer difference = lastPosition != null ? (lastPosition - actualPosition) : null;
                             track.setDifference(difference);
-                            //log.info("Today: " + name + " - " + actualPosition + " / Yesterday: " + name + " - " + lastPosition + " / diff: " + track.getDifference());
                         } catch (NullPointerException | IndexOutOfBoundsException e) {
                             log.error("Error occurred because there are no artists.", e);
                         }
@@ -154,7 +153,6 @@ public class StatsServiceImpl implements StatsService {
                         Integer lastPosition = item.getArtists().getOrDefault(name, null);
                         Integer difference = lastPosition != null ? (lastPosition - actualPosition) : null;
                         artist.setDifference(difference);
-                        //log.info("Today: " + name + " - " + actualPosition + " / Yesterday: " + name + " - " + lastPosition + " / diff: " + artist.getDifference());
                     });
                 return dto;
                 }).orElse(dto);
@@ -172,7 +170,6 @@ public class StatsServiceImpl implements StatsService {
                         Integer lastScore = item.getGenres().getOrDefault(name, null);
                         Integer difference = lastScore != null ? (actualScore - lastScore) : null;
                         genre.setDifference(difference);
-                        //log.info("Today: " + name + " - " + actualScore + " / Yesterday: " + name + " - " + lastScore + " / diff: " + genre.getDifference());
                     });
                     return dto;
                 }).orElse(dto);

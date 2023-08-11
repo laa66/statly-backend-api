@@ -15,7 +15,7 @@ import java.util.Optional;
 import static com.laa66.statlyapp.jwt.CookieUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CookieUtilsUnitTest {
+class CookieUtilsUnitTest {
 
     @Test
     void shouldGetCookie() {

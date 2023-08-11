@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
-public class SocialServiceImplUnitTest {
+class SocialServiceImplUnitTest {
 
     @Mock
     UserRepository userRepository;
