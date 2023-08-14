@@ -21,4 +21,6 @@ public interface SocialService {
 
     User updateSocialLinks(long userId, Map<String, String> socialLinks);
 
+    void saveUserLocation(long userId, Double longitude, Double latitude);
+
 }

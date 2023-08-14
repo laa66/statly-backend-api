@@ -25,7 +25,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -249,6 +249,23 @@ class SocialServiceImplUnitTest {
 
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> socialService.updateSocialLinks(2L, Map.of()));
+    }
+
+    @Test
+    void shouldSaveUserLocation() {
+        User user = new User()
+                .withId(1L)
+                .withUserInfo(new UserInfo(1, "ig", null, null, null, null));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        socialService.saveUserLocation(1L, 53.21, 32.67);
+        verify(userRepository, times(1))
+                .save(argThat(arg ->
+                        arg.getId() == 1L &&
+                        arg.getUserInfo().getLongitude() == 53.21 &&
+                        arg.getUserInfo().getLatitude() == 32.67));
+
+        when(userRepository.findById(2L)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> socialService.saveUserLocation(2L, 32.12, 53.31));
     }
 
 }

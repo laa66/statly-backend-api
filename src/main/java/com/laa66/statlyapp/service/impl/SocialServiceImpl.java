@@ -96,6 +96,17 @@ public class SocialServiceImpl implements SocialService {
                 }).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER));
     }
 
+    @Override
+    public void saveUserLocation(long userId, Double longitude, Double latitude) {
+        userRepository.save(userRepository.findById(userId)
+                .map(user -> {
+                    user.getUserInfo()
+                            .setLongitude(longitude)
+                            .setLatitude(latitude);
+                    return user;
+                }).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER));
+    }
+
     //helpers
     private ProfileDTO createProfileDTO(User user, long userId) {
         return new ProfileDTO(
