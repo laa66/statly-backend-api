@@ -11,7 +11,6 @@ import com.laa66.statlyapp.repository.UserRepository;
 import com.laa66.statlyapp.service.SocialService;
 import com.laa66.statlyapp.service.StatsService;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
