@@ -3,8 +3,8 @@ package com.laa66.statlyapp.controller;
 import com.laa66.statlyapp.DTO.FollowersDTO;
 import com.laa66.statlyapp.DTO.ProfileDTO;
 import com.laa66.statlyapp.DTO.UserDTO;
-import com.laa66.statlyapp.constants.StatlyConstants;
 import com.laa66.statlyapp.model.OAuth2UserWrapper;
+import com.laa66.statlyapp.model.mapbox.Coordinates;
 import com.laa66.statlyapp.service.SocialService;
 import com.laa66.statlyapp.service.UserService;
 import jakarta.validation.Valid;
@@ -63,6 +63,13 @@ public class SocialController {
     public ResponseEntity<Void> addLinks(@AuthenticationPrincipal OAuth2UserWrapper principal, @Valid @RequestBody Map<String, String> socialLinks) {
         long userId = principal.getUserId();
         socialService.updateSocialLinks(userId, socialLinks);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/location")
+    public ResponseEntity<Void> saveLocation(@AuthenticationPrincipal OAuth2UserWrapper principal, @RequestBody Coordinates coordinates) {
+        long userId = principal.getUserId();
+        socialService.saveUserLocation(userId, coordinates.getLongitude(), coordinates.getLatitude());
         return ResponseEntity.noContent().build();
     }
 }

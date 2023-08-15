@@ -8,6 +8,7 @@ import com.laa66.statlyapp.constants.StatlyConstants;
 import com.laa66.statlyapp.exception.UserNotFoundException;
 import com.laa66.statlyapp.jwt.JwtProvider;
 import com.laa66.statlyapp.model.OAuth2UserWrapper;
+import com.laa66.statlyapp.model.mapbox.Coordinates;
 import com.laa66.statlyapp.model.spotify.Image;
 import com.laa66.statlyapp.repository.SpotifyTokenRepository;
 import com.laa66.statlyapp.service.SocialService;
@@ -31,8 +32,7 @@ import java.util.Map;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -220,6 +220,22 @@ class SocialControllerIntegrationTest {
 
         mockMvc.perform(put("/member/links")
                         .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isFound());
+    }
+
+    @Test
+    void shouldSaveLocation() throws Exception {
+        Coordinates coordinates = new Coordinates(53.4312, -22.3345);
+        mockMvc.perform(post("/member/location")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer token")
+                .content(mapper.writeValueAsString(coordinates)))
+                .andExpect(status().isNoContent());
+        verify(socialService, times(1)).saveUserLocation(1, 53.4312, -22.3345);
+
+        mockMvc.perform(post("/member/location")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(coordinates)))
                 .andExpect(status().isFound());
     }
 
