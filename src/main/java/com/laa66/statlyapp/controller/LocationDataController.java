@@ -22,7 +22,7 @@ public class LocationDataController {
     @GetMapping("/users/matching")
     public ResponseEntity<Collection<UserDTO>> findClosestMatchingUsers(@AuthenticationPrincipal OAuth2UserWrapper principal) {
         Long userId = principal.getUserId();
-        Collection<UserDTO> closestMatchingUsers = locationService.findClosestMatchingUsers(userId);
+        Collection<UserDTO> closestMatchingUsers = locationService.findBestMatchingUsers(userId);
         return ResponseEntity.ok(closestMatchingUsers);
     }
 

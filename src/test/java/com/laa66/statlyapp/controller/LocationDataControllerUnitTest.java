@@ -65,7 +65,7 @@ class LocationDataControllerUnitTest {
         UserDTO user2 = UserDTO.builder()
                 .id("2")
                 .build();
-        when(locationService.findClosestMatchingUsers(1L))
+        when(locationService.findBestMatchingUsers(1L))
                 .thenReturn(List.of(user1, user2));
         mockMvc.perform(get("/api/location/users/matching")
                 .header("Authorization", "Bearer token")

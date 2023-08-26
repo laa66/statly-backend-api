@@ -36,7 +36,7 @@ class LocationServiceImplUnitTest {
     LocationServiceImpl locationService;
 
     @Test
-    void shouldFindClosestMatchingUsersValidId() {
+    void shouldFindBestMatchingUsersValidId() {
         UserDTO user1 = UserDTO.builder()
                 .id("1")
                 .coordinates(new Coordinates(50., 54.))
@@ -56,26 +56,22 @@ class LocationServiceImplUnitTest {
         when(analysisService.getUsersMatching(1, 3))
                 .thenReturn(Map.of("overall", 34.));
         when(mapAPIService.getReverseGeocoding(any()))
-                .thenReturn(user2.withLocation(new Location()))
-                .thenReturn(user3.withLocation(new Location()));
+                .thenReturn(user2.withLocation(new Location())
+                        .withDistance(5.))
+                .thenReturn(user3.withLocation(new Location())
+                        .withDistance(6.));
         when(userService.findUserById(1)).thenReturn(user1);
-        when(mapAPIService.getDistanceMatrix(argThat(arg ->
-             arg.size() == 3 && arg.get(0)
-                     .getId()
-                     .equals(user1.getId())))
-        ).thenReturn(users);
-        Collection<UserDTO> closestMatchingUsers = locationService.findClosestMatchingUsers(1);
+        Collection<UserDTO> closestMatchingUsers = locationService.findBestMatchingUsers(1);
         assertEquals(3, closestMatchingUsers.size());
         verify(userService, times(1)).findAllUsers();
         verify(analysisService, times(2)).getUsersMatching(anyLong(), anyLong());
         verify(mapAPIService, times(2)).getReverseGeocoding(any());
-        verify(mapAPIService, times(1)).getDistanceMatrix(argThat(arg -> arg.size() == 3));
     }
 
     @Test
-    void shouldFindClosestMatchingUsersInvalidId() {
+    void shouldFindBestMatchingUsersInvalidId() {
         when(userService.findUserById(1)).thenThrow(UserNotFoundException.class);
-        assertThrows(UserNotFoundException.class, () -> locationService.findClosestMatchingUsers(1));
+        assertThrows(UserNotFoundException.class, () -> locationService.findBestMatchingUsers(1));
     }
 
     @Test
@@ -114,6 +110,22 @@ class LocationServiceImplUnitTest {
     void shouldFindUsersNearbyInvalidId() {
         when(userService.findUserById(1)).thenThrow(UserNotFoundException.class);
         assertThrows(UserNotFoundException.class, () -> locationService.findUsersNearby(1));
+    }
+
+    @Test
+    void shouldCalculateDistanceHaversine() {
+        UserDTO baseUser = UserDTO.builder()
+                .id("1")
+                .coordinates(new Coordinates(17.12664026741288,51.14271806954306))
+                .build();
+
+        UserDTO user = UserDTO.builder()
+                .id("2")
+                .coordinates(new Coordinates(17.076744434118698, 51.12063051665086))
+                .build();
+
+        UserDTO returnUser = locationService.calculateDistanceHaversine(baseUser, user);
+        assertEquals(4.260747329405308, returnUser.getDistance());
 
     }
 
