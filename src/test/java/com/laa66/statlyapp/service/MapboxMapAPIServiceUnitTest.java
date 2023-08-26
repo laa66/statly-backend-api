@@ -54,7 +54,7 @@ class MapboxMapAPIServiceUnitTest {
                         .build()
         );
         Matrix matrix = new Matrix("OK",
-                List.of(List.of(0., 5.6, 3.0)),
+                List.of(List.of(0., 5600.0, 3000.)),
                 Collections.emptyList());
         when(restTemplate.getForObject(MapboxAPI.DISTANCE_MATRIX.get()
                 .replace("{coordinates_list}", "50.1,1.5;25.0,1.5;30.7,1.5")

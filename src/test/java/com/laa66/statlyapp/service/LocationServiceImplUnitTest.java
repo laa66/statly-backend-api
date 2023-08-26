@@ -75,6 +75,27 @@ class LocationServiceImplUnitTest {
     }
 
     @Test
+    void shouldFindBestMatchingUsersNoCoordinates() {
+        UserDTO user1 = UserDTO.builder()
+                .id("1")
+                .coordinates(new Coordinates(50., 54.))
+                .build();
+        UserDTO user2 = UserDTO.builder()
+                .id("2")
+                .build();
+        UserDTO user3 = UserDTO.builder()
+                .id("3")
+                .build();
+        List<UserDTO> users = List.of(user1, user2, user3);
+        when(userService.findAllUsers()).thenReturn(users);
+        when(userService.findUserById(1)).thenReturn(user1);
+        Collection<UserDTO> matchingUsers = locationService.findBestMatchingUsers(1);
+        assertEquals(1, matchingUsers.size());
+        verify(userService, times(1)).findAllUsers();
+        verifyNoInteractions(mapAPIService, analysisService);
+    }
+
+    @Test
     void shouldFindUsersNearbyValidId() {
         UserDTO user1 = UserDTO.builder()
                 .id("1")
@@ -110,6 +131,30 @@ class LocationServiceImplUnitTest {
     void shouldFindUsersNearbyInvalidId() {
         when(userService.findUserById(1)).thenThrow(UserNotFoundException.class);
         assertThrows(UserNotFoundException.class, () -> locationService.findUsersNearby(1));
+    }
+
+    @Test
+    void shouldFindUsersNearbyNoCoordinatesNoNearby() {
+        UserDTO user1 = UserDTO.builder()
+                .id("1")
+                .coordinates(new Coordinates(50.5, 54.3))
+                .build();
+        UserDTO user2 = UserDTO.builder()
+                .id("2")
+                .build();
+        UserDTO user3 = UserDTO.builder()
+                .id("3")
+                .coordinates(new Coordinates(12.3, 45.0))
+                .build();
+        List<UserDTO> users = List.of(user1, user2, user3);
+        when(userService.findUserById(1L)).thenReturn(user1);
+        when(userService.findAllUsers()).thenReturn(users);
+
+        Collection<UserDTO> usersNearby = locationService.findUsersNearby(1L);
+        assertEquals(1, usersNearby.size());
+        verify(userService, times(1)).findUserById(anyLong());
+        verify(userService, times(1)).findAllUsers();
+        verifyNoInteractions(mapAPIService);
     }
 
     @Test

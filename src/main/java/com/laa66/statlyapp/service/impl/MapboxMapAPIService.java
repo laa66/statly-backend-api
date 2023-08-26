@@ -31,7 +31,7 @@ public class MapboxMapAPIService implements MapAPIService {
                 .filter(list -> !list.isEmpty())
                 .map(list -> list.get(0))
                 .map(dist -> IntStream.range(0, dist.size())
-                        .mapToObj(i -> users.get(i).withDistance(dist.get(i)))
+                        .mapToObj(i -> users.get(i).withDistance(dist.get(i) / 1000))
                         .toList())
                 .orElse(Collections.emptyList());
     }

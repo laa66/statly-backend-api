@@ -24,6 +24,7 @@ public class LocationServiceImpl implements LocationService {
         return userService.findAllUsers()
                 .stream()
                 .filter(userDTO -> userId != Long.parseLong(userDTO.getId()))
+                .filter(user -> user.getCoordinates() != null)
                 .map(user -> user.withMatch(analysisService
                             .getUsersMatching(userId, Long.parseLong(user.getId()))
                             .getOrDefault("overall", null)))
@@ -42,13 +43,15 @@ public class LocationServiceImpl implements LocationService {
         UserDTO baseUser = userService.findUserById(userId);
         List<UserDTO> users = userService.findAllUsers()
                 .stream()
-                .filter(userDTO -> userId != Long.parseLong(userDTO.getId()) && baseUser.isNearby(userDTO))
+                .filter(userDTO -> userId != Long.parseLong(userDTO.getId()))
+                .filter(user -> user.getCoordinates() != null)
+                .filter(baseUser::isNearby)
                 .map(mapAPIService::getReverseGeocoding)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), collected -> {
                     collected.add(0, baseUser);
                     return collected;
                 }));
-        return mapAPIService.getDistanceMatrix(users);
+        return users.size() > 1 ? mapAPIService.getDistanceMatrix(users) : users;
     }
 
     @Override
@@ -60,7 +63,7 @@ public class LocationServiceImpl implements LocationService {
         double dLon = (c2.getLongitude() - c1.getLongitude()) * Math.PI / 180;
         double dLat = (c2.getLatitude() - c1.getLatitude()) * Math.PI / 180;
 
-        double haversine = Math.sin(dLat / 2) 
+        double haversine = Math.sin(dLat / 2)
                 * Math.sin(dLat / 2)
                 + Math.cos(c1.getLatitude()
                 * Math.PI / 180)
