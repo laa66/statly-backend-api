@@ -74,4 +74,10 @@ public class LocationServiceImpl implements LocationService {
         double distance = earthRad * 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
         return user.withDistance(distance);
     }
+
+    @Override
+    public String getMapAccessToken() {
+        ResourceBundle resource = ResourceBundle.getBundle("application");
+        return resource.getString("api.matrix.access-token");
+    }
 }

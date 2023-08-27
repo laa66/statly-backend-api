@@ -8,4 +8,5 @@ public interface LocationService {
     Collection<UserDTO> findBestMatchingUsers(long userId);
     Collection<UserDTO> findUsersNearby(long userId);
     UserDTO calculateDistanceHaversine(UserDTO user1, UserDTO user2);
+    String getMapAccessToken();
 }
