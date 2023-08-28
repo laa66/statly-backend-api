@@ -77,7 +77,7 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public String getMapAccessToken() {
-        ResourceBundle resource = ResourceBundle.getBundle("application");
-        return resource.getString("api.matrix.access-token");
+        String accessToken = System.getenv("MAP_API_PUBLIC_TOKEN");
+        return "{\"token\":\"" + accessToken + "\"}";
     }
 }

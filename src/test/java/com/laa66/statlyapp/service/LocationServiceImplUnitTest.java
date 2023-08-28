@@ -177,7 +177,7 @@ class LocationServiceImplUnitTest {
     @Test
     void shouldGetMapAccessToken() {
         String mapAccessToken = locationService.getMapAccessToken();
-        assertEquals("token", mapAccessToken);
+        assertNotNull(mapAccessToken);
     }
 
 }

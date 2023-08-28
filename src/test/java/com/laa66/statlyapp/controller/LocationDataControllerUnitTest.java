@@ -1,6 +1,5 @@
 package com.laa66.statlyapp.controller;
 
-import com.icegreen.greenmail.configuration.UserBean;
 import com.laa66.statlyapp.DTO.UserDTO;
 import com.laa66.statlyapp.config.TestSecurityConfig;
 import com.laa66.statlyapp.jwt.JwtProvider;
@@ -23,8 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -102,5 +100,17 @@ class LocationDataControllerUnitTest {
         mockMvc.perform(get("/api/location/users/nearby")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isFound());
+    }
+
+    @Test
+    void shouldGetMapAccessToken() throws Exception {
+        when(locationService.getMapAccessToken()).thenReturn("public_token");
+        mockMvc.perform(get("/api/location/token")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer token"))
+                .andExpectAll(
+                        status().isOk(),
+                        content().string(is("public_token"))
+                );
     }
 }

@@ -33,4 +33,10 @@ public class LocationDataController {
         return ResponseEntity.ok(usersNearby);
     }
 
+    @GetMapping("/token")
+    public ResponseEntity<String> getMapAccessToken() {
+        String mapAccessToken = locationService.getMapAccessToken();
+        return ResponseEntity.ok(mapAccessToken);
+    }
+
 }
