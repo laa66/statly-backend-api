@@ -7,6 +7,7 @@ import com.laa66.statlyapp.model.OAuth2UserWrapper;
 import com.laa66.statlyapp.repository.SpotifyTokenRepository;
 import com.laa66.statlyapp.service.LocationService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
