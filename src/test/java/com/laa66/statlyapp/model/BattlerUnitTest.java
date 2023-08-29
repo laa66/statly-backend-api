@@ -1,6 +1,7 @@
 package com.laa66.statlyapp.model;
 
 import com.laa66.statlyapp.DTO.AnalysisDTO;
+import com.laa66.statlyapp.model.spotify.Battler;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.util.Pair;
 
@@ -9,7 +10,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class BattlerUnitTest {
+class BattlerUnitTest {
 
     Battler battler1;
     Battler battler2;
@@ -67,14 +68,7 @@ public class BattlerUnitTest {
                 "mainstream", 45.,
                 "boringness", 260.),
                 List.of())); // 315
-        battler2 = new Battler(1L, new AnalysisDTO(Map.of("tempo", 120.,
-                "valence", .35,
-                "energy", .60,
-                "danceability", .45,
-                "mainstream", 45.,
-                "boringness", 260.),
-                List.of())); // 315
-        Pair<Battler, Battler> battle = battler1.battle(battler2);
+        Pair<Battler, Battler> battle = battler1.battle(battler1);
         assertNull(battle);
     }
 

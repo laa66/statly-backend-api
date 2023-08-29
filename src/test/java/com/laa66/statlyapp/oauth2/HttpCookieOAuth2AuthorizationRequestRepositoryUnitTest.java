@@ -10,7 +10,7 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
 import static com.laa66.statlyapp.jwt.CookieUtils.serialize;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HttpCookieOAuth2AuthorizationRequestRepositoryUnitTest {
+class HttpCookieOAuth2AuthorizationRequestRepositoryUnitTest {
 
     HttpCookieOAuth2AuthorizationRequestRepository requestRepository = new HttpCookieOAuth2AuthorizationRequestRepository();
 

@@ -1,6 +1,6 @@
 package com.laa66.statlyapp.DTO;
 
-import com.laa66.statlyapp.model.Genre;
+import com.laa66.statlyapp.model.spotify.Genre;
 import lombok.*;
 
 import java.time.LocalDate;

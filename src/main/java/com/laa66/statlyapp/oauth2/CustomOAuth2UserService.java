@@ -2,13 +2,13 @@ package com.laa66.statlyapp.oauth2;
 
 import com.laa66.statlyapp.DTO.UserDTO;
 import com.laa66.statlyapp.entity.User;
+import com.laa66.statlyapp.entity.UserInfo;
 import com.laa66.statlyapp.entity.UserStats;
 import com.laa66.statlyapp.exception.UserAuthenticationException;
-import com.laa66.statlyapp.model.Image;
+import com.laa66.statlyapp.model.spotify.Image;
 import com.laa66.statlyapp.model.OAuth2UserWrapper;
 import com.laa66.statlyapp.service.UserService;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -36,13 +36,15 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         try {
             String email = oAuth2User.getEmail();
             UserDTO userDTO = Optional.ofNullable(userService.findUserByEmail(email))
-                    .orElseGet(() -> userService.saveUser(new User(0,
-                            oAuth2User.getId(),
-                            oAuth2User.getDisplayName(),
-                            email,
-                            getImageUrl(oAuth2User.getImages()),
-                            LocalDateTime.now(),
-                            new UserStats())));
+                    .orElseGet(() -> userService.saveUser(
+                            new User().withId(0)
+                                    .withExternalId(oAuth2User.getId())
+                                    .withUsername(oAuth2User.getDisplayName())
+                                    .withEmail(email)
+                                    .withImage(getImageUrl(oAuth2User.getImages()))
+                                    .withJoinDate(LocalDateTime.now())
+                                    .withUserStats(new UserStats())
+                                    .withUserInfo(new UserInfo())));
             attributes.put("userId", Long.parseLong(userDTO.getId()));
             return new OAuth2UserWrapper(new DefaultOAuth2User(oAuth2User.getAuthorities(),
                     Collections.unmodifiableMap(attributes),

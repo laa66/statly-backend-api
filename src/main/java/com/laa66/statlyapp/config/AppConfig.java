@@ -26,6 +26,16 @@ public class AppConfig {
     }
 
     @Bean
+    public MapAPIService matrixAPIService(@Value("${api.matrix.access-token}") String accessToken, @Qualifier("restTemplate") RestTemplate restTemplate) {
+        return new MapboxMapAPIService(accessToken, restTemplate);
+    }
+
+    @Bean
+    public LocationService locationService(MapAPIService mapAPIService, UserService userService, LibraryAnalysisService analysisService) {
+        return new LocationServiceImpl(mapAPIService, userService, analysisService);
+    }
+
+    @Bean
     public SpotifyTokenService spotifyTokenService(@Qualifier("restTemplate") RestTemplate restTemplate, SpotifyTokenRepository spotifyTokenRepository) {
         return new SpotifyTokenServiceImpl(restTemplate, spotifyTokenRepository);
     }
@@ -47,9 +57,13 @@ public class AppConfig {
     }
 
     @Bean
-    public UserService userService(UserRepository userRepository,
-                                   BetaUserRepository betaUserRepository) {
-        return new UserServiceImpl(userRepository, betaUserRepository);
+    public UserService userService(UserRepository userRepository) {
+        return new UserServiceImpl(userRepository);
+    }
+
+    @Bean
+    public BetaUserService betaUserService(BetaUserRepository betaUserRepository) {
+        return new BetaUserServiceImpl(betaUserRepository);
     }
 
     @Bean

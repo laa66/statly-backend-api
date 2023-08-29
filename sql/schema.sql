@@ -5,10 +5,17 @@ CREATE TABLE IF NOT EXISTS user_stats (
     mainstream DOUBLE NOT NULL,
     boringness DOUBLE NOT NULL,
     points BIGINT NOT NULL,
+    battle_count INT NOT NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS user_info (
+	id BIGINT AUTO_INCREMENT,
     fb VARCHAR(100),
     ig VARCHAR(100),
     twitter VARCHAR(100),
-    battle_count INT NOT NULL,
+    longitude DOUBLE,
+    latitude DOUBLE,
     PRIMARY KEY (id)
 );
 
@@ -20,9 +27,12 @@ CREATE TABLE IF NOT EXISTS users (
     image_url VARCHAR(100) NOT NULL,
     join_date DATETIME NOT NULL,
     user_stats_id BIGINT,
+    user_info_id BIGINT,
     PRIMARY KEY (id),
-    FOREIGN KEY (user_stats_id) REFERENCES user_stats(id)
+    FOREIGN KEY (user_stats_id) REFERENCES user_stats(id),
+    FOREIGN KEY (user_info_id) REFERENCES user_info(id)
 );
+
 
 CREATE TABLE IF NOT EXISTS user_friends (
 	user_id BIGINT NOT NULL,

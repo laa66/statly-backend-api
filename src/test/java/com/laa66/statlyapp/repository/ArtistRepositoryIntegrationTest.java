@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
-public class ArtistRepositoryIntegrationTest extends MySQLBaseContainerTest {
+class ArtistRepositoryIntegrationTest extends MySQLBaseContainerTest {
 
     @Autowired
     ArtistRepository artistRepository;

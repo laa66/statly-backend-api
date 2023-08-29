@@ -5,16 +5,15 @@ import com.laa66.statlyapp.DTO.GenresDTO;
 import com.laa66.statlyapp.DTO.TracksDTO;
 import com.laa66.statlyapp.entity.*;
 import com.laa66.statlyapp.exception.UserNotFoundException;
-import com.laa66.statlyapp.model.Genre;
-import com.laa66.statlyapp.model.Artist;
-import com.laa66.statlyapp.model.Track;
+import com.laa66.statlyapp.model.spotify.Genre;
+import com.laa66.statlyapp.model.spotify.Artist;
+import com.laa66.statlyapp.model.spotify.Track;
 import com.laa66.statlyapp.repository.ArtistRepository;
 import com.laa66.statlyapp.repository.GenreRepository;
 import com.laa66.statlyapp.repository.TrackRepository;
 import com.laa66.statlyapp.repository.UserRepository;
 import com.laa66.statlyapp.service.StatsService;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.transaction.annotation.Transactional;
@@ -108,21 +107,15 @@ public class StatsServiceImpl implements StatsService {
     @Override
     public void saveUserStats(long userId, Map<String, Double> statsMap) {
         User user = userRepository.findById(userId)
-                .map(foundUser -> {
-                    foundUser.setUserStats(new UserStats(
-                            foundUser.getUserStats().getId(),
-                            statsMap.getOrDefault("energy", 0.),
-                            statsMap.getOrDefault("tempo", 0.),
-                            statsMap.getOrDefault("mainstream", 0.),
-                            statsMap.getOrDefault("boringness", 0.),
-                            foundUser.getUserStats().getPoints(),
-                            foundUser.getUserStats().getIg(),
-                            foundUser.getUserStats().getFb(),
-                            foundUser.getUserStats().getTwitter(),
-                            foundUser.getUserStats().getBattleCount()
-                    ));
-                    return foundUser;
-                }).orElseThrow(() -> new UserNotFoundException("User not found"));
+                .map(foundUser -> foundUser.withUserStats(new UserStats(
+                        foundUser.getUserStats().getId(),
+                        statsMap.getOrDefault("energy", 0.),
+                        statsMap.getOrDefault("tempo", 0.),
+                        statsMap.getOrDefault("mainstream", 0.),
+                        statsMap.getOrDefault("boringness", 0.),
+                        foundUser.getUserStats().getPoints(),
+                        foundUser.getUserStats().getBattleCount()
+                ))).orElseThrow(() -> new UserNotFoundException("User not found"));
         userRepository.save(user);
     }
 
@@ -140,7 +133,6 @@ public class StatsServiceImpl implements StatsService {
                             Integer lastPosition = item.getTracks().getOrDefault(artist + "_" + name, null);
                             Integer difference = lastPosition != null ? (lastPosition - actualPosition) : null;
                             track.setDifference(difference);
-                            //log.info("Today: " + name + " - " + actualPosition + " / Yesterday: " + name + " - " + lastPosition + " / diff: " + track.getDifference());
                         } catch (NullPointerException | IndexOutOfBoundsException e) {
                             log.error("Error occurred because there are no artists.", e);
                         }
@@ -161,7 +153,6 @@ public class StatsServiceImpl implements StatsService {
                         Integer lastPosition = item.getArtists().getOrDefault(name, null);
                         Integer difference = lastPosition != null ? (lastPosition - actualPosition) : null;
                         artist.setDifference(difference);
-                        //log.info("Today: " + name + " - " + actualPosition + " / Yesterday: " + name + " - " + lastPosition + " / diff: " + artist.getDifference());
                     });
                 return dto;
                 }).orElse(dto);
@@ -179,7 +170,6 @@ public class StatsServiceImpl implements StatsService {
                         Integer lastScore = item.getGenres().getOrDefault(name, null);
                         Integer difference = lastScore != null ? (actualScore - lastScore) : null;
                         genre.setDifference(difference);
-                        //log.info("Today: " + name + " - " + actualScore + " / Yesterday: " + name + " - " + lastScore + " / diff: " + genre.getDifference());
                     });
                     return dto;
                 }).orElse(dto);

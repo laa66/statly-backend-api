@@ -6,14 +6,16 @@ import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.SpotifyAPIEmptyResponseException;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
-import com.laa66.statlyapp.model.*;
-import com.laa66.statlyapp.model.request.RequestUpdatePlaylist;
-import com.laa66.statlyapp.model.response.ResponsePlaylists;
-import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
+import com.laa66.statlyapp.model.spotify.request.RequestUpdatePlaylist;
+import com.laa66.statlyapp.model.spotify.response.ResponsePlaylists;
+import com.laa66.statlyapp.model.spotify.response.ResponseTracksAnalysis;
+import com.laa66.statlyapp.model.spotify.Playlist;
+import com.laa66.statlyapp.model.spotify.PlaylistInfo;
+import com.laa66.statlyapp.model.spotify.PlaylistTrack;
+import com.laa66.statlyapp.model.spotify.Track;
 import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.StatsService;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -33,6 +35,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static com.laa66.statlyapp.constants.SpotifyAPI.*;
+
 @AllArgsConstructor
 public class SpotifyAPIServiceImpl implements SpotifyAPIService {
 
@@ -44,13 +48,13 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
 
     @Override
     public UserDTO getCurrentUser() {
-        return restTemplate.exchange(SpotifyAPI.CURRENT_USER.get(), HttpMethod.GET, null, UserDTO.class).getBody();
+        return restTemplate.exchange(CURRENT_USER.get(), HttpMethod.GET, null, UserDTO.class).getBody();
     }
 
     @Override
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
     public TracksDTO getTopTracks(long userId, String range) {
-        TracksDTO body = restTemplate.exchange(SpotifyAPI.TOP_TRACKS.get() + range + "_term", HttpMethod.GET, null, TracksDTO.class).getBody();
+        TracksDTO body = restTemplate.exchange(TOP_TRACKS.get() + range + "_term", HttpMethod.GET, null, TracksDTO.class).getBody();
         return Optional.ofNullable(body).map(topTracksDTO -> {
             topTracksDTO.withRange(range);
             return statsService.compareTracks(userId, topTracksDTO);
@@ -60,7 +64,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     @Override
     @Cacheable(cacheNames = "api", keyGenerator = "customKeyGenerator")
     public ArtistsDTO getTopArtists(long userId, String range) {
-        ArtistsDTO body = restTemplate.exchange(SpotifyAPI.TOP_ARTISTS.get() + range + "_term", HttpMethod.GET, null, ArtistsDTO.class).getBody();
+        ArtistsDTO body = restTemplate.exchange(TOP_ARTISTS.get() + range + "_term", HttpMethod.GET, null, ArtistsDTO.class).getBody();
         return Optional.ofNullable(body).map(topArtistsDTO -> {
                     topArtistsDTO.withRange(range);
                     return statsService.compareArtists(userId, topArtistsDTO);
@@ -69,7 +73,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
 
     @Override
     public RecentlyPlayedDTO getRecentlyPlayed() {
-        return restTemplate.exchange(SpotifyAPI.RECENTLY_PLAYED_TRACKS.get(), HttpMethod.GET, null, RecentlyPlayedDTO.class).getBody();
+        return restTemplate.exchange(RECENTLY_PLAYED_TRACKS.get(), HttpMethod.GET, null, RecentlyPlayedDTO.class).getBody();
     }
 
     @Override
@@ -82,7 +86,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
                                     .skip(i)
                                     .limit(100))
                             .map(trackStream -> getTracksIds(trackStream))
-                            .map(ids -> SpotifyAPI.TRACKS_ANALYSIS.get() + ids)
+                            .map(ids -> TRACKS_ANALYSIS.get() + ids)
                             .map(url -> restTemplate.exchange(url, HttpMethod.GET, null, ResponseTracksAnalysis.class).getBody())
                             .map(body -> Optional.ofNullable(body)
                                     .orElseThrow(SPOTIFY_API_EMPTY_RESPONSE_EXCEPTION_SUPPLIER)
@@ -94,8 +98,8 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
 
     @Override
     public ResponsePlaylists getUserPlaylists(@Nullable String externalId) {
-        String url = externalId == null ? SpotifyAPI.CURRENT_USER_PLAYLISTS.get() :
-                SpotifyAPI.USER_PLAYLISTS.get().replace("user_id", externalId);
+        String url = externalId == null ? CURRENT_USER_PLAYLISTS.get() :
+                USER_PLAYLISTS.get().replace("user_id", externalId);
         ResponsePlaylists responsePlaylists = new ResponsePlaylists(null, 0, new LinkedList<>());
         ResponsePlaylists body;
         do {
@@ -111,7 +115,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
 
     @Override
     public TracksDTO getPlaylistTracks(PlaylistInfo playlistInfo, String country) {
-        String url = SpotifyAPI.PLAYLIST_TRACKS.get().replace("playlist_id", playlistInfo.getId()).replace("country_code", country);
+        String url = PLAYLIST_TRACKS.get().replace("playlist_id", playlistInfo.getId()).replace("country_code", country);
         Playlist playlist = new Playlist(playlistInfo.getName(), null, new LinkedList<>());
         Playlist body;
         do {
@@ -129,9 +133,9 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
         UserDTO user = getCurrentUser();
         String playlistRange;
         switch (range) {
-            case "short" -> playlistRange = SpotifyAPI.PLAYLIST_RANGE_SHORT.get();
-            case "medium" -> playlistRange = SpotifyAPI.PLAYLIST_RANGE_MEDIUM.get();
-            case "long" -> playlistRange = SpotifyAPI.PLAYLIST_RANGE_LONG.get();
+            case "short" -> playlistRange = PLAYLIST_RANGE_SHORT.get();
+            case "medium" -> playlistRange = PLAYLIST_RANGE_MEDIUM.get();
+            case "long" -> playlistRange = PLAYLIST_RANGE_LONG.get();
             default -> throw new SpotifyAPIException("Wrong data range", HttpStatus.BAD_REQUEST.value());
         }
         PlaylistDTO playlist = postEmptyPlaylist(user, playlistRange);
@@ -152,7 +156,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
     }
 
     private PlaylistDTO postEmptyPlaylist(UserDTO user, String range) {
-        String url = SpotifyAPI.CREATE_TOP_PLAYLIST.get().replace("user_id", user.getId());
+        String url = CREATE_TOP_PLAYLIST.get().replace("user_id", user.getId());
         String body;
         try {
             Resource resource = new ClassPathResource("json/post-playlist.json");
@@ -180,7 +184,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        restTemplate.exchange(SpotifyAPI.ADD_PLAYLIST_TRACK.get()
+        restTemplate.exchange(ADD_PLAYLIST_TRACK.get()
                         .replace("playlist_id", playlist.getId()), HttpMethod.POST, new HttpEntity<>(body), String.class);
     }
 
@@ -195,7 +199,7 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
-        restTemplate.exchange(SpotifyAPI.EDIT_PLAYLIST_IMAGE.get().replace("playlist_id", playlist.getId()), HttpMethod.PUT,
+        restTemplate.exchange(EDIT_PLAYLIST_IMAGE.get().replace("playlist_id", playlist.getId()), HttpMethod.PUT,
                 new HttpEntity<>(encodedImage, headers), Void.class);
     }
 

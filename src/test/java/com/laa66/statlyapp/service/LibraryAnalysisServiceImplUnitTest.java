@@ -2,8 +2,8 @@ package com.laa66.statlyapp.service;
 
 import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.exception.TooManyRequestsException;
-import com.laa66.statlyapp.model.*;
-import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
+import com.laa66.statlyapp.model.spotify.response.ResponseTracksAnalysis;
+import com.laa66.statlyapp.model.spotify.*;
 import com.laa66.statlyapp.service.impl.LibraryAnalysisServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

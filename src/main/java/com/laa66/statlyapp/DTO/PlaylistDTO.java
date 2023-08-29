@@ -2,7 +2,7 @@ package com.laa66.statlyapp.DTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.laa66.statlyapp.model.SpotifyURL;
+import com.laa66.statlyapp.model.spotify.SpotifyURL;
 import lombok.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)

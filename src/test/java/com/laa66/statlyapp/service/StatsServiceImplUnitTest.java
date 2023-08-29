@@ -6,20 +6,17 @@ import com.laa66.statlyapp.DTO.TracksDTO;
 import com.laa66.statlyapp.entity.*;
 import com.laa66.statlyapp.entity.User;
 import com.laa66.statlyapp.exception.UserNotFoundException;
-import com.laa66.statlyapp.model.*;
+import com.laa66.statlyapp.model.spotify.*;
 import com.laa66.statlyapp.repository.*;
 import com.laa66.statlyapp.service.impl.StatsServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatcher;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,7 +26,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class StatsServiceImplUnitTest {
+class StatsServiceImplUnitTest {
 
     @Mock
     UserRepository userRepository;
@@ -141,8 +138,9 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldSaveUserStats() {
-        User user = new User(1L, "id", "username", "email", "image", LocalDateTime.now()
-        , new UserStats(1L, 0.0, 0.0, 0.0, 0.0, 0, "ig", "fb", "twitter", 0));
+        User user = new User()
+                .withId(1L)
+                .withUserStats(new UserStats(1L, 0., 0., 0., 0., 0, 0));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         Map<String, Double> statsMap = Map.of(
                 "energy", 50.0,
@@ -151,7 +149,11 @@ public class StatsServiceImplUnitTest {
                 "boringness", 300.0
         );
         statsService.saveUserStats(1L, statsMap);
-        verify(userRepository, times(1)).save(ArgumentMatchers.same(user));
+        verify(userRepository, times(1)).save(argThat(argument ->
+                argument.getUserStats().getBoringness() == statsMap.get("boringness") &&
+                argument.getUserStats().getMainstream() == statsMap.get("mainstream") &&
+                argument.getUserStats().getEnergy() == statsMap.get("energy") &&
+                argument.getUserStats().getTempo() == statsMap.get("tempo")));
 
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> statsService.saveUserStats(2L, statsMap));
@@ -568,13 +570,12 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldIsBattlePossibleTrue() {
-        User user1 = new User(1, null, null ,null, null, null, new UserStats(
-                1, .0, .0, .0, .0, 0, 0
-        ));
-
-        User user2 = new User(2, null, null ,null, null, null, new UserStats(
-                1, .0, .0, .0, .0, 0, 9
-        ));
+        User user1 = new User()
+                .withId(1L)
+                .withUserStats(new UserStats(1, 0., 0., 0., 0., 0 ,0));
+        User user2 = new User()
+                .withId(2L)
+                .withUserStats(new UserStats(2, 0., 0., 0., 0., 0,9));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
         when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
         assertTrue(statsService.isBattlePossible(1, 2));
@@ -582,13 +583,12 @@ public class StatsServiceImplUnitTest {
 
     @Test
     void shouldIsBattlePossibleFalse() {
-        User user1 = new User(1, null, null ,null, null, null, new UserStats(
-                1, .0, .0, .0, .0, 0, 11
-        ));
-
-        User user2 = new User(2, null, null ,null, null, null, new UserStats(
-                1, .0, .0, .0, .0, 0, 9
-        ));
+        User user1 = new User()
+                .withId(1L)
+                .withUserStats(new UserStats(1, 0., 0., 0., 0., 0 ,11));
+        User user2 = new User()
+                .withId(2L)
+                .withUserStats(new UserStats(2, 0., 0., 0., 0., 0,9));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
         when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
         assertFalse(statsService.isBattlePossible(1, 2));

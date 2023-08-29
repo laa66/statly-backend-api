@@ -11,7 +11,6 @@ import com.laa66.statlyapp.repository.UserRepository;
 import com.laa66.statlyapp.service.SocialService;
 import com.laa66.statlyapp.service.StatsService;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -88,10 +87,21 @@ public class SocialServiceImpl implements SocialService {
     public User updateSocialLinks(long userId, Map<String, String> socialLinks) {
         return userRepository.save(userRepository.findById(userId)
                 .map(user -> {
-                    user.getUserStats()
+                    user.getUserInfo()
                             .setFb(socialLinks.getOrDefault("fb", null))
                             .setIg(socialLinks.getOrDefault("ig", null))
                             .setTwitter(socialLinks.getOrDefault("twitter", null));
+                    return user;
+                }).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER));
+    }
+
+    @Override
+    public void saveUserLocation(long userId, Double longitude, Double latitude) {
+        userRepository.save(userRepository.findById(userId)
+                .map(user -> {
+                    user.getUserInfo()
+                            .setLongitude(longitude)
+                            .setLatitude(latitude);
                     return user;
                 }).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER));
     }
@@ -118,9 +128,9 @@ public class SocialServiceImpl implements SocialService {
                         "boringness", user.getUserStats().getBoringness(),
                         "mainstream", user.getUserStats().getMainstream()
                 ),
-                user.getUserStats().getIg(),
-                user.getUserStats().getFb(),
-                user.getUserStats().getTwitter(),
+                user.getUserInfo().getIg(),
+                user.getUserInfo().getFb(),
+                user.getUserInfo().getTwitter(),
                 user.getUserStats().getPoints()
         );
     }

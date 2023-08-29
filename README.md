@@ -25,7 +25,7 @@ Check out [Statly](https://laa66.github.io/statly-frontend/) to see the applicat
       # Clone this repository to your local machine
       $ git clone https://github.com/laa66/statly-backend-api.git
 
-Create ``.env`` file in root project directory and set specific key/value pairs within it: 
+Create ``.env`` file in root project directory and set specific key-value pairs within it: 
 1. Obtain a **Client ID** and **Client secret** from [Spotify Developer](https://developer.spotify.com/) panel
 2. Set ``SPOTIFY_CLIENT_ID``, ``SPOTIFY_CLIENT_SECRET`` environment variables
    with the values from your Spotify Developer panel
@@ -33,6 +33,8 @@ Create ``.env`` file in root project directory and set specific key/value pairs 
 4. Set ``STATLY_ADMIN_EMAIL`` variable to administrator's email to receive notifications about the app
 5. Set ``STATLY_MAIL_ADDRESS`` and ``STATLY_MAIL_PASSWORD`` for Gmail SMTP server properties
 6. Set ``STATLY_SECRET`` to Base64 encoded secret phrase for JWT signature Secret Key generation (HMAC-SHA256)
+7. Set ``MATRIX_API_TOKEN`` to your Mapbox account secret token
+8. Set ``MAP_API_PUBLIC_TOKEN`` to your Mapbox account public token
 <!-- end -->
 
       # Run statly-backend-api using docker-compose in root directory
@@ -76,12 +78,16 @@ Create ``.env`` file in root project directory and set specific key/value pairs 
 
 * Creating a ``playlist battle`` between users, earning points, and viewing the ranking
 
+* Finding users with ``the best music library match`` and displaying them on Earth map
+
+* Finding ``nearby users`` and displaying them on Earth map
+
 * Redirecting users to ``Spotify web player`` immediately after clicking on some resources e.g. on special track, artist or created playlist
 
 * Sending ``email notifications`` to users
 
 With these features Statly provides an easy and efficient way for users to explore and interact with their Spotify listening data.
-The app is powered by the Spotify API and makes use of the OAuth2 authorization flow with Spring Boot for backend and React for frontend.
+The app is powered by Spotify API and Mapbox API and also makes use of the OAuth2 authorization flow with Spring Boot for backend and React for frontend.
 Users can access the app through the web, it is deployed on Railway cloud and GitHub pages providing easy access to anyone who wants to connect their Spotify account and check their listening habits.
 
 ## Documentation 📖
@@ -104,6 +110,8 @@ You can view full documentation of this project in different paths:
 - OAuth 2.0
 - Docker
 - SQL
+- Spotify API
+- Mapbox API
 - React.js
 - HTML & CSS
 - Bootstrap v5.2
@@ -111,7 +119,7 @@ You can view full documentation of this project in different paths:
 - GitHub Pages
 - IntelliJ IDEA Community Edition
 - Visual Studio Code
-- MySQL Workbench
+- MySQL
 
 #### Tested with:
 
@@ -124,7 +132,6 @@ You can view full documentation of this project in different paths:
 
 ## To-do 💡
 
-- Develop functionality to find users in your area who matches the best with your library
 - Implement functionality for comparing user listening habits over the past 6 months/all time
 - Integrate small web player into the React-app that can play user's top songs within the browser
 - Move Spotify-powered app from development mode to extended modem, enabling anyone to use Statly without needing to register for the beta
@@ -144,6 +151,9 @@ You can view full documentation of this project in different paths:
 <hr/>
 
 ![Statly-genres](src/main/resources/image/statly-genres.png)
+<hr/>
+
+![Statly-map](src/main/resources/image/statly-map.png)
 <hr/>
 
 ![Statly-analysis](src/main/resources/image/statly-analysis.png)

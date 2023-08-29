@@ -1,6 +1,6 @@
 package com.laa66.statlyapp.DTO;
 
-import com.laa66.statlyapp.model.Image;
+import com.laa66.statlyapp.model.spotify.Image;
 import lombok.Value;
 
 import java.util.List;

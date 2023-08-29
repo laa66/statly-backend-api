@@ -6,9 +6,9 @@ import com.laa66.statlyapp.DTO.*;
 import com.laa66.statlyapp.config.TestOAuth2RestTemplateConfig;
 import com.laa66.statlyapp.constants.SpotifyAPI;
 import com.laa66.statlyapp.exception.SpotifyAPIException;
-import com.laa66.statlyapp.model.*;
-import com.laa66.statlyapp.model.response.ResponsePlaylists;
-import com.laa66.statlyapp.model.response.ResponseTracksAnalysis;
+import com.laa66.statlyapp.model.spotify.response.ResponsePlaylists;
+import com.laa66.statlyapp.model.spotify.response.ResponseTracksAnalysis;
+import com.laa66.statlyapp.model.spotify.*;
 import com.laa66.statlyapp.repository.ArtistRepository;
 import com.laa66.statlyapp.repository.GenreRepository;
 import com.laa66.statlyapp.repository.TrackRepository;
@@ -68,7 +68,12 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @Test
     void shouldGetCurrentUserResponseOk() throws JsonProcessingException {
-        UserDTO data = new UserDTO("1", "uri", "test@mail.com", "user", List.of(), 0);
+        UserDTO data = UserDTO.builder()
+                .id("1")
+                .email("test@mail.com")
+                .name("user")
+                .images(List.of())
+                .build();
         mockServer.expect(ExpectedCount.once(),
                 requestTo(SpotifyAPI.CURRENT_USER.get()))
                 .andExpect(method(HttpMethod.GET))
@@ -232,9 +237,9 @@ class SpotifyAPIServiceImplIntegrationTest {
     void shouldGetUserPlaylistsResponseOk() throws JsonProcessingException {
         ResponsePlaylists responsePlaylists = new ResponsePlaylists(null, 2, List.of(
                 new PlaylistInfo(new SpotifyURL(), "id1", List.of(), "playlist1",
-                        new UserDTO("1", "uri", "mail", "username", List.of(), 0)),
+                        null),
                 new PlaylistInfo(new SpotifyURL(), "id2", List.of(), "playlist2",
-                        new UserDTO("1", "uri", "mail", "username", List.of(), 0))));
+                        null)));
         mockServer.expect(ExpectedCount.once(),
                 requestTo(SpotifyAPI.CURRENT_USER_PLAYLISTS.get()))
                 .andExpect(method(HttpMethod.GET))
@@ -292,7 +297,14 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @Test
     void shouldPostTopTracksResponseOk() throws JsonProcessingException {
-        UserDTO user = new UserDTO("1", "uri", "test@mail.com", "user", List.of(), 0);
+        UserDTO user = UserDTO.builder()
+                .id("1")
+                .uri("uri")
+                .email("test@mail.com")
+                .name("user")
+                .images(List.of())
+                .points(0)
+                .build();
         Track track = new Track();
         track.setUri("trackId");
         TracksDTO topTracks = new TracksDTO(List.of(track), "1", "short", null);
@@ -341,7 +353,14 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @Test
     void shouldPostTopTracksResponseWrongRange() throws JsonProcessingException {
-        UserDTO user = new UserDTO("1", "uri","test@mail.com", "user", List.of(), 0);
+        UserDTO user = UserDTO.builder()
+                .id("1")
+                .uri("uri")
+                .email("test@mail.com")
+                .name("user")
+                .images(List.of())
+                .points(0)
+                .build();
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.CURRENT_USER.get()))
                 .andExpect(method(HttpMethod.GET))

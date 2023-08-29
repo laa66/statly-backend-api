@@ -2,6 +2,7 @@ package com.laa66.statlyapp.model;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.laa66.statlyapp.model.spotify.Image;
 import lombok.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;

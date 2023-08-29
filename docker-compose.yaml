@@ -18,6 +18,7 @@ services:
       STATLY_MAIL_ADDRESS: ${STATLY_MAIL_ADDRESS}
       STATLY_MAIL_PASSWORD: ${STATLY_MAIL_PASSWORD}
       STATLY_SECRET: ${STATLY_SECRET}
+      MATRIX_API_TOKEN: ${MATRIX_API_TOKEN}
     depends_on:
       db:
         condition: service_healthy
