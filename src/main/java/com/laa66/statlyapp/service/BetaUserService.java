@@ -8,6 +8,8 @@ public interface BetaUserService {
 
     void saveBetaUser(BetaUserDTO betaUserDTO);
 
+    void activateUser(String email);
+
     List<BetaUserDTO> findAllBetaUsers();
 
     void deleteAllBetaUsers();

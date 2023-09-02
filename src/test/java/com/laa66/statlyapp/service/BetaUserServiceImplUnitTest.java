@@ -2,6 +2,7 @@ package com.laa66.statlyapp.service;
 
 import com.laa66.statlyapp.DTO.BetaUserDTO;
 import com.laa66.statlyapp.entity.BetaUser;
+import com.laa66.statlyapp.exception.UserNotFoundException;
 import com.laa66.statlyapp.repository.BetaUserRepository;
 import com.laa66.statlyapp.service.impl.BetaUserServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,6 +55,26 @@ class BetaUserServiceImplUnitTest {
     void shouldDeleteAllBetaUsers() {
         betaUserService.deleteAllBetaUsers();
         verify(betaUserRepository, times(1)).deleteAll();
+    }
+
+    @Test
+    void shouldActivateUserExists() {
+        BetaUser betaUser = new BetaUser(1, "name", "email", LocalDateTime.now(), true);
+        when(betaUserRepository.findByEmail("email")).thenReturn(Optional.of(betaUser));
+        when(betaUserRepository.save(betaUser)).thenReturn(betaUser);
+
+        betaUserService.activateUser("email");
+        verify(betaUserRepository, times(1)).findByEmail("email");
+        verify(betaUserRepository, times(1)).save(betaUser);
+    }
+
+    @Test
+    void shouldActivateUserNotExists() {
+        when(betaUserRepository.findByEmail("emptyEmail")).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> betaUserService.activateUser("emptyEmail"));
+        verify(betaUserRepository, times(1)).findByEmail("emptyEmail");
+        verify(betaUserRepository, never()).save(any());
     }
 
 }
