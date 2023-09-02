@@ -5,7 +5,9 @@ import com.laa66.statlyapp.jwt.JwtProvider;
 import com.laa66.statlyapp.oauth2.*;
 import com.laa66.statlyapp.repository.SpotifyTokenRepository;
 import com.laa66.statlyapp.repository.impl.SpotifyTokenRepositoryImpl;
+import com.laa66.statlyapp.service.BetaUserService;
 import com.laa66.statlyapp.service.UserService;
+import com.laa66.statlyapp.service.impl.BetaUserServiceImpl;
 import com.laa66.statlyapp.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -69,6 +71,11 @@ public class TestSecurityConfig {
     }
 
     @Bean
+    public BetaUserService betaUserService() {
+        return new BetaUserServiceImpl(null);
+    }
+
+    @Bean
     public UserService userService() {
         return new UserServiceImpl(null);
     }
@@ -106,8 +113,8 @@ public class TestSecurityConfig {
     }
 
     @Bean
-    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService(UserService userService) {
-        return new CustomOAuth2UserService(userService);
+    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService(BetaUserService betaUserService, UserService userService) {
+        return new CustomOAuth2UserService(betaUserService, userService);
     }
 
     @Bean

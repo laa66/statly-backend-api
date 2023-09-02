@@ -7,6 +7,7 @@ import com.laa66.statlyapp.entity.UserStats;
 import com.laa66.statlyapp.exception.UserAuthenticationException;
 import com.laa66.statlyapp.model.spotify.Image;
 import com.laa66.statlyapp.model.OAuth2UserWrapper;
+import com.laa66.statlyapp.service.BetaUserService;
 import com.laa66.statlyapp.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -22,6 +23,7 @@ import java.util.*;
 @AllArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
+    private final BetaUserService betaUserService;
     private final UserService userService;
 
     @Override
@@ -36,7 +38,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         try {
             String email = oAuth2User.getEmail();
             UserDTO userDTO = Optional.ofNullable(userService.findUserByEmail(email))
-                    .orElseGet(() -> userService.saveUser(
+                    .map(user -> {
+                        if (!betaUserService.existsByEmail(user.getEmail()))
+                            throw new UserAuthenticationException("User not registered for beta");
+                        return user;
+                    }).orElseGet(() -> userService.saveUser(
                             new User().withId(0)
                                     .withExternalId(oAuth2User.getId())
                                     .withUsername(oAuth2User.getDisplayName())

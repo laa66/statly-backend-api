@@ -11,6 +11,7 @@ public class EntityMapper {
     public static UserDTO toUserDTO(User user) {
         return UserDTO.builder()
                 .id(Long.toString(user.getId()))
+                .email(user.getEmail())
                 .name(user.getUsername())
                 .images(List.of(new Image(user.getImage(), null, null)))
                 .points(user.getUserStats().getPoints())

@@ -70,11 +70,21 @@ class BetaUserServiceImplUnitTest {
 
     @Test
     void shouldActivateUserNotExists() {
-        when(betaUserRepository.findByEmail("emptyEmail")).thenReturn(Optional.empty());
+        when(betaUserRepository.findByEmail("wrongEmail")).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> betaUserService.activateUser("emptyEmail"));
-        verify(betaUserRepository, times(1)).findByEmail("emptyEmail");
+        assertThrows(UserNotFoundException.class, () -> betaUserService.activateUser("wrongEmail"));
+        verify(betaUserRepository, times(1)).findByEmail("wrongEmail");
         verify(betaUserRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldExistsByEmailExists() {
+        when(betaUserRepository.existsByEmail("email")).thenReturn(true);
+        when(betaUserRepository.existsByEmail("wrongEmail")).thenReturn(false);
+
+        assertTrue(betaUserService.existsByEmail("email"));
+        assertFalse(betaUserService.existsByEmail("wrongEmail"));
+
     }
 
 }

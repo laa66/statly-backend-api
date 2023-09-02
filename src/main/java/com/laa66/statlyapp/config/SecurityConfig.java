@@ -4,6 +4,7 @@ import com.laa66.statlyapp.jwt.JwtAuthenticationFilter;
 import com.laa66.statlyapp.jwt.JwtProvider;
 import com.laa66.statlyapp.oauth2.*;
 import com.laa66.statlyapp.repository.SpotifyTokenRepository;
+import com.laa66.statlyapp.service.BetaUserService;
 import com.laa66.statlyapp.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -90,8 +91,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService(UserService userService) {
-        return new CustomOAuth2UserService(userService);
+    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService(UserService userService, BetaUserService betaUserService) {
+        return new CustomOAuth2UserService(betaUserService, userService);
     }
 
     @Bean
