@@ -35,8 +35,8 @@ class BetaUserServiceImplUnitTest {
     @Test
     void shouldFindAllBetaUsers() {
         List<BetaUser> betaUsers = List.of(
-                new BetaUser(1, "user1", "user1@mail.com", LocalDateTime.of(2023, 1, 1, 12, 0, 0)),
-                new BetaUser(2, "user2", "user2@gmail.com", LocalDateTime.of(2023, 1,1,11, 0, 0)));
+                new BetaUser(1, "user1", "user1@mail.com", LocalDateTime.of(2023, 1, 1, 12, 0, 0), true),
+                new BetaUser(2, "user2", "user2@gmail.com", LocalDateTime.of(2023, 1,1,11, 0, 0), true));
         when(betaUserRepository.findAll()).thenReturn(betaUsers);
         List<BetaUserDTO> dtoList = betaUserService.findAllBetaUsers();
         assertNotNull(dtoList);

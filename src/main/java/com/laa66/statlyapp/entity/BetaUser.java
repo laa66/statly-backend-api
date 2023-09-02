@@ -23,4 +23,7 @@ public class BetaUser {
 
     private String email;
     private LocalDateTime date;
+
+    @Column(name = "active")
+    private boolean isActive;
 }

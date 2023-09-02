@@ -17,7 +17,7 @@ public class BetaUserServiceImpl implements BetaUserService {
 
     @Override
     public void saveBetaUser(BetaUserDTO betaUserDTO) {
-        BetaUser betaUser = new BetaUser(0, betaUserDTO.getFullName(), betaUserDTO.getEmail(), LocalDateTime.now());
+        BetaUser betaUser = new BetaUser(0, betaUserDTO.getFullName(), betaUserDTO.getEmail(), LocalDateTime.now(), false);
         betaUserRepository.save(betaUser);
     }
 
