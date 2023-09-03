@@ -30,8 +30,9 @@ public class BetaUserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/notification")
-    public ResponseEntity<Void> sendNotification(@RequestBody BetaUserDTO betaUserDTO) {
+    @PostMapping("/activate")
+    public ResponseEntity<Void> activate(@RequestBody BetaUserDTO betaUserDTO) {
+        betaUserService.activateUser(betaUserDTO.getEmail());
         mailService.sendAccessGrantedNotification(betaUserDTO);
         return ResponseEntity.noContent().build();
     }

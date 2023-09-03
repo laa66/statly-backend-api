@@ -111,13 +111,14 @@ class BetaUserControllerIntegrationTest {
     }
 
     @Test
-    void shouldSentNotification() throws Exception {
+    void shouldActivate() throws Exception {
         BetaUserDTO dto = new BetaUserDTO("name", "email", null);
-        mockMvc.perform(post("/beta/notification")
+        mockMvc.perform(post("/beta/activate")
                         .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isNoContent());
+        verify(betaUserService, times(1)).activateUser(dto.getEmail());
         verify(mailService, times(1)).sendAccessGrantedNotification(any());
     }
 
