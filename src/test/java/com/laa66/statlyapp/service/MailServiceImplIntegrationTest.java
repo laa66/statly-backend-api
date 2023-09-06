@@ -40,7 +40,7 @@ class MailServiceImplIntegrationTest extends MySQLBaseContainerTest {
 
     @Test
     void shouldSendAccessGrantedNotification() throws MessagingException, IOException {
-        BetaUserDTO dto = new BetaUserDTO("name", "email", "date");
+        BetaUserDTO dto = new BetaUserDTO("name", "email", "date", false);
         mailService.sendAccessGrantedNotification(dto);
         MimeMessage message = greenMail.getReceivedMessages()[0];
         assertNotNull(message);

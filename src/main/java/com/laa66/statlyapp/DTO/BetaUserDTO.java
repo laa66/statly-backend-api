@@ -9,4 +9,5 @@ public class BetaUserDTO {
     String fullName;
     String email;
     String date;
+    boolean isActive;
 }

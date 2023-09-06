@@ -18,7 +18,7 @@ public class BetaUserServiceImpl implements BetaUserService {
 
     @Override
     public void saveBetaUser(BetaUserDTO betaUserDTO) {
-        BetaUser betaUser = new BetaUser(0, betaUserDTO.getFullName(), betaUserDTO.getEmail(), LocalDateTime.now(), false);
+        BetaUser betaUser = new BetaUser(0, betaUserDTO.getFullName(), betaUserDTO.getEmail(), LocalDateTime.now(), betaUserDTO.isActive());
         betaUserRepository.save(betaUser);
     }
 
@@ -41,7 +41,7 @@ public class BetaUserServiceImpl implements BetaUserService {
     @Override
     public List<BetaUserDTO> findAllBetaUsers() {
         return ((Collection<BetaUser>) betaUserRepository.findAll()).stream()
-                .map(user -> new BetaUserDTO(user.getFullName(), user.getEmail(), user.getDate().toString()))
+                .map(user -> new BetaUserDTO(user.getFullName(), user.getEmail(), user.getDate().toString(), user.isActive()))
                 .toList();
     }
 

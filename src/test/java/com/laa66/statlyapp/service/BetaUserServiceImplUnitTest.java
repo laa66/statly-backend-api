@@ -30,7 +30,7 @@ class BetaUserServiceImplUnitTest {
 
     @Test
     void shouldSaveBetaUser() {
-        betaUserService.saveBetaUser(new BetaUserDTO("name", "email", "date"));
+        betaUserService.saveBetaUser(new BetaUserDTO("name", "email", "date", false));
         verify(betaUserRepository, times(1)).save(any());
     }
 
