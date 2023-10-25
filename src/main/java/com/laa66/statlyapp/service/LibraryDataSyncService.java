@@ -2,16 +2,16 @@ package com.laa66.statlyapp.service;
 
 public interface LibraryDataSyncService {
 
-    default void synchronize() {
-        synchronizeTracks();
-        synchronizeArtists();
-        synchronizeGenres();
+    default void synchronize(long userId) {
+        synchronizeTracks(userId);
+        synchronizeArtists(userId);
+        synchronizeGenres(userId);
     }
 
-    void synchronizeTracks();
+    void synchronizeTracks(long userId);
 
-    void synchronizeArtists();
+    void synchronizeArtists(long userId);
 
-    void synchronizeGenres();
+    void synchronizeGenres(long userId);
 
 }
