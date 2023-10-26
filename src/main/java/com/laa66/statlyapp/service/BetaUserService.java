@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface BetaUserService {
 
+    BetaUserDTO findBetaUserByEmail(String email);
+
     void saveBetaUser(BetaUserDTO betaUserDTO);
 
     boolean existsByEmail(String email);
