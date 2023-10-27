@@ -31,11 +31,6 @@ public class BetaUserServiceImpl implements BetaUserService {
     }
 
     @Override
-    public boolean existsByEmail(String email) {
-        return betaUserRepository.existsByEmail(email);
-    }
-
-    @Override
     public void activateUser(String email) {
         betaUserRepository.findByEmail(email)
                 .ifPresentOrElse(betaUser -> {

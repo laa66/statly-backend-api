@@ -17,18 +17,21 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({TooManyRequestsException.class})
     public ResponseEntity<ExceptionDTO> handleTooManyRequestsException(TooManyRequestsException e) {
+        log.error("Error: " + e.getMessage(), e);
         ExceptionDTO exceptionDTO = new ExceptionDTO(HttpStatus.TOO_MANY_REQUESTS.value(), e.getMessage(), System.currentTimeMillis());
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(exceptionDTO);
     }
 
     @ExceptionHandler({BadRequestException.class})
     public ResponseEntity<ExceptionDTO> handleBadRequestException(BadRequestException e) {
+        log.error("Error: " + e.getMessage(), e);
         ExceptionDTO exceptionDTO = new ExceptionDTO(HttpStatus.BAD_REQUEST.value(), e.getMessage(), System.currentTimeMillis());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionDTO);
     }
 
     @ExceptionHandler({UserNotFoundException.class})
     public ResponseEntity<ExceptionDTO> handleUserNotFoundException(UserNotFoundException e) {
+        log.error("Error: " + e.getMessage(), e);
         ExceptionDTO exceptionDTO = new ExceptionDTO(HttpStatus.NOT_FOUND.value(), e.getMessage(), System.currentTimeMillis());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionDTO);
     }
@@ -56,6 +59,7 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({SpotifyAPIEmptyResponseException.class})
     public ResponseEntity<ExceptionDTO> handleSpotifyAPIEmptyResponseException(SpotifyAPIEmptyResponseException e) {
+        log.error("Error: " + e.getMessage(), e);
         ExceptionDTO exceptionDTO = new ExceptionDTO(HttpStatus.NO_CONTENT.value(), e.getMessage(), System.currentTimeMillis());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(exceptionDTO);
     }

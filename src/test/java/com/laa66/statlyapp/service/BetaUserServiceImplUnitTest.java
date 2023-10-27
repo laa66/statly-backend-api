@@ -92,15 +92,4 @@ class BetaUserServiceImplUnitTest {
         verify(betaUserRepository, times(1)).findByEmail("wrongEmail");
         verify(betaUserRepository, never()).save(any());
     }
-
-    @Test
-    void shouldExistsByEmailExists() {
-        when(betaUserRepository.existsByEmail("email")).thenReturn(true);
-        when(betaUserRepository.existsByEmail("wrongEmail")).thenReturn(false);
-
-        assertTrue(betaUserService.existsByEmail("email"));
-        assertFalse(betaUserService.existsByEmail("wrongEmail"));
-
-    }
-
 }
