@@ -1,5 +1,6 @@
 package com.laa66.statlyapp.service.impl;
 
+import com.laa66.statlyapp.DTO.ArtistsDTO;
 import com.laa66.statlyapp.DTO.TracksDTO;
 import com.laa66.statlyapp.service.LibraryAnalysisService;
 import com.laa66.statlyapp.service.LibraryDataSyncService;
@@ -24,7 +25,8 @@ public class InitialLibraryDataSyncService implements LibraryDataSyncService {
 
     @Override
     public void synchronizeArtists(long userId) {
-
+        ArtistsDTO artistsDTO = spotifyAPIService.getTopArtists(userId, "long");
+        statsService.saveUserArtists(Map.of(artistsDTO, userId));
     }
 
     @Override

@@ -1,11 +1,8 @@
 package com.laa66.statlyapp.service;
 
+import com.laa66.statlyapp.DTO.ArtistsDTO;
 import com.laa66.statlyapp.DTO.TracksDTO;
-import com.laa66.statlyapp.service.LibraryAnalysisService;
-import com.laa66.statlyapp.service.SpotifyAPIService;
-import com.laa66.statlyapp.service.StatsService;
 import com.laa66.statlyapp.service.impl.InitialLibraryDataSyncService;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,6 +25,9 @@ class InitialLibraryDataSyncServiceUnitTest {
     StatsService statsService;
 
     @Mock
+    ArtistsDTO mockArtistsDTO;
+
+    @Mock
     TracksDTO mockTracksDTO;
 
     @InjectMocks
@@ -39,6 +39,16 @@ class InitialLibraryDataSyncServiceUnitTest {
         dataSyncService.synchronizeTracks(1L);
         verify(statsService, times(1))
                 .saveUserTracks(argThat(arg -> arg.containsKey(mockTracksDTO)
+                && arg.containsValue(1L)
+                && arg.keySet().size() == 1));
+    }
+
+    @Test
+    void shouldSynchronizeArtists() {
+        when(spotifyAPIService.getTopArtists(anyLong(), eq("long"))).thenReturn(mockArtistsDTO);
+        dataSyncService.synchronizeArtists(1L);
+        verify(statsService, times(1))
+                .saveUserArtists(argThat(arg -> arg.containsKey(mockArtistsDTO)
                 && arg.containsValue(1L)
                 && arg.keySet().size() == 1));
     }
