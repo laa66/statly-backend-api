@@ -1,6 +1,7 @@
 package com.laa66.statlyapp.service;
 
 import com.laa66.statlyapp.DTO.ArtistsDTO;
+import com.laa66.statlyapp.DTO.GenresDTO;
 import com.laa66.statlyapp.DTO.TracksDTO;
 import com.laa66.statlyapp.service.impl.InitialLibraryDataSyncService;
 import org.junit.jupiter.api.Test;
@@ -30,8 +31,13 @@ class InitialLibraryDataSyncServiceUnitTest {
     @Mock
     TracksDTO mockTracksDTO;
 
+    @Mock
+    GenresDTO mockGenresDTO;
+
     @InjectMocks
     InitialLibraryDataSyncService dataSyncService;
+
+
 
     @Test
     void shouldSynchronizeTracks() {
@@ -49,6 +55,18 @@ class InitialLibraryDataSyncServiceUnitTest {
         dataSyncService.synchronizeArtists(1L);
         verify(statsService, times(1))
                 .saveUserArtists(argThat(arg -> arg.containsKey(mockArtistsDTO)
+                && arg.containsValue(1L)
+                && arg.keySet().size() == 1));
+    }
+
+    @Test
+    void shouldSynchronizeGenres() {
+        when(spotifyAPIService.getTopArtists(anyLong(), eq("long"))).thenReturn(mockArtistsDTO);
+        when(analysisService.getTopGenres(anyLong(), eq("long"), eq(mockArtistsDTO)))
+                .thenReturn(mockGenresDTO);
+        dataSyncService.synchronizeGenres(1L);
+        verify(statsService, times(1))
+                .saveUserGenres(argThat(arg -> arg.containsKey(mockGenresDTO)
                 && arg.containsValue(1L)
                 && arg.keySet().size() == 1));
     }

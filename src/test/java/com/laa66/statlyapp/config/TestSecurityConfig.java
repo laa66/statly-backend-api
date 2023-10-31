@@ -53,7 +53,7 @@ public class TestSecurityConfig {
     @Value("${api.spotify.scope}")
     private String SCOPE;
 
-    @Value("${api.client.url}")
+    @Value("${statly.client.url}")
     private String CLIENT_URL;
 
     @Value("${statly.api.admin-email}")

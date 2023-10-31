@@ -1,0 +1,44 @@
+# API
+api:
+  spotify:
+    client-id: ${SPOTIFY_CLIENT_ID}
+    client-secret: ${SPOTIFY_CLIENT_SECRET}
+    scope: user-read-recently-played,user-read-private,user-read-email,user-top-read,playlist-modify-public,playlist-modify-private,playlist-read-private,playlist-read-collaborative,ugc-image-upload
+  matrix:
+    access-token: ${MATRIX_API_TOKEN}
+
+# web
+statly:
+  api:
+    admin-email: ${STATLY_ADMIN_EMAIL}
+  client:
+    url: ${STATLY_APP_URL}
+
+## spring
+spring:
+  datasource:
+    url: ${STATLY_DB_URL}
+    username: ${STATLY_DB_USERNAME}
+    password: ${STATLY_DB_PASSWORD}
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl: none
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${STATLY_MAIL_ADDRESS}
+    password: ${STATLY_MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+## JWT
+jwt:
+  provider:
+    secret: ${STATLY_SECRET}
