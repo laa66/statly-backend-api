@@ -249,4 +249,24 @@ public class StatsServiceImpl implements StatsService {
                 .orElse(10);
         return battleCount < 10 && battleCountBattle < 10;
     }
+
+    @Override
+    public boolean isTrackSynchronized(long userId) {
+        return trackRepository.findAllByUserId(userId)
+                .stream()
+                .anyMatch(userTrack -> userTrack.getRange().equals("long"));
+
+    }
+
+    @Override
+    public boolean isArtistSynchronized(long userId) {
+        return artistRepository.findAllByUserId(userId)
+                .stream()
+                .anyMatch(userArtist -> userArtist.getRange().equals("long"));
+    }
+
+    @Override
+    public boolean isGenreSynchronized(long userId) {
+        return false;
+    }
 }

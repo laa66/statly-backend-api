@@ -14,7 +14,7 @@ statly:
   client:
     url: ${STATLY_APP_URL}
 
-## spring
+# spring
 spring:
   datasource:
     url: ${STATLY_DB_URL}
@@ -38,7 +38,7 @@ spring:
           starttls:
             enable: true
 
-## JWT
+# JWT
 jwt:
   provider:
     secret: ${STATLY_SECRET}
