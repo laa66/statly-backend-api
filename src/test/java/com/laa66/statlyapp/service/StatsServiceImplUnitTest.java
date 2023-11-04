@@ -661,4 +661,34 @@ class StatsServiceImplUnitTest {
         assertFalse(artistSynchronized);
     }
 
+    @Test
+    void shouldIsGenreSynchronizedTrue() {
+        Collection<UserGenre> matchGenres = List.of(
+                new UserGenre(1, 1, "long", Map.of(
+                        "item1", 3, "item5", 4, "item3", 5
+                ), null),
+                new UserGenre(1, 1, "long", Map.of(
+                        "item4", 3, "item1", 4, "item3", 5
+                ), null)
+        );
+        when(genreRepository.findAllByUserId(1L)).thenReturn(matchGenres);
+        boolean genreSynchronized = statsService.isGenreSynchronized(1L);
+        assertTrue(genreSynchronized);
+    }
+
+    @Test
+    void shouldIsGenreSynchronizedFalse() {
+        Collection<UserGenre> matchGenres = List.of(
+                new UserGenre(1, 1, "medium", Map.of(
+                        "item1", 3, "item5", 4, "item3", 5
+                ), null),
+                new UserGenre(1, 1, "short", Map.of(
+                        "item4", 3, "item1", 4, "item3", 5
+                ), null)
+        );
+        when(genreRepository.findAllByUserId(1L)).thenReturn(matchGenres);
+        boolean genreSynchronized = statsService.isGenreSynchronized(1L);
+        assertFalse(genreSynchronized);
+    }
+
 }

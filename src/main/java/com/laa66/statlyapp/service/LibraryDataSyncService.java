@@ -14,4 +14,6 @@ public interface LibraryDataSyncService {
 
     void synchronizeGenres(long userId);
 
+    boolean isLibraryDataSynchronized(long userId);
+
 }

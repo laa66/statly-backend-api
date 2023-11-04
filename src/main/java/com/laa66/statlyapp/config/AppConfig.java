@@ -75,4 +75,5 @@ public class AppConfig {
     public SpotifyTokenRepository spotifyTokenRepository(CacheManager cacheManager) {
         return new SpotifyTokenRepositoryImpl(cacheManager);
     }
+
 }

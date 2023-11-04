@@ -36,4 +36,11 @@ public class InitialLibraryDataSyncService implements LibraryDataSyncService {
         GenresDTO genresDTO = libraryAnalysisService.getTopGenres(userId, "long", artistsDTO);
         statsService.saveUserGenres(Map.of(genresDTO, userId));
     }
+
+    @Override
+    public boolean isLibraryDataSynchronized(long userId) {
+        if (!statsService.isTrackSynchronized(userId)) return false;
+        if (!statsService.isArtistSynchronized(userId)) return false;
+        return statsService.isGenreSynchronized(userId);
+    }
 }

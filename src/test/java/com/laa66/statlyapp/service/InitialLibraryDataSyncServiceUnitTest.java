@@ -13,6 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 @ExtendWith(MockitoExtension.class)
 class InitialLibraryDataSyncServiceUnitTest {
 
@@ -70,4 +72,39 @@ class InitialLibraryDataSyncServiceUnitTest {
                 && arg.containsValue(1L)
                 && arg.keySet().size() == 1));
     }
+
+    @Test
+    void shouldIsLibraryDataSynchronizedTrue() {
+        when(statsService.isTrackSynchronized(1L)).thenReturn(true);
+        when(statsService.isArtistSynchronized(1L)).thenReturn(true);
+        when(statsService.isGenreSynchronized(1L)).thenReturn(true);
+        boolean userLibrarySynchronized = dataSyncService.isLibraryDataSynchronized(1L);
+        assertTrue(userLibrarySynchronized);
+    }
+
+    @Test
+    void shouldIsLibraryDataSynchronizedTrackFalse() {
+        when(statsService.isTrackSynchronized(1L)).thenReturn(false);
+        boolean userLibrarySynchronized = dataSyncService.isLibraryDataSynchronized(1L);
+        assertFalse(userLibrarySynchronized);
+    }
+
+    @Test
+    void shouldIsLibraryDataSynchronizedArtistFalse() {
+        when(statsService.isTrackSynchronized(1L)).thenReturn(true);
+        when(statsService.isArtistSynchronized(1L)).thenReturn(false);
+        boolean userLibrarySynchronized = dataSyncService.isLibraryDataSynchronized(1L);
+        assertFalse(userLibrarySynchronized);
+    }
+
+    @Test
+    void shouldIsLibrarySynchronizedGenreFalse() {
+        when(statsService.isTrackSynchronized(1L)).thenReturn(true);
+        when(statsService.isArtistSynchronized(1L)).thenReturn(true);
+        when(statsService.isGenreSynchronized(1L)).thenReturn(false);
+        boolean userLibrarySynchronized = dataSyncService.isLibraryDataSynchronized(1L);
+        assertFalse(userLibrarySynchronized);
+    }
+
+
 }

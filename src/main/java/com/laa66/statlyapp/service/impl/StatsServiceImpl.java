@@ -265,8 +265,11 @@ public class StatsServiceImpl implements StatsService {
                 .anyMatch(userArtist -> userArtist.getRange().equals("long"));
     }
 
+    // sync
     @Override
     public boolean isGenreSynchronized(long userId) {
-        return false;
+        return genreRepository.findAllByUserId(userId)
+                .stream()
+                .anyMatch(userGenre -> userGenre.getRange().equals("long"));
     }
 }
