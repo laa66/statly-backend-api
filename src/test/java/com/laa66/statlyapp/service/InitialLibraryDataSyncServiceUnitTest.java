@@ -44,6 +44,7 @@ class InitialLibraryDataSyncServiceUnitTest {
     @Test
     void shouldSynchronizeTracks() {
         when(spotifyAPIService.getTopTracks(anyLong(), eq("long"))).thenReturn(mockTracksDTO);
+        when(mockTracksDTO.withDate(any())).thenReturn(mockTracksDTO);
         dataSyncService.synchronizeTracks(1L);
         verify(statsService, times(1))
                 .saveUserTracks(argThat(arg -> arg.containsKey(mockTracksDTO)
@@ -54,6 +55,7 @@ class InitialLibraryDataSyncServiceUnitTest {
     @Test
     void shouldSynchronizeArtists() {
         when(spotifyAPIService.getTopArtists(anyLong(), eq("long"))).thenReturn(mockArtistsDTO);
+        when(mockArtistsDTO.withDate(any())).thenReturn(mockArtistsDTO);
         dataSyncService.synchronizeArtists(1L);
         verify(statsService, times(1))
                 .saveUserArtists(argThat(arg -> arg.containsKey(mockArtistsDTO)
@@ -64,6 +66,7 @@ class InitialLibraryDataSyncServiceUnitTest {
     @Test
     void shouldSynchronizeGenres() {
         when(spotifyAPIService.getTopArtists(anyLong(), eq("long"))).thenReturn(mockArtistsDTO);
+        when(mockGenresDTO.withDate(any())).thenReturn(mockGenresDTO);
         when(analysisService.getTopGenres(anyLong(), eq("long"), eq(mockArtistsDTO)))
                 .thenReturn(mockGenresDTO);
         dataSyncService.synchronizeGenres(1L);

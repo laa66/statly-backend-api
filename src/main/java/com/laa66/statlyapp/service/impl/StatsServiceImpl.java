@@ -72,7 +72,10 @@ public class StatsServiceImpl implements StatsService {
                                 List<Artist> artists = item.getArtists();
                                 return (artists != null && !artists.isEmpty() ? artists.get(0).getName() : null) + "_" + item.getName(); //added null check
                             }, s -> counter.getAndIncrement(), (ex, rep) -> ex));
-            return new UserTrack(0, entry.getValue(), entry.getKey().getRange(), tracks, LocalDate.now());
+            return new UserTrack(0, entry.getValue(), entry.getKey().getRange(), tracks,
+                    entry.getKey().getDate() == null
+                            ? LocalDate.now()
+                            : entry.getKey().getDate());
         }).toList();
         trackRepository.saveAll(userTrackList);
     }
@@ -86,7 +89,9 @@ public class StatsServiceImpl implements StatsService {
                    .stream()
                    .collect(Collectors
                            .toMap(Artist::getName, s -> counter.getAndIncrement(),  (ex, rep) -> ex));
-           return new UserArtist(0, entry.getValue(), entry.getKey().getRange(), artists, LocalDate.now());
+           return new UserArtist(0, entry.getValue(), entry.getKey().getRange(), artists, entry.getKey().getDate() == null
+                   ? LocalDate.now()
+                   : entry.getKey().getDate());
         }).toList();
         artistRepository.saveAll(userArtistList);
     }
@@ -99,7 +104,9 @@ public class StatsServiceImpl implements StatsService {
                     .stream()
                     .collect(Collectors
                             .toMap(Genre::getGenre, Genre::getScore, (ex, rep) -> ex));
-            return new UserGenre(0, entry.getValue(), entry.getKey().getRange(), genres, LocalDate.now());
+            return new UserGenre(0, entry.getValue(), entry.getKey().getRange(), genres, entry.getKey().getDate() == null
+                    ? LocalDate.now()
+                    : entry.getKey().getDate());
         }).toList();
         genreRepository.saveAll(userGenreList);
     }

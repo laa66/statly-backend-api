@@ -46,6 +46,13 @@ public class AppConfig {
     }
 
     @Bean
+    public LibraryDataSyncService libraryDataSyncService(SpotifyAPIService spotifyAPIService,
+                                                         LibraryAnalysisService libraryAnalysisService,
+                                                         StatsService statsService) {
+        return new InitialLibraryDataSyncService(spotifyAPIService, libraryAnalysisService, statsService);
+    }
+
+    @Bean
     public StatsService statsService(TrackRepository trackRepository,
                                      ArtistRepository artistRepository,
                                      GenreRepository genreRepository,

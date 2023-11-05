@@ -24,11 +24,13 @@ public class TracksDTO {
 
     private LocalDate date;
 
-    public void withRange(String range) {
+    public TracksDTO withRange(String range) {
         this.range = range;
+        return this;
     }
 
-    public void withDate(LocalDate date) {
+    public TracksDTO withDate(LocalDate date) {
         this.date = date;
+        return this;
     }
 }

@@ -5,6 +5,7 @@ import com.laa66.statlyapp.jwt.JwtProvider;
 import com.laa66.statlyapp.oauth2.*;
 import com.laa66.statlyapp.repository.SpotifyTokenRepository;
 import com.laa66.statlyapp.service.BetaUserService;
+import com.laa66.statlyapp.service.LibraryDataSyncService;
 import com.laa66.statlyapp.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -71,8 +72,9 @@ public class SecurityConfig {
     @Bean
     public OAuth2SuccessHandler oAuth2SuccessHandler(SpotifyTokenRepository spotifyTokenRepository,
                                                      HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository,
-                                                     JwtProvider jwtProvider) {
-        return new OAuth2SuccessHandler(spotifyTokenRepository, httpCookieOAuth2AuthorizationRequestRepository, jwtProvider, URI.create(CLIENT_URL));
+                                                     JwtProvider jwtProvider,
+                                                     LibraryDataSyncService libraryDataSyncService) {
+        return new OAuth2SuccessHandler(spotifyTokenRepository, httpCookieOAuth2AuthorizationRequestRepository, libraryDataSyncService, jwtProvider, URI.create(CLIENT_URL));
     }
 
     @Bean

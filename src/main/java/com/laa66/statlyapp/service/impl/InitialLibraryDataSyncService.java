@@ -9,6 +9,7 @@ import com.laa66.statlyapp.service.SpotifyAPIService;
 import com.laa66.statlyapp.service.StatsService;
 import lombok.AllArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 @AllArgsConstructor
@@ -21,20 +22,26 @@ public class InitialLibraryDataSyncService implements LibraryDataSyncService {
     @Override
     public void synchronizeTracks(long userId) {
         TracksDTO tracksDTO = spotifyAPIService.getTopTracks(userId, "long");
-        statsService.saveUserTracks(Map.of(tracksDTO, userId));
+        statsService.saveUserTracks(Map.of(tracksDTO.withDate(LocalDate
+                .now()
+                .minusDays(1L)), userId));
     }
 
     @Override
     public void synchronizeArtists(long userId) {
         ArtistsDTO artistsDTO = spotifyAPIService.getTopArtists(userId, "long");
-        statsService.saveUserArtists(Map.of(artistsDTO, userId));
+        statsService.saveUserArtists(Map.of(artistsDTO.withDate(LocalDate
+                .now()
+                .minusDays(1L)), userId));
     }
 
     @Override
     public void synchronizeGenres(long userId) {
         ArtistsDTO artistsDTO = spotifyAPIService.getTopArtists(userId, "long");
         GenresDTO genresDTO = libraryAnalysisService.getTopGenres(userId, "long", artistsDTO);
-        statsService.saveUserGenres(Map.of(genresDTO, userId));
+        statsService.saveUserGenres(Map.of(genresDTO.withDate(LocalDate
+                .now()
+                .minusDays(1L)), userId));
     }
 
     @Override

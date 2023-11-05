@@ -24,11 +24,13 @@ public class ArtistsDTO {
 
     private LocalDate date;
 
-    public void withRange(String range) {
+    public ArtistsDTO withRange(String range) {
         this.range = range;
+        return this;
     }
 
-    public void withDate(LocalDate date) {
+    public ArtistsDTO withDate(LocalDate date) {
         this.date = date;
+        return this;
     }
 }
