@@ -35,4 +35,9 @@ public interface StatsService {
 
     boolean isBattlePossible(long userId, long battleUserId);
 
+    boolean isTrackSynchronized(long userId);
+
+    boolean isArtistSynchronized(long userId);
+
+    boolean isGenreSynchronized(long userId);
 }

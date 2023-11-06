@@ -5,6 +5,7 @@ import com.laa66.statlyapp.jwt.CookieUtils;
 import com.laa66.statlyapp.jwt.JwtProvider;
 import com.laa66.statlyapp.model.OAuth2UserWrapper;
 import com.laa66.statlyapp.repository.SpotifyTokenRepository;
+import com.laa66.statlyapp.service.LibraryDataSyncService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,6 +27,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private final SpotifyTokenRepository spotifyTokenRepository;
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+    private final LibraryDataSyncService libraryDataSyncService;
     private final JwtProvider tokenProvider;
     private final URI clientAuthorizedUri;
 
@@ -34,7 +36,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
         OAuth2UserWrapper principal = (OAuth2UserWrapper) authentication.getPrincipal();
         spotifyTokenRepository.saveToken(principal.getUserId(), token);
-        if (response.isCommitted()) return;
+        if (!libraryDataSyncService.isLibraryDataSynchronized(principal.getUserId()))
+            libraryDataSyncService.synchronize(principal.getUserId());
+        if (response.isCommitted())
+            return;
         String url = determineTargetUrl(request, principal);
         clearAuthenticationAttributes(request, response);
         getRedirectStrategy().sendRedirect(request, response, url);

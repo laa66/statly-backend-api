@@ -601,4 +601,94 @@ class StatsServiceImplUnitTest {
         assertFalse(statsService.isBattlePossible(1, 2));
     }
 
+    @Test
+    void shouldIsTrackSynchronizedTrue() {
+        Collection<UserTrack> tracks = List.of(
+                new UserTrack(1, 1, "long", Map.of(
+                        "item1", 1, "item2", 2, "item3", 3
+                ), null),
+                new UserTrack(2, 1, "short", Map.of(
+                        "item3", 1, "item4", 2, "item5", 3
+                ), null)
+        );
+        when(trackRepository.findAllByUserId(1L)).thenReturn(tracks);
+        boolean trackSynchronized = statsService.isTrackSynchronized(1L);
+        assertTrue(trackSynchronized);
+    }
+
+    @Test
+    void shouldIsTrackSynchronizedFalse() {
+        Collection<UserTrack> tracks = List.of(
+                new UserTrack(1, 1, "short", Map.of(
+                        "item1", 1, "item2", 2, "item3", 3
+                ), null),
+                new UserTrack(2, 1, "short", Map.of(
+                        "item3", 1, "item4", 2, "item5", 3
+                ), null)
+        );
+        when(trackRepository.findAllByUserId(1L)).thenReturn(tracks);
+        boolean trackSynchronized = statsService.isTrackSynchronized(1L);
+        assertFalse(trackSynchronized);
+    }
+
+    @Test
+    void shouldIsArtistSynchronizedTrue() {
+        Collection<UserArtist> artists = List.of(
+                new UserArtist(1, 1, "long", Map.of(
+                        "item1", 1, "item2", 2, "item3", 3
+                ), null),
+                new UserArtist(2, 1, "short", Map.of(
+                        "item1", 1, "item3", 2, "item4", 3
+                ), null)
+        );
+        when(artistRepository.findAllByUserId(1L)).thenReturn(artists);
+        boolean artistSynchronized = statsService.isArtistSynchronized(1L);
+        assertTrue(artistSynchronized);
+    }
+
+    @Test
+    void shouldIsArtistSynchronizedFalse() {
+        Collection<UserArtist> artists = List.of(
+                new UserArtist(1, 1, "short", Map.of(
+                        "item1", 1, "item2", 2, "item3", 3
+                ), null),
+                new UserArtist(2, 1, "short", Map.of(
+                        "item1", 1, "item3", 2, "item4", 3
+                ), null)
+        );
+        when(artistRepository.findAllByUserId(1L)).thenReturn(artists);
+        boolean artistSynchronized = statsService.isArtistSynchronized(1L);
+        assertFalse(artistSynchronized);
+    }
+
+    @Test
+    void shouldIsGenreSynchronizedTrue() {
+        Collection<UserGenre> matchGenres = List.of(
+                new UserGenre(1, 1, "long", Map.of(
+                        "item1", 3, "item5", 4, "item3", 5
+                ), null),
+                new UserGenre(1, 1, "long", Map.of(
+                        "item4", 3, "item1", 4, "item3", 5
+                ), null)
+        );
+        when(genreRepository.findAllByUserId(1L)).thenReturn(matchGenres);
+        boolean genreSynchronized = statsService.isGenreSynchronized(1L);
+        assertTrue(genreSynchronized);
+    }
+
+    @Test
+    void shouldIsGenreSynchronizedFalse() {
+        Collection<UserGenre> matchGenres = List.of(
+                new UserGenre(1, 1, "medium", Map.of(
+                        "item1", 3, "item5", 4, "item3", 5
+                ), null),
+                new UserGenre(1, 1, "short", Map.of(
+                        "item4", 3, "item1", 4, "item3", 5
+                ), null)
+        );
+        when(genreRepository.findAllByUserId(1L)).thenReturn(matchGenres);
+        boolean genreSynchronized = statsService.isGenreSynchronized(1L);
+        assertFalse(genreSynchronized);
+    }
+
 }

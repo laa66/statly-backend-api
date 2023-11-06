@@ -1,0 +1,25 @@
+api:
+  matrix:
+    access-token: token
+  spotify:
+    client-id: ${SPOTIFY_CLIENT_ID}
+    client-secret: ${SPOTIFY_CLIENT_SECRET}
+    scope: user-read-recently-played,user-read-private,user-top-read,playlist-modify-public
+
+statly:
+  api:
+    admin-email: admin@mail.com
+  client:
+    url: STATLY_APP_URL
+
+spring:
+  mail:
+    host: 127.0.0.1
+    port: 3025
+    username: user
+    password: admin
+    protocol: smtp
+
+jwt:
+  provider:
+    secret: ${STATLY_SECRET}
