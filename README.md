@@ -25,7 +25,7 @@ Check out [Statly](https://laa66.github.io/statly-frontend/) to see the applicat
       # Clone this repository to your local machine
       $ git clone https://github.com/laa66/statly-backend-api.git
 
-Create ``.env`` file in root project directory and set specific key-value pairs within it: 
+Create ``.env`` file in root project directory and set specific key-value pairs within it:
 1. Obtain a **Client ID** and **Client secret** from [Spotify Developer](https://developer.spotify.com/) panel
 2. Set ``SPOTIFY_CLIENT_ID``, ``SPOTIFY_CLIENT_SECRET`` environment variables
    with the values from your Spotify Developer panel
@@ -50,7 +50,7 @@ Create ``.env`` file in root project directory and set specific key-value pairs 
 
 ## How to use 🗺️
 
-1. At the very beginning, try to register as beta-tester on the Home page and your access should be granted after 15 minutes. You will receive confirmation email :)
+1. At the very beginning click ``Join Beta`` button on the home page and try to register as beta-tester with your Spotify firstname, lastname and email address. Your access should be granted after 15 minutes. You will receive confirmation email :)
 2. Click on ``Login with Spotify`` button on the Home page. You will be redirected to Spotify account service
 3. Login with your Spotify username and password
 4. **Congratulations!** Now you can use all features of Statly
@@ -68,7 +68,7 @@ Create ``.env`` file in root project directory and set specific key-value pairs 
 
 * Calculate and displays a user's ``library audio analysis`` based on different indicators such as average energy, tempo, mainstream, boringness etc.
 
-* Displays user's ``all playlists`` and give them ability to calculate playlist energy, tempo, mainstream and boringess score
+* Displays user's ``all playlists`` and give them ability to calculate playlist energy, tempo, mainstream and boringness score
 
 * Allows users to view their ``recently played`` tracks, giving them easy access to music they have enjoyed
 
@@ -86,6 +86,10 @@ Create ``.env`` file in root project directory and set specific key-value pairs 
 
 * Sending ``email notifications`` to users
 
+* ``Synchronizing user data`` with their Spotify library on initial login
+
+* Assigning ``beta access`` to users by Admin
+
 With these features Statly provides an easy and efficient way for users to explore and interact with their Spotify listening data.
 The app is powered by Spotify API and Mapbox API and also makes use of the OAuth2 authorization flow with Spring Boot for backend and React for frontend.
 Users can access the app through the web, it is deployed on Railway cloud and GitHub pages providing easy access to anyone who wants to connect their Spotify account and check their listening habits.
@@ -102,24 +106,24 @@ You can view full documentation of this project in different paths:
 #### Technologies & tools used:
 
 - Java 19
-- Spring Boot 3 (Spring REST, Spring Data JPA, Spring MVC, Spring Security, Spring AOP, Spring Mail)
-- Hibernate & JPA
+- Spring Boot 3 (Spring MVC, Spring Security, Spring Data JPA, Spring AOP, Spring Mail)
+- Hibernate
 - Maven
 - Project Lombok
 - JWT
 - OAuth 2.0
 - Docker
-- SQL
-- Spotify API
-- Mapbox API
+- MySQL
 - React.js
 - HTML & CSS
-- Bootstrap v5.2
+- Bootstrap
+- Spotify API
+- Mapbox API
 - Railway Cloud
 - GitHub Pages
 - IntelliJ IDEA Community Edition
 - Visual Studio Code
-- MySQL
+- MySQL Workbench
 
 #### Tested with:
 
@@ -132,6 +136,8 @@ You can view full documentation of this project in different paths:
 
 ## To-do 💡
 
+- Common song and artist among two users
+- User QR code
 - Implement functionality for comparing user listening habits over the past 6 months/all time
 - Integrate small web player into the React-app that can play user's top songs within the browser
 - Move Spotify-powered app from development mode to extended modem, enabling anyone to use Statly without needing to register for the beta
