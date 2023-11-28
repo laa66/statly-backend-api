@@ -6,7 +6,11 @@ import java.util.List;
 
 public interface BetaUserService {
 
+    BetaUserDTO findBetaUserByEmail(String email);
+
     void saveBetaUser(BetaUserDTO betaUserDTO);
+
+    void activateUser(String email);
 
     List<BetaUserDTO> findAllBetaUsers();
 

@@ -74,8 +74,8 @@ class BetaUserControllerIntegrationTest {
     @Test
     void shouldGetAllBetaUsers() throws Exception {
         List<BetaUserDTO> betaUsers = List.of(
-                new BetaUserDTO("user1", "user1@mail.com", LocalDateTime.of(2023, 1, 1, 12, 0, 0).toString()),
-                new BetaUserDTO("user2", "user2@email.com", LocalDateTime.of(2023, 1,1,11, 0, 0).toString()));
+                new BetaUserDTO("user1", "user1@mail.com", LocalDateTime.of(2023, 1, 1, 12, 0, 0).toString(), false),
+                new BetaUserDTO("user2", "user2@email.com", LocalDateTime.of(2023, 1,1,11, 0, 0).toString(), false));
         when(betaUserService.findAllBetaUsers()).thenReturn(betaUsers);
         mockMvc.perform(get("/beta/all")
                         .header("Authorization", "Bearer token")
@@ -111,13 +111,14 @@ class BetaUserControllerIntegrationTest {
     }
 
     @Test
-    void shouldSentNotification() throws Exception {
-        BetaUserDTO dto = new BetaUserDTO("name", "email", null);
-        mockMvc.perform(post("/beta/notification")
+    void shouldActivate() throws Exception {
+        BetaUserDTO dto = new BetaUserDTO("name", "email", null, false);
+        mockMvc.perform(post("/beta/activate")
                         .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isNoContent());
+        verify(betaUserService, times(1)).activateUser(dto.getEmail());
         verify(mailService, times(1)).sendAccessGrantedNotification(any());
     }
 

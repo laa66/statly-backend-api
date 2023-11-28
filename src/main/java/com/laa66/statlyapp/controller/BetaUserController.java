@@ -25,13 +25,14 @@ public class BetaUserController {
 
     @GetMapping("/join")
     public ResponseEntity<Void> join(@RequestParam("name") String fullName, @RequestParam String email) {
-        betaUserService.saveBetaUser(new BetaUserDTO(fullName, email, null));
+        betaUserService.saveBetaUser(new BetaUserDTO(fullName, email, null, false));
         mailService.sendJoinBetaNotification();
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/notification")
-    public ResponseEntity<Void> sendNotification(@RequestBody BetaUserDTO betaUserDTO) {
+    @PostMapping("/activate")
+    public ResponseEntity<Void> activate(@RequestBody BetaUserDTO betaUserDTO) {
+        betaUserService.activateUser(betaUserDTO.getEmail());
         mailService.sendAccessGrantedNotification(betaUserDTO);
         return ResponseEntity.noContent().build();
     }

@@ -4,6 +4,7 @@ import com.laa66.statlyapp.exception.BadRequestException;
 import com.laa66.statlyapp.jwt.JwtProvider;
 import com.laa66.statlyapp.model.OAuth2UserWrapper;
 import com.laa66.statlyapp.repository.impl.SpotifyTokenRepositoryImpl;
+import com.laa66.statlyapp.service.LibraryDataSyncService;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,8 @@ import java.util.Collections;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OAuth2SuccessHandlerUnitTest {
@@ -35,6 +37,9 @@ class OAuth2SuccessHandlerUnitTest {
 
     @Mock
     JwtProvider jwtProvider;
+
+    @Mock
+    LibraryDataSyncService libraryDataSyncService;
 
     OAuth2SuccessHandler oAuth2SuccessHandler;
 
@@ -49,6 +54,7 @@ class OAuth2SuccessHandlerUnitTest {
         oAuth2SuccessHandler = new OAuth2SuccessHandler(
                 spotifyTokenRepository,
                 httpCookieOAuth2AuthorizationRequestRepository,
+                libraryDataSyncService,
                 jwtProvider,
                 URI.create("http://localhost:3000")
         );
@@ -61,12 +67,25 @@ class OAuth2SuccessHandlerUnitTest {
     }
 
     @Test
-    void shouldOnAuthenticationSuccessValidRedirectUri() throws IOException {
+    void shouldOnAuthenticationSuccessValidRedirectUriSynchronized() throws IOException {
         request.setCookies(new Cookie("redirect_uri", "http://localhost:3000"));
         when(jwtProvider.createToken((OAuth2UserWrapper) authentication.getPrincipal())).thenReturn("header.payload.signature");
+        when(libraryDataSyncService.isLibraryDataSynchronized(1L)).thenReturn(true);
         oAuth2SuccessHandler.onAuthenticationSuccess(request, response, authentication);
         assertEquals("http://localhost:3000?jwt=header.payload.signature", response.getRedirectedUrl());
         assertNotNull(request.getCookies());
+        verify(libraryDataSyncService, never()).synchronize(anyLong());
+    }
+
+    @Test
+    void shouldOnAuthenticationSuccessValidRedirectUriNotSynchronized() throws IOException {
+        request.setCookies(new Cookie("redirect_uri", "http://localhost:3000"));
+        when(jwtProvider.createToken((OAuth2UserWrapper) authentication.getPrincipal())).thenReturn("header.payload.signature");
+        when(libraryDataSyncService.isLibraryDataSynchronized(1L)).thenReturn(false);
+        oAuth2SuccessHandler.onAuthenticationSuccess(request, response, authentication);
+        assertEquals("http://localhost:3000?jwt=header.payload.signature", response.getRedirectedUrl());
+        assertNotNull(request.getCookies());
+        verify(libraryDataSyncService, times(1)).synchronize(1L);
     }
 
     @Test

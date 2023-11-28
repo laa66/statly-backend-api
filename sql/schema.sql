@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS beta_users (
     full_name VARCHAR(50) NOT NULL,
     email VARCHAR(50) NOT NULL,
     date DATETIME NOT NULL,
+    active BOOLEAN NOT NULL,
     PRIMARY KEY (id)
 );
 

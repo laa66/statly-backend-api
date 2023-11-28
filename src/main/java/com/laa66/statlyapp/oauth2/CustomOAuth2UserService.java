@@ -5,8 +5,10 @@ import com.laa66.statlyapp.entity.User;
 import com.laa66.statlyapp.entity.UserInfo;
 import com.laa66.statlyapp.entity.UserStats;
 import com.laa66.statlyapp.exception.UserAuthenticationException;
+import com.laa66.statlyapp.exception.UserNotFoundException;
 import com.laa66.statlyapp.model.spotify.Image;
 import com.laa66.statlyapp.model.OAuth2UserWrapper;
+import com.laa66.statlyapp.service.BetaUserService;
 import com.laa66.statlyapp.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -22,6 +24,7 @@ import java.util.*;
 @AllArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
+    private final BetaUserService betaUserService;
     private final UserService userService;
 
     @Override
@@ -45,11 +48,13 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                                     .withJoinDate(LocalDateTime.now())
                                     .withUserStats(new UserStats())
                                     .withUserInfo(new UserInfo())));
+            if (!betaUserService.findBetaUserByEmail(userDTO.getEmail()).isActive())
+                throw new UserAuthenticationException("User not registered for beta");
             attributes.put("userId", Long.parseLong(userDTO.getId()));
             return new OAuth2UserWrapper(new DefaultOAuth2User(oAuth2User.getAuthorities(),
                     Collections.unmodifiableMap(attributes),
                     "display_name"));
-        } catch (NullPointerException e) {
+        } catch (NullPointerException | UserNotFoundException e) {
             throw new UserAuthenticationException("User cannot be properly authenticated");
         }
     }

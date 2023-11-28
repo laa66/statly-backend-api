@@ -16,11 +16,13 @@ public class GenresDTO {
     private String range;
     private LocalDate date;
 
-    public void withRange(String range) {
+    public GenresDTO withRange(String range) {
         this.range = range;
+        return this;
     }
 
-    public void withDate(LocalDate date) {
+    public GenresDTO withDate(LocalDate date) {
         this.date = date;
+        return this;
     }
 }
