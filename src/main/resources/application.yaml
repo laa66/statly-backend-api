@@ -1,3 +1,8 @@
+# server
+server:
+  address: ${SERVER_ADDRESS}
+  port: ${PORT}
+
 # API
 api:
   spotify:
