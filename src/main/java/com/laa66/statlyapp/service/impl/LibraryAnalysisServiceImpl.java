@@ -78,7 +78,7 @@ public class LibraryAnalysisServiceImpl implements LibraryAnalysisService {
                     List<Genre> transformedGenres = sliceGenres.stream()
                             .map(item -> new Genre(item.getGenre(), (int) ((item.getScore() / sum) * 100)))
                             .toList();
-                    return statsService.compareGenres(userId, new GenresDTO(transformedGenres, range, null));
+                    return statsService.compareGenres(userId, new GenresDTO(transformedGenres, range, null, null));
                 })
                 .orElseThrow(() -> new RuntimeException("Artists cannot be null"));
     }

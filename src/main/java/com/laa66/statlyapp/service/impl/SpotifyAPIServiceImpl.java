@@ -208,6 +208,6 @@ public class SpotifyAPIServiceImpl implements SpotifyAPIService {
                 .stream()
                 .map(PlaylistTrack::getTrack)
                 .toList();
-        return new TracksDTO(tracks, Integer.toString(tracks.size()), null, LocalDate.now());
+        return new TracksDTO(tracks, Integer.toString(tracks.size()), null, LocalDate.now(), null);
     }
 }

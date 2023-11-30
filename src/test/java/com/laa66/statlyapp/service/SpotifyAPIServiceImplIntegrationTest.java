@@ -100,7 +100,7 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @Test
     void shouldGetTopTracksResponseOk() throws JsonProcessingException {
-        TracksDTO data = new TracksDTO(List.of(new Track()),"1", "short", null);
+        TracksDTO data = new TracksDTO(List.of(new Track()),"1", "short", null, null);
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.TOP_TRACKS.get() + "short_term"))
                 .andExpect(method(HttpMethod.GET))
@@ -126,7 +126,7 @@ class SpotifyAPIServiceImplIntegrationTest {
 
     @Test
     void shouldGetTopArtistsResponseOk() throws JsonProcessingException {
-        ArtistsDTO data = new ArtistsDTO("1", new ArrayList<>(), "short", null);
+        ArtistsDTO data = new ArtistsDTO("1", new ArrayList<>(), "short", null, null);
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.TOP_ARTISTS.get() + "short_term"))
                 .andExpect(method(HttpMethod.GET))
@@ -188,7 +188,7 @@ class SpotifyAPIServiceImplIntegrationTest {
                 "uri",
                 new SpotifyURL(),
                 "id",
-                0)), "1", "long", LocalDate.now());
+                0)), "1", "long", LocalDate.now(), null);
         ResponseTracksAnalysis response = new ResponseTracksAnalysis(List.of(new TrackAnalysis(
                 0.15,
                 0.5,
@@ -223,7 +223,7 @@ class SpotifyAPIServiceImplIntegrationTest {
                 "uri",
                 new SpotifyURL(),
                 "id",
-                0)), "1", "long", LocalDate.now());
+                0)), "1", "long", LocalDate.now(), null);
         mockServer.expect(ExpectedCount.once(),
                         requestTo(SpotifyAPI.TRACKS_ANALYSIS.get() + "id"))
                 .andExpect(method(HttpMethod.GET))
@@ -307,7 +307,7 @@ class SpotifyAPIServiceImplIntegrationTest {
                 .build();
         Track track = new Track();
         track.setUri("trackId");
-        TracksDTO topTracks = new TracksDTO(List.of(track), "1", "short", null);
+        TracksDTO topTracks = new TracksDTO(List.of(track), "1", "short", null, null);
         PlaylistDTO playlist = new PlaylistDTO("1", new SpotifyURL());
         String data = "playlist";
 
