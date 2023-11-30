@@ -24,6 +24,8 @@ public class TracksDTO {
 
     private LocalDate date;
 
+    private LocalDate lastVisit;
+
     public TracksDTO withRange(String range) {
         this.range = range;
         return this;
@@ -31,6 +33,11 @@ public class TracksDTO {
 
     public TracksDTO withDate(LocalDate date) {
         this.date = date;
+        return this;
+    }
+
+    public TracksDTO withLastVisit(LocalDate lastVisit) {
+        this.lastVisit = lastVisit;
         return this;
     }
 }

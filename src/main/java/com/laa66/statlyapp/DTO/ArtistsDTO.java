@@ -24,6 +24,8 @@ public class ArtistsDTO {
 
     private LocalDate date;
 
+    private LocalDate lastVisit;
+
     public ArtistsDTO withRange(String range) {
         this.range = range;
         return this;
@@ -31,6 +33,11 @@ public class ArtistsDTO {
 
     public ArtistsDTO withDate(LocalDate date) {
         this.date = date;
+        return this;
+    }
+
+    public ArtistsDTO withLastVisit(LocalDate lastVisit) {
+        this.lastVisit = lastVisit;
         return this;
     }
 }

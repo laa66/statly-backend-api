@@ -61,7 +61,7 @@ class SpotifyAPIServiceImplUnitTest {
     @Test
     void shouldGetTopTracksWithValidUrl() {
         TracksDTO dto = new TracksDTO(List.of(new Track()
-                , new Track()), "2", "long", null);
+                , new Track()), "2", "long", null, null);
         when(restTemplate.exchange(eq(SpotifyAPI.TOP_TRACKS.get() + "long_term"),
                 eq(HttpMethod.GET), any(), eq(TracksDTO.class)))
                 .thenReturn(new ResponseEntity<>(dto, HttpStatus.OK));
@@ -91,7 +91,7 @@ class SpotifyAPIServiceImplUnitTest {
 
     @Test
     void shouldGetTopArtistsWithValidUrl() {
-        ArtistsDTO dto = new ArtistsDTO("1", List.of(new Artist(), new Artist()), "long", null);
+        ArtistsDTO dto = new ArtistsDTO("1", List.of(new Artist(), new Artist()), "long", null, null);
         when(restTemplate.exchange(eq(SpotifyAPI.TOP_ARTISTS.get() + "long_term"),
                 eq(HttpMethod.GET), any(), eq(ArtistsDTO.class)))
                 .thenReturn(new ResponseEntity<>(dto, HttpStatus.OK));
@@ -140,7 +140,7 @@ class SpotifyAPIServiceImplUnitTest {
                 "uri",
                 new SpotifyURL(),
                 "id",
-                0)), "1", "long", LocalDate.now());
+                0)), "1", "long", LocalDate.now(), null);
         ResponseTracksAnalysis response = new ResponseTracksAnalysis(List.of(new TrackAnalysis(
                 0.15,
                 0.5,
@@ -171,7 +171,7 @@ class SpotifyAPIServiceImplUnitTest {
                 "uri",
                 new SpotifyURL(),
                 "id",
-                0)), "1", "long", LocalDate.now());
+                0)), "1", "long", LocalDate.now(), null);
         when(restTemplate.exchange(eq(SpotifyAPI.TRACKS_ANALYSIS.get() + "id"),
                 eq(HttpMethod.GET), any(), eq(ResponseTracksAnalysis.class)))
                 .thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
@@ -338,7 +338,7 @@ class SpotifyAPIServiceImplUnitTest {
                 .name("testuser")
                 .images(List.of(new Image()))
                 .build();
-        TracksDTO tracksDTO = new TracksDTO(List.of(new Track(), new Track()), "2", "long", null);
+        TracksDTO tracksDTO = new TracksDTO(List.of(new Track(), new Track()), "2", "long", null, null);
         PlaylistDTO playlistDTO = new PlaylistDTO("1", new SpotifyURL());
         String snapshotId = "snapshotId";
 
@@ -428,7 +428,7 @@ class SpotifyAPIServiceImplUnitTest {
                 .name("testuser")
                 .images(List.of(new Image()))
                 .build();
-        TracksDTO tracksDTO = new TracksDTO(List.of(new Track(), new Track()), "2", "long", null);
+        TracksDTO tracksDTO = new TracksDTO(List.of(new Track(), new Track()), "2", "long", null, null);
         PlaylistDTO playlistDTO = new PlaylistDTO("1", new SpotifyURL());
 
         when(restTemplate.exchange(eq(SpotifyAPI.CURRENT_USER.get()),
@@ -458,7 +458,7 @@ class SpotifyAPIServiceImplUnitTest {
                 .name("testuser")
                 .images(List.of(new Image()))
                 .build();
-        TracksDTO tracksDTO = new TracksDTO(List.of(new Track(), new Track()), "2", "long", null);
+        TracksDTO tracksDTO = new TracksDTO(List.of(new Track(), new Track()), "2", "long", null, null);
         PlaylistDTO playlistDTO = new PlaylistDTO("1", new SpotifyURL());
         String snapshotId = "snapshotId";
 

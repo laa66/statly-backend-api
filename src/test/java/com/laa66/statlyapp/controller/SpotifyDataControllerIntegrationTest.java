@@ -64,7 +64,7 @@ class SpotifyDataControllerIntegrationTest {
 
     @Test
     void shouldGetTopTracks() throws Exception {
-        TracksDTO tracksDTO = new TracksDTO(List.of(new Track()), "1", "short", null);
+        TracksDTO tracksDTO = new TracksDTO(List.of(new Track()), "1", "short", null, null);
         when(spotifyAPIService.getTopTracks(1, "short")).thenReturn(tracksDTO);
         mockMvc.perform(get("/api/spotify/tracks/top")
                         .header("Authorization", "Bearer token")
@@ -83,7 +83,7 @@ class SpotifyDataControllerIntegrationTest {
 
     @Test
     void shouldGetTopArtists() throws Exception {
-        ArtistsDTO artistsDTO = new ArtistsDTO("1", List.of(new Artist()), "short", null);
+        ArtistsDTO artistsDTO = new ArtistsDTO("1", List.of(new Artist()), "short", null, null);
         when(spotifyAPIService.getTopArtists(1, "short")).thenReturn(artistsDTO);
         mockMvc.perform(get("/api/spotify/artists/top")
                         .header("Authorization", "Bearer token")
@@ -102,8 +102,8 @@ class SpotifyDataControllerIntegrationTest {
 
     @Test
     void shouldGetTopGenres() throws Exception {
-        GenresDTO genresDTO = new GenresDTO(List.of(new Genre("rock", 2)), "short", null);
-        ArtistsDTO artistsDTO = new ArtistsDTO("1", List.of(new Artist()), "short", null);
+        GenresDTO genresDTO = new GenresDTO(List.of(new Genre("rock", 2)), "short", null, null);
+        ArtistsDTO artistsDTO = new ArtistsDTO("1", List.of(new Artist()), "short", null, null);
         when(spotifyAPIService.getTopArtists(1, "short")).thenReturn(artistsDTO);
         when(libraryAnalysisService.getTopGenres(1, "short", artistsDTO)).thenReturn(genresDTO);
         mockMvc.perform(get("/api/spotify/genres/top")
@@ -188,7 +188,7 @@ class SpotifyDataControllerIntegrationTest {
 
     @Test
     void shouldGetLibraryAnalysis() throws Exception {
-        TracksDTO tracksDTO = new TracksDTO(List.of(new Track()), "1", "long", null);
+        TracksDTO tracksDTO = new TracksDTO(List.of(new Track()), "1", "long", null, null);
         AnalysisDTO analysisDTO = new AnalysisDTO(
                 Map.of("acousticness", 0.34, "valence", 0.55),
                 List.of(new Image())
@@ -215,7 +215,7 @@ class SpotifyDataControllerIntegrationTest {
     @Test
     void shouldGetPlaylistAnalysis() throws Exception {
         PlaylistInfo playlistInfo = new PlaylistInfo(new SpotifyURL(), "id", List.of(), "name", null);
-        TracksDTO tracksDTO = new TracksDTO(List.of(new Track()), "1", "long", null);
+        TracksDTO tracksDTO = new TracksDTO(List.of(new Track()), "1", "long", null, null);
         AnalysisDTO analysisDTO = new AnalysisDTO(
                 Map.of("acousticness", 0.34, "valence", 0.55),
                 List.of(new Image())

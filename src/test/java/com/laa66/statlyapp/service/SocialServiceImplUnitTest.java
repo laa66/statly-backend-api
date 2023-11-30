@@ -52,9 +52,9 @@ class SocialServiceImplUnitTest {
                 .withUserStats(new UserStats(1, 40.0, 30.0, 50.0, 300.0, 500, 0))
                 .withUserInfo(new UserInfo());
         TracksDTO tracksDTO = new TracksDTO(List.of(new Track(List.of(new Artist("artist")), "title"))
-                , "2", "long", null);
+                , "2", "long", null, null);
         ArtistsDTO artistsDTO = new ArtistsDTO("1", List.of(new Artist("artist"))
-                , "long", null);
+                , "long", null, null);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(statsService.getUserTracks(1, "long")).thenReturn(tracksDTO);
         when(statsService.getUserArtists(1, "long")).thenReturn(artistsDTO);

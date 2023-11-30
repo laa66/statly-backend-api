@@ -44,8 +44,8 @@ class LibraryAnalysisServiceImplUnitTest {
         artist1.setGenres(List.of("classic", "classic", "classic", "rock", "rock", "rock", "rock"));
         Artist artist2 = new Artist();
         artist2.setGenres(List.of("classic", "classic", "classic"));
-        ArtistsDTO artistsDTO = new ArtistsDTO("2", List.of(artist1, artist2), "long", null);
-        GenresDTO genresDTO = new GenresDTO(List.of(new Genre("classic", 60), new Genre("rock", 40)), "long", null);
+        ArtistsDTO artistsDTO = new ArtistsDTO("2", List.of(artist1, artist2), "long", null, null);
+        GenresDTO genresDTO = new GenresDTO(List.of(new Genre("classic", 60), new Genre("rock", 40)), "long", null, null);
         when(statsService.compareGenres(eq(1L), any())).thenReturn(genresDTO);
         GenresDTO returnDto = libraryAnalysisService.getTopGenres(1, "long", artistsDTO);
 
@@ -60,7 +60,7 @@ class LibraryAnalysisServiceImplUnitTest {
         assertThrows(RuntimeException.class,
                 () -> libraryAnalysisService.getTopGenres(1, "long", null));
         assertThrows(RuntimeException.class,
-                () -> libraryAnalysisService.getTopGenres(1, "long", new ArtistsDTO("0", null, "long", LocalDate.now())));
+                () -> libraryAnalysisService.getTopGenres(1, "long", new ArtistsDTO("0", null, "long", LocalDate.now(), null)));
     }
 
     @Test
@@ -68,7 +68,7 @@ class LibraryAnalysisServiceImplUnitTest {
         TracksDTO tracksDTO = new TracksDTO(List.of(
                 new Track(new Album(List.of(new Image()), "album1", List.of()), List.of(), "name", 35, "uri", new SpotifyURL(), "id1", 0),
                 new Track(new Album(List.of(new Image(), new Image()), "album2", List.of()), List.of(), "name", 75, "uri", new SpotifyURL(), "id2", 0)
-        ), "2", "long", LocalDate.now());
+        ), "2", "long", LocalDate.now(), null);
         ResponseTracksAnalysis tracksAnalysis = new ResponseTracksAnalysis(List.of(
                 new TrackAnalysis(0.6, 0.5, 0.15, 0.23, 0.8, -6.0, 0.22, 120.0, 0.5),
                 new TrackAnalysis(0.4, 0.3, 0.23, 0.13, 0.14, -45.0, 0.52, 150.5, 0.98),

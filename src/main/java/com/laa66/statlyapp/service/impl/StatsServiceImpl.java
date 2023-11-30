@@ -44,8 +44,8 @@ public class StatsServiceImpl implements StatsService {
                                 String[] artistTitle = entry.getKey().split("_");
                                 return new Track(List.of(new Artist(artistTitle[0])), artistTitle[1]);
                             }).toList();
-                    return new TracksDTO(tracks, Integer.toString(tracks.size()), range, item.getDate());
-                }).orElse(new TracksDTO(null, "0", range, null));
+                    return new TracksDTO(tracks, Integer.toString(tracks.size()), range, item.getDate(), null);
+                }).orElse(new TracksDTO(null, "0", range, null, null));
     }
 
     @Override
@@ -56,8 +56,8 @@ public class StatsServiceImpl implements StatsService {
                             .sorted(Map.Entry.comparingByValue())
                             .map(entry -> new Artist(entry.getKey()))
                             .toList();
-                    return new ArtistsDTO(Integer.toString(artists.size()), artists, range, item.getDate());
-                }).orElse(new ArtistsDTO("0", null, range, null));
+                    return new ArtistsDTO(Integer.toString(artists.size()), artists, range, item.getDate(), null);
+                }).orElse(new ArtistsDTO("0", null, range, null, null));
     }
 
     @Override
@@ -130,7 +130,7 @@ public class StatsServiceImpl implements StatsService {
     public TracksDTO compareTracks(long userId, TracksDTO dto) {
         return trackRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, dto.getRange())
                 .map(item -> {
-                    dto.withDate(item.getDate());
+                    dto.withLastVisit(item.getDate());
                     IntStream.range(0, dto.getTracks().size()).forEach(index -> {
                         try { //handled npe
                             Track track = dto.getTracks().get(index);
@@ -152,7 +152,7 @@ public class StatsServiceImpl implements StatsService {
     public ArtistsDTO compareArtists(long userId, ArtistsDTO dto) {
         return artistRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, dto.getRange())
                 .map(item -> {
-                    dto.withDate(item.getDate());
+                    dto.withLastVisit(item.getDate());
                     IntStream.range(0, dto.getArtists().size()).forEach(index -> {
                         Artist artist = dto.getArtists().get(index);
                         String name = artist.getName();
@@ -169,7 +169,7 @@ public class StatsServiceImpl implements StatsService {
     public GenresDTO compareGenres(long userId, GenresDTO dto) {
         return genreRepository.findFirstByUserIdAndRangeOrderByDateDesc(userId, dto.getRange())
                 .map(item -> {
-                    dto.withDate(item.getDate());
+                    dto.withLastVisit(item.getDate());
                     IntStream.range(0, dto.getGenres().size()).forEach(index -> {
                         Genre genre = dto.getGenres().get(index);
                         String name = genre.getGenre();

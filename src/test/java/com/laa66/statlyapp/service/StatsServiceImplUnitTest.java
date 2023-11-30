@@ -94,13 +94,13 @@ class StatsServiceImplUnitTest {
     @Test
     void shouldSaveUserTracks() {
         Track track = new Track(List.of(new Artist("artist")), "song");
-        TracksDTO trackDTO = new TracksDTO(Collections.singletonList(track), "1", "short", null);
+        TracksDTO trackDTO = new TracksDTO(Collections.singletonList(track), "1", "short", null, null);
         Map<TracksDTO, Long> trackMap = Collections.singletonMap(trackDTO, 1L);
         statsService.saveUserTracks(trackMap);
 
         Track track1 = new Track(Collections.singletonList(new Artist("artist")), "song");
         Track track2 = new Track(Collections.singletonList(new Artist("artist")), "song");
-        TracksDTO tracksDTO = new TracksDTO(List.of(track1, track2), "2", "short", null);
+        TracksDTO tracksDTO = new TracksDTO(List.of(track1, track2), "2", "short", null, null);
         Map<TracksDTO, Long> tracksMap = Map.of(tracksDTO, 1L);
         statsService.saveUserTracks(tracksMap);
         verify(trackRepository, times(2)).saveAll(anyList());
@@ -109,13 +109,13 @@ class StatsServiceImplUnitTest {
     @Test
     void shouldSaveUserArtists() {
         Artist artist = new Artist("artist");
-        ArtistsDTO artistDTO = new ArtistsDTO("1", Collections.singletonList(artist), "short", null);
+        ArtistsDTO artistDTO = new ArtistsDTO("1", Collections.singletonList(artist), "short", null, null);
         Map<ArtistsDTO, Long> artistMap = Collections.singletonMap(artistDTO, 1L);
         statsService.saveUserArtists(artistMap);
 
         Artist artist1 = new Artist("artist");
         Artist artist2 = new Artist("artist");
-        ArtistsDTO artistsDTO = new ArtistsDTO("2", List.of(artist1, artist2), "short", null);
+        ArtistsDTO artistsDTO = new ArtistsDTO("2", List.of(artist1, artist2), "short", null, null);
         Map<ArtistsDTO, Long> artistsMap = Map.of(artistsDTO, 1L);
         statsService.saveUserArtists(artistsMap);
         verify(artistRepository, times(2)).saveAll(anyList());
@@ -124,14 +124,14 @@ class StatsServiceImplUnitTest {
     @Test
     void shouldSaveUserGenres() {
         GenresDTO genreDTO = new GenresDTO(Collections
-                .singletonList(new Genre("genre", 20)), "short", null);
+                .singletonList(new Genre("genre", 20)), "short", null, null);
         Map<GenresDTO, Long> genreMap = Collections.singletonMap(genreDTO, 1L);
         statsService.saveUserGenres(genreMap);
         verify(genreRepository, times(1)).saveAll(anyList());
 
         Genre genre1 = new Genre("rock", 30);
         Genre genre2 = new Genre("rock", 60);
-        GenresDTO genresDTO = new GenresDTO(List.of(genre1, genre2), "short", null);
+        GenresDTO genresDTO = new GenresDTO(List.of(genre1, genre2), "short", null, null);
         statsService.saveUserGenres(Map.of(genresDTO, 1L));
         verify(genreRepository, times(2)).saveAll(anyList());
     }
@@ -166,7 +166,7 @@ class StatsServiceImplUnitTest {
         TracksDTO dto = new TracksDTO(List.of(
                 new Track(new Album(), List.of(artist1), "track1", 50, "uri", new SpotifyURL(), "id", 0),
                 new Track(new Album(), List.of(artist2), "track2", 50, "uri", new SpotifyURL(), "id", 0)
-        ), "2", "short", null);
+        ), "2", "short", null, null);
         UserTrack track = new UserTrack(1, 1, "short", Map.of(
                 "artist1_track1", 2, "artist2_track2", 1
         ), LocalDate.of(2023, 1, 1));
@@ -182,7 +182,7 @@ class StatsServiceImplUnitTest {
         assertEquals(dto.getTracks().get(1).getName(), returnDto.getTracks().get(1).getName());
         assertEquals(1, returnDto.getTracks().get(0).getDifference(), "Artist1 was on second place and now should be at first place");
         assertEquals(-1, returnDto.getTracks().get(1).getDifference(), "Artist2 was on first place and now should be at second place");
-        assertEquals(track.getDate(), returnDto.getDate());
+        assertEquals(dto.getDate(), returnDto.getDate());
     }
 
     @Test
@@ -190,7 +190,7 @@ class StatsServiceImplUnitTest {
         TracksDTO dto = new TracksDTO(List.of(
                 new Track(new Album(), null, "track1", 50, "uri", new SpotifyURL(), "id", 0),
                 new Track(new Album(), List.of(), "track2", 50, "uri", new SpotifyURL(), "id", 0)
-        ), "2", "short", null);
+        ), "2", "short", null, null);
         UserTrack track = new UserTrack(1, 1, "short", Map.of(
                 "artist1_track1", 2, "artist2_track2", 1
         ), LocalDate.of(2023, 1, 1));
@@ -206,7 +206,7 @@ class StatsServiceImplUnitTest {
         assertEquals(dto.getTracks().get(1).getName(), returnDto.getTracks().get(1).getName());
         assertEquals(0, returnDto.getTracks().get(0).getDifference());
         assertEquals(0, returnDto.getTracks().get(1).getDifference());
-        assertEquals(track.getDate(), returnDto.getDate());
+        assertEquals(dto.getDate(), returnDto.getDate());
     }
 
     @Test
@@ -216,7 +216,7 @@ class StatsServiceImplUnitTest {
         TracksDTO dto = new TracksDTO(List.of(
                 new Track(new Album(), List.of(artist1), "track1", 50, "uri", new SpotifyURL(), "id", 0),
                 new Track(new Album(), List.of(artist2), "track2", 50, "uri", new SpotifyURL(), "id", 0)
-        ), "2", "short", null);
+        ), "2", "short", null, null);
         when(trackRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "short"))
                 .thenReturn(Optional.empty());
         TracksDTO returnDto = statsService.compareTracks(1, dto);
@@ -238,7 +238,7 @@ class StatsServiceImplUnitTest {
         TracksDTO dto = new TracksDTO(List.of(
                 new Track(new Album(), List.of(artist1), "track1", 50, "uri", new SpotifyURL(), "id", 0),
                 new Track(new Album(), List.of(artist2), "track2", 50, "uri", new SpotifyURL(), "id", 0)
-        ), "2", "wrong", null);
+        ), "2", "wrong", null, null);
         when(trackRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "wrong"))
                 .thenReturn(Optional.empty());
         TracksDTO returnDto = statsService.compareTracks(1, dto);
@@ -258,7 +258,7 @@ class StatsServiceImplUnitTest {
         ArtistsDTO dto = new ArtistsDTO("2", List.of(
                 new Artist(List.of(), List.of(), "artist1", "uri", new SpotifyURL(), 0),
                 new Artist(List.of(), List.of(), "artist2", "uri", new SpotifyURL(), 0)
-        ), "short", null);
+        ), "short", null, null);
         UserArtist artist = new UserArtist(1, 1, "short", Map.of(
                 "artist1", 2, "artist2", 1
         ), LocalDate.of(2023, 1, 1));
@@ -274,7 +274,7 @@ class StatsServiceImplUnitTest {
         assertEquals(dto.getArtists().get(1).getName(), returnDto.getArtists().get(1).getName());
         assertEquals(1, returnDto.getArtists().get(0).getDifference(), "Artist1 was on second place and now should be at first place");
         assertEquals(-1, returnDto.getArtists().get(1).getDifference(), "Artist2 was on first place and now should be at second place");
-        assertEquals(artist.getDate(), returnDto.getDate());
+        assertEquals(dto.getDate(), returnDto.getDate());
     }
 
     @Test
@@ -282,7 +282,7 @@ class StatsServiceImplUnitTest {
         ArtistsDTO dto = new ArtistsDTO("2", List.of(
                 new Artist(List.of(), List.of(), "artist1", "uri", new SpotifyURL(), 0),
                 new Artist(List.of(), List.of(), "artist2", "uri", new SpotifyURL(), 0)
-        ), "short", null);
+        ), "short", null, null);
         when(artistRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "short"))
                 .thenReturn(Optional.empty());
 
@@ -303,7 +303,7 @@ class StatsServiceImplUnitTest {
         ArtistsDTO dto = new ArtistsDTO("2", List.of(
                 new Artist(List.of(), List.of(), "artist1", "uri", new SpotifyURL(), 0),
                 new Artist(List.of(), List.of(), "artist2", "uri", new SpotifyURL(), 0)
-        ), "wrong", null);
+        ), "wrong", null, null);
         when(artistRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "wrong"))
                 .thenReturn(Optional.empty());
 
@@ -325,7 +325,7 @@ class StatsServiceImplUnitTest {
                 new Genre("genre1", 20),
                 new Genre("genre2", 15),
                 new Genre("genre3", 8)
-        ), "short", null);
+        ), "short", null, null);
 
         UserGenre genre = new UserGenre(1, 1, "short", Map.of(
                 "genre1", 10, "genre2", 30, "genre4", 5
@@ -342,7 +342,7 @@ class StatsServiceImplUnitTest {
         assertEquals(10, returnDto.getGenres().get(0).getDifference());
         assertEquals(-15, returnDto.getGenres().get(1).getDifference());
         assertNull(returnDto.getGenres().get(2).getDifference());
-        assertEquals(genre.getDate(), returnDto.getDate());
+        assertEquals(dto.getDate(), returnDto.getDate());
     }
 
     @Test
@@ -351,7 +351,7 @@ class StatsServiceImplUnitTest {
                 new Genre("genre1", 20),
                 new Genre("genre2", 15),
                 new Genre("genre3", 8)
-        ), "short", null);
+        ), "short", null, null);
         when(genreRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "short"))
                 .thenReturn(Optional.empty());
 
@@ -373,7 +373,7 @@ class StatsServiceImplUnitTest {
                 new Genre("genre1", 20),
                 new Genre("genre2", 15),
                 new Genre("genre3", 8)
-        ), "wrong", null);
+        ), "wrong", null, null);
         when(genreRepository.findFirstByUserIdAndRangeOrderByDateDesc(1, "wrong"))
                 .thenReturn(Optional.empty());
 
