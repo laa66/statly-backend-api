@@ -22,7 +22,7 @@ public class CacheTask {
     private final CacheManager cacheManager;
     private final StatsService statsService;
 
-    @Scheduled(cron = "0 06 22 * * *")
+    @Scheduled(cron = "0 59 21 * * *")
     public void saveCache() {
         Optional.ofNullable((CaffeineCache) cacheManager.getCache("api"))
                 .ifPresentOrElse(caffeineCache -> {
