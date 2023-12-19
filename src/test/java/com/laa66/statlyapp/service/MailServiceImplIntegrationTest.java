@@ -30,7 +30,7 @@ class MailServiceImplIntegrationTest extends MySQLBaseContainerTest {
 
     @Test
     void shouldSendJoinBetaNotification() throws MessagingException, IOException {
-        mailService.sendJoinBetaNotification();
+        mailService.sendJoinBetaNotification("name", "email", "number ");
         MimeMessage message = greenMail.getReceivedMessages()[0];
         assertNotNull(message);
         assertEquals("admin@mail.com", message.getAllRecipients()[0].toString());
