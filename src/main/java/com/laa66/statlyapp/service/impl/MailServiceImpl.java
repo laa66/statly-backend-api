@@ -25,14 +25,20 @@ public class MailServiceImpl implements MailService {
     private final JSONParser parser = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
 
     @Override
-    public void sendJoinBetaNotification() {
+    public void sendJoinBetaNotification(String fullName, String email, String phoneNumber) {
+        String additionalInfo = "Personal info: "
+                + fullName + "\n"
+                + "Email address: "
+                + email + "\n"
+                + "Phone number: "
+                + phoneNumber;
         Resource resource = new ClassPathResource("json/join-beta-mail.json");
         try {
             JSONObject object = (JSONObject) parser.parse(resource.getInputStream());
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(email);
+            message.setTo(this.email);
             message.setSubject((String) object.get("subject"));
-            message.setText((String) object.get("text"));
+            message.setText(object.get("text") + "\n\n" + additionalInfo);
             mailSender.send(message);
         } catch (IOException | ParseException e) {
             throw new RuntimeException("Failed to read mail template.", e);

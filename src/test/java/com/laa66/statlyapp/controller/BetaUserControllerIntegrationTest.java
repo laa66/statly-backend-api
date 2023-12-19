@@ -104,10 +104,11 @@ class BetaUserControllerIntegrationTest {
         mockMvc.perform(get("/beta/join")
                         .header("Authorization", "Bearer token")
                         .param("name", "name")
-                        .param("email", "email"))
+                        .param("email", "email")
+                        .param("phone_number", "999777555"))
                 .andExpect(status().isNoContent());
         verify(betaUserService, times(1)).saveBetaUser(isA(BetaUserDTO.class));
-        verify(mailService, times(1)).sendJoinBetaNotification();
+        verify(mailService, times(1)).sendJoinBetaNotification("name", "email", "999777555");
     }
 
     @Test
