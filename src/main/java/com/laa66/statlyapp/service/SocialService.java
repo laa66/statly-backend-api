@@ -4,6 +4,7 @@ import com.laa66.statlyapp.DTO.FollowersDTO;
 import com.laa66.statlyapp.DTO.ProfileDTO;
 import com.laa66.statlyapp.constants.StatlyConstants;
 import com.laa66.statlyapp.entity.User;
+import com.laa66.statlyapp.model.mapbox.Coordinates;
 
 import java.util.Map;
 
@@ -21,6 +22,6 @@ public interface SocialService {
 
     User updateSocialLinks(long userId, Map<String, String> socialLinks);
 
-    void saveUserLocation(long userId, Double longitude, Double latitude);
+    void saveUserLocation(long userId, Coordinates coordinates);
 
 }

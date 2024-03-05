@@ -6,6 +6,7 @@ import com.laa66.statlyapp.entity.User;
 import com.laa66.statlyapp.entity.UserInfo;
 import com.laa66.statlyapp.entity.UserStats;
 import com.laa66.statlyapp.exception.UserNotFoundException;
+import com.laa66.statlyapp.model.mapbox.Coordinates;
 import com.laa66.statlyapp.model.spotify.Artist;
 import com.laa66.statlyapp.model.spotify.Track;
 import com.laa66.statlyapp.repository.UserRepository;
@@ -257,7 +258,7 @@ class SocialServiceImplUnitTest {
                 .withId(1L)
                 .withUserInfo(new UserInfo(1, "ig", null, null, null, null));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        socialService.saveUserLocation(1L, 53.21, 32.67);
+        socialService.saveUserLocation(1L, new Coordinates(53.21, 32.67));
         verify(userRepository, times(1))
                 .save(argThat(arg ->
                         arg.getId() == 1L &&
@@ -265,7 +266,7 @@ class SocialServiceImplUnitTest {
                         arg.getUserInfo().getLatitude() == 32.67));
 
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> socialService.saveUserLocation(2L, 32.12, 53.31));
+        assertThrows(UserNotFoundException.class, () -> socialService.saveUserLocation(2L, new Coordinates(32.12, 53.31)));
     }
 
 }

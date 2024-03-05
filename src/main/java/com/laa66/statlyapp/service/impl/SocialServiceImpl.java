@@ -7,7 +7,9 @@ import com.laa66.statlyapp.constants.StatlyConstants;
 import com.laa66.statlyapp.entity.User;
 import com.laa66.statlyapp.exception.UserNotFoundException;
 import com.laa66.statlyapp.mapper.EntityMapper;
+import com.laa66.statlyapp.model.mapbox.Coordinates;
 import com.laa66.statlyapp.repository.UserRepository;
+import com.laa66.statlyapp.service.CoordinatesEncryptionService;
 import com.laa66.statlyapp.service.SocialService;
 import com.laa66.statlyapp.service.StatsService;
 import lombok.AllArgsConstructor;
@@ -96,12 +98,12 @@ public class SocialServiceImpl implements SocialService {
     }
 
     @Override
-    public void saveUserLocation(long userId, Double longitude, Double latitude) {
+    public void saveUserLocation(long userId, Coordinates coordinates) {
         userRepository.save(userRepository.findById(userId)
                 .map(user -> {
                     user.getUserInfo()
-                            .setLongitude(longitude)
-                            .setLatitude(latitude);
+                            .setLongitude(coordinates.getLongitude())
+                            .setLatitude(coordinates.getLatitude());
                     return user;
                 }).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER));
     }
