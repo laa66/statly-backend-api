@@ -31,8 +31,12 @@ public class AppConfig {
     }
 
     @Bean
-    public LocationService locationService(MapAPIService mapAPIService, UserService userService, LibraryAnalysisService analysisService) {
-        return new LocationServiceImpl(mapAPIService, userService, analysisService);
+    public LocationService locationService(MapAPIService mapAPIService,
+                                           UserService userService,
+                                           LibraryAnalysisService analysisService) {
+        return new LocationServiceImpl(mapAPIService,
+                userService,
+                analysisService);
     }
 
     @Bean
@@ -49,7 +53,9 @@ public class AppConfig {
     public LibraryDataSyncService libraryDataSyncService(SpotifyAPIService spotifyAPIService,
                                                          LibraryAnalysisService libraryAnalysisService,
                                                          StatsService statsService) {
-        return new InitialLibraryDataSyncService(spotifyAPIService, libraryAnalysisService, statsService);
+        return new InitialLibraryDataSyncService(spotifyAPIService,
+                libraryAnalysisService,
+                statsService);
     }
 
     @Bean
@@ -74,7 +80,8 @@ public class AppConfig {
     }
 
     @Bean
-    public SocialService socialService(UserRepository userRepository, StatsService statsService) {
+    public SocialService socialService(UserRepository userRepository,
+                                       StatsService statsService) {
         return new SocialServiceImpl(userRepository, statsService);
     }
 

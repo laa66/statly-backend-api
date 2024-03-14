@@ -1,4 +1,4 @@
-package com.laa66.statlyapp.mapper;
+package com.laa66.statlyapp.util;
 
 import com.laa66.statlyapp.DTO.BetaUserDTO;
 import com.laa66.statlyapp.DTO.UserDTO;
