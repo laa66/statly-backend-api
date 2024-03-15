@@ -1,51 +1,35 @@
 package com.laa66.statlyapp.util;
 
 import com.laa66.statlyapp.model.mapbox.Coordinates;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.data.util.Pair;
+
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CoordinateEncryptorUnitTest {
 
-    @Test
-    void shouldEncryptCoordinatesPositiveBoth() {
-        Coordinates coordinates = new Coordinates(53.231, 43.21);
-
-        Pair<String, String> encryptedCoordinates = CoordinateEncryptor.encrypt(coordinates);
-
-        assertEquals("1213235", encryptedCoordinates.getFirst());
-        assertEquals("121234", encryptedCoordinates.getSecond());
+    private static Stream<Arguments> coordinatesProvider() {
+        return Stream.of(
+                Arguments.of(53.231, 43.2134),
+                Arguments.of(53.231, -43.2134),
+                Arguments.of(-53.231, 43.2134),
+                Arguments.of(-53.231, -43.2134)
+        );
     }
 
-    @Test
-    void shouldEncryptCoordinatesNegativeFirst() {
-        Coordinates coordinates = new Coordinates(-53.231, 43.21);
+    @ParameterizedTest
+    @MethodSource("com.laa66.statlyapp.util.CoordinateEncryptorUnitTest#coordinatesProvider")
+    void shouldEncryptDecryptCoordinates(double longitude, double latitude) {
+        Coordinates coordinates = new Coordinates(longitude, latitude);
+        Pair<String, String> encrypted = CoordinateEncryptor.encrypt(coordinates);
+        Coordinates decrypted = CoordinateEncryptor.decrypt(encrypted);
 
-        Pair<String, String> encryptedCoordinates = CoordinateEncryptor.encrypt(coordinates);
-
-        assertEquals("0313235", encryptedCoordinates.getFirst());
-        assertEquals("121234", encryptedCoordinates.getSecond());
-    }
-
-    @Test
-    void shouldEncryptCoordinatesNegativeSecond() {
-        Coordinates coordinates = new Coordinates(53.231, -43.21);
-
-        Pair<String, String> encryptedCoordinates = CoordinateEncryptor.encrypt(coordinates);
-
-        assertEquals("1213235", encryptedCoordinates.getFirst());
-        assertEquals("031234", encryptedCoordinates.getSecond());
-    }
-
-    @Test
-    void shouldEncryptCoordinatesNegativeBoth() {
-        Coordinates coordinates = new Coordinates(-53.231, -43.21);
-
-        Pair<String, String> encryptedCoordinates = CoordinateEncryptor.encrypt(coordinates);
-
-        assertEquals("0313235", encryptedCoordinates.getFirst());
-        assertEquals("031234", encryptedCoordinates.getSecond());
+        assertEquals(coordinates.getLatitude(), decrypted.getLatitude());
+        assertEquals(coordinates.getLongitude(), decrypted.getLongitude());
     }
 
 

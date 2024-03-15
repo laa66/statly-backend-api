@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS user_info (
     fb VARCHAR(100),
     ig VARCHAR(100),
     twitter VARCHAR(100),
-    longitude DOUBLE,
-    latitude DOUBLE,
+    longitude VARCHAR(100),
+    latitude VARCHAR(100),
     PRIMARY KEY (id)
 );
 

@@ -24,7 +24,7 @@ class EntityMapperUnitTest {
                 "imageUrl",
                 LocalDateTime.now(),
                 new UserStats(1L, 0.7, 0.7, 0.7, 0.7, 50, 1),
-                new UserInfo(1L, "", "", "", 54.23, -43.21));
+                new UserInfo(1L, "", "", "", "122345", "021234"));
 
         UserDTO userDTO = EntityMapper.toUserDTO(user);
         assertAll(
@@ -33,8 +33,8 @@ class EntityMapperUnitTest {
                 () -> assertEquals(user.getUsername(), userDTO.getName()),
                 () -> assertEquals(user.getImage(), userDTO.getImages().get(0).getUrl()),
                 () -> assertEquals(user.getUserStats().getPoints(), userDTO.getPoints()),
-                () -> assertEquals(user.getUserInfo().getLongitude(), userDTO.getCoordinates().getLongitude()),
-                () -> assertEquals(user.getUserInfo().getLatitude(), userDTO.getCoordinates().getLatitude())
+                () -> assertEquals(54.32, userDTO.getCoordinates().getLongitude()),
+                () -> assertEquals(-43.21, userDTO.getCoordinates().getLatitude())
         );
     }
 

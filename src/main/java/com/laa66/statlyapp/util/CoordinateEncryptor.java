@@ -21,30 +21,41 @@ public class CoordinateEncryptor {
                 .map(aDouble -> {
                     int index = aDouble.toString().indexOf(".");
                     boolean isNegative = aDouble < 0;
-
-                    return new StringBuilder(aDouble.toString())
+                    String toModify = aDouble.toString();
+                    if (isNegative) {
+                        toModify = toModify.replaceFirst("-", "");
+                        index--;
+                    }
+                    return new StringBuilder(toModify)
                             .deleteCharAt(index)
                             .append(index)
                             .append(isNegative ? 0 : 1)
                             .reverse()
-                            .toString()
-                            .replaceFirst("-", "");
+                            .toString();
                 })
                 .toArray(String[]::new);
 
         return Pair.of(encryptedCoordinates[0], encryptedCoordinates[1]);
     }
 
+    // TODO: 14.03.2024 Repair this
     public static Coordinates decrypt(Pair<String, String> encryptedCoordinates) {
         String lon = StringUtils.reverse(encryptedCoordinates.getFirst());
         String lat = StringUtils.reverse(encryptedCoordinates.getSecond());
         double[] array = Stream.of(lon, lat)
-                .mapToDouble(coordinate -> Double.parseDouble(new StringBuilder(coordinate)
-                        .delete(coordinate.length() - 2, coordinate.length() - 1)
-                        .insert(coordinate.length() - 1, coordinate.charAt(coordinate.length() - 1) == 0 ? "" : "-")
-                        .insert(coordinate.charAt(coordinate.length() - 2), '.')
-                        .toString()))
-                .toArray();
+                .mapToDouble(coordinate -> {
+                    int len = coordinate.length();
+                    /*double obj = Double.parseDouble(new StringBuilder(coordinate)
+                            .delete(len - 2, len - 1)
+                            .insert(0, coordinate.charAt(len - 1) == 0 ? "" : "-")
+                            .insert(coordinate.charAt(len - 2), '.')
+                            .toString());*/
+                    StringBuilder sb = new StringBuilder(coordinate);
+                    sb.delete(len - 2, len);
+                    sb.insert(Integer.parseInt(String.valueOf(coordinate.charAt(len - 2))), ".");
+                    sb.insert(0, Integer.parseInt(String.valueOf(coordinate.charAt(len - 1))) == 0 ? "-" : "");
+                    return Double.parseDouble(sb.toString());
+                }).toArray();
 
         return new Coordinates(array[0], array[1]);
     }

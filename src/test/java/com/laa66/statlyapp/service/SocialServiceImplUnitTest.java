@@ -262,8 +262,8 @@ class SocialServiceImplUnitTest {
         verify(userRepository, times(1))
                 .save(argThat(arg ->
                         arg.getId() == 1L &&
-                        arg.getUserInfo().getLongitude() == 53.21 &&
-                        arg.getUserInfo().getLatitude() == 32.67));
+                        arg.getUserInfo().getLongitude().equals("121235") &&
+                        arg.getUserInfo().getLatitude().equals("127623")));
 
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> socialService.saveUserLocation(2L, new Coordinates(32.12, 53.31)));
