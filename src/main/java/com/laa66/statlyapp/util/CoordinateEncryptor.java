@@ -38,23 +38,17 @@ public class CoordinateEncryptor {
         return Pair.of(encryptedCoordinates[0], encryptedCoordinates[1]);
     }
 
-    // TODO: 14.03.2024 Repair this
     public static Coordinates decrypt(Pair<String, String> encryptedCoordinates) {
         String lon = StringUtils.reverse(encryptedCoordinates.getFirst());
         String lat = StringUtils.reverse(encryptedCoordinates.getSecond());
         double[] array = Stream.of(lon, lat)
                 .mapToDouble(coordinate -> {
                     int len = coordinate.length();
-                    /*double obj = Double.parseDouble(new StringBuilder(coordinate)
-                            .delete(len - 2, len - 1)
-                            .insert(0, coordinate.charAt(len - 1) == 0 ? "" : "-")
-                            .insert(coordinate.charAt(len - 2), '.')
-                            .toString());*/
-                    StringBuilder sb = new StringBuilder(coordinate);
-                    sb.delete(len - 2, len);
-                    sb.insert(Integer.parseInt(String.valueOf(coordinate.charAt(len - 2))), ".");
-                    sb.insert(0, Integer.parseInt(String.valueOf(coordinate.charAt(len - 1))) == 0 ? "-" : "");
-                    return Double.parseDouble(sb.toString());
+                    return Double.parseDouble(new StringBuilder(coordinate)
+                            .delete(len - 2, len)
+                            .insert(Integer.parseInt(String.valueOf(coordinate.charAt(len - 2))), ".")
+                            .insert(0, Integer.parseInt(String.valueOf(coordinate.charAt(len - 1))) == 0 ? "-" : "")
+                            .toString());
                 }).toArray();
 
         return new Coordinates(array[0], array[1]);
