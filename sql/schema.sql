@@ -88,3 +88,5 @@ ON SCHEDULE EVERY 1 DAY
 STARTS (TIMESTAMP(CURRENT_DATE))
 DO
 UPDATE user_stats SET battle_count = 0;
+
+INSERT INTO beta_users (id, full_name, email, date, active) VALUES (1, 'Maxime Schulz', 'max.sclz94@gmail.com', now(), true);
