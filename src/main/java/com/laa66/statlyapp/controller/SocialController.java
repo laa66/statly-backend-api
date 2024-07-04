@@ -69,7 +69,7 @@ public class SocialController {
     @PostMapping("/location")
     public ResponseEntity<Void> saveLocation(@AuthenticationPrincipal OAuth2UserWrapper principal, @RequestBody Coordinates coordinates) {
         long userId = principal.getUserId();
-        socialService.saveUserLocation(userId, coordinates.getLongitude(), coordinates.getLatitude());
+        socialService.saveUserLocation(userId, coordinates);
         return ResponseEntity.noContent().build();
     }
 }

@@ -231,7 +231,7 @@ class SocialControllerIntegrationTest {
                 .header("Authorization", "Bearer token")
                 .content(mapper.writeValueAsString(coordinates)))
                 .andExpect(status().isNoContent());
-        verify(socialService, times(1)).saveUserLocation(1, 53.4312, -22.3345);
+        verify(socialService, times(1)).saveUserLocation(1, new Coordinates(53.4312, -22.3345));
 
         mockMvc.perform(post("/member/location")
                 .contentType(MediaType.APPLICATION_JSON)

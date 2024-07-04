@@ -6,11 +6,14 @@ import com.laa66.statlyapp.DTO.UserDTO;
 import com.laa66.statlyapp.constants.StatlyConstants;
 import com.laa66.statlyapp.entity.User;
 import com.laa66.statlyapp.exception.UserNotFoundException;
-import com.laa66.statlyapp.mapper.EntityMapper;
+import com.laa66.statlyapp.util.CoordinateEncryptor;
+import com.laa66.statlyapp.util.EntityMapper;
+import com.laa66.statlyapp.model.mapbox.Coordinates;
 import com.laa66.statlyapp.repository.UserRepository;
 import com.laa66.statlyapp.service.SocialService;
 import com.laa66.statlyapp.service.StatsService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.util.Pair;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -96,12 +99,13 @@ public class SocialServiceImpl implements SocialService {
     }
 
     @Override
-    public void saveUserLocation(long userId, Double longitude, Double latitude) {
+    public void saveUserLocation(long userId, Coordinates coordinates) {
+        Pair<String, String> encryptedCoordinates = CoordinateEncryptor.encrypt(coordinates);
         userRepository.save(userRepository.findById(userId)
                 .map(user -> {
                     user.getUserInfo()
-                            .setLongitude(longitude)
-                            .setLatitude(latitude);
+                            .setLongitude(encryptedCoordinates.getFirst())
+                            .setLatitude(encryptedCoordinates.getSecond());
                     return user;
                 }).orElseThrow(USER_NOT_FOUND_EXCEPTION_SUPPLIER));
     }

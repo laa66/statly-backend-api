@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS user_info (
     fb VARCHAR(100),
     ig VARCHAR(100),
     twitter VARCHAR(100),
-    longitude DOUBLE,
-    latitude DOUBLE,
+    longitude VARCHAR(100),
+    latitude VARCHAR(100),
     PRIMARY KEY (id)
 );
 
@@ -88,3 +88,5 @@ ON SCHEDULE EVERY 1 DAY
 STARTS (TIMESTAMP(CURRENT_DATE))
 DO
 UPDATE user_stats SET battle_count = 0;
+
+INSERT INTO beta_users (id, full_name, email, date, active) VALUES (1, 'Maxime Schulz', 'max.sclz94@gmail.com', now(), true);

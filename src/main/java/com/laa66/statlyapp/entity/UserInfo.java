@@ -20,7 +20,7 @@ public class UserInfo {
     private String ig;
     private String fb;
     private String twitter;
-    private Double longitude;
-    private Double latitude;
+    private String longitude;
+    private String latitude;
 
 }
